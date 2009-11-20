@@ -1,0 +1,46 @@
+
+# The names of the C and Fortran compilers
+CC=gcc
+#F77=g95 
+F77=g95 -ftrace=full
+
+# If you need to link to dynamic libraries installed in non-standard
+# locations and are using the GNU linker, you may want to add
+# '-Wl,--rpath,/path/to/dynamic/library' to the 'LINKER' variable
+# below. Alternatively, you could edit the 'LD_LIBARY_PATH'
+# environement variable or use the 'ldconfig' program.
+LINKER=${F77}
+
+# Compiler flags
+C_FLAGS=-g -O2
+F77_FLAGS= -g  #-malign-double # gfortran
+#F77_FLAGS= -g -freal-loops -fbounds-check -ftrace=full # g95
+F77_FLAGS= -O3 -freal-loops
+#-g -O2 
+#-fpe3
+
+# GetDP subdirectories and libraries
+COUPL_DIRS=Main sous_prog quad whittaker airy
+# airy
+#COUPL_LIBS=-Llib -lfrtbegin -lMain_bis -lsous_prog -lwhittaker -lairy -lquadpack # g77
+COUPL_LIBS=-Llib -lgfortranbegin -lMain_bis -lsous_prog -lwhittaker -lairy -lquadpack # gfortran
+COUPL_LIBS=-Llib  -lMain_bis -lsous_prog -lwhittaker -lairy -lquadpack # g95
+
+
+
+# How you create a static library on this machine
+AR=/usr/bin/ar ruvs
+RANLIB=ranlib
+
+# The extension to use for executables...
+EXEEXT=.exe
+
+# Installation directories
+prefix=/usr/local
+exec_prefix=${prefix}
+bindir=${exec_prefix}/bin
+datadir=${prefix}/share
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+mandir=${prefix}/man
+infodir=${prefix}/info
