@@ -1,4 +1,4 @@
-function aloha_plot_fftSpectrum(f,z,E)
+function varargout = aloha_plot_fftSpectrum(f,z,E)
 % plot the FFT-made power spectrum of a field E
 % 
 % INPUT
@@ -8,6 +8,8 @@ function aloha_plot_fftSpectrum(f,z,E)
 %  
 %  OUPUT
 %   none
+%   or
+%   [n_z, Ez_spectral]
 %   
 % AUTHOR: J.Hillairet / V.Fuch
 % LAST UPDATE:
@@ -32,8 +34,13 @@ n_parallel = lambda*K./(abs(max(z)-min(z)));
 
 
 h=aloha_plot_figure(figure);
-plot(n_parallel, abs(Efft).^2./max(abs(Efft).^2));
-xlabel('n_{//}');
-ylabel('|FFT[E]|^2');
-set(gca, 'XLim', [-20, 20]);
-grid on;
+    plot(n_parallel, abs(Efft).^2./max(abs(Efft).^2));
+    xlabel('n_{//}');
+    ylabel('|FFT[E]|^2');
+    set(gca, 'XLim', [-20, 20]);
+    grid on;
+
+if (nargout == 2)
+    varargout{1} = n_parallel;
+    varargout{2} = Efft;
+end
