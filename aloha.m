@@ -245,11 +245,13 @@ bool_display_directivity = true;
 %       D = (1/P)*int{+1,+inf}(dP/nz^2);
 definition_directivite = 1;
 
-% TODO : champ electrique dans l'embouchure de l'antenne 
+% (Parallel) Electric field in the mouth of the antenna
+% champ electrique dans l'embouchure de l'antenne 
 bool_compute_total_field = true;
 bool_display_total_field = true;
 
-% TODO : champ dans le plasma 
+% (Parallel) Electric field in some mm into the plasma
+% [Plane-Wave propagation]
 bool_compute_plasma_field = true;
 bool_display_plasma_field = true;
 
