@@ -134,7 +134,9 @@ for idx_sc = 1:length(scenarios)
     
     % sauvegarde resultats dans le scenario
     scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe); 
-    
+    % save some constants into the scenario (for check purpose essentially)
+    scenario.results = aloha_setfield(scenario.results, k0);
+
     % show execution time
     disp(aloha_message(['Execution time : ', num2str(toc), ' s']));
 
