@@ -1,10 +1,14 @@
-function varargout = aloha_plot_fftSpectrum(f,z,E)
+function varargout = aloha_plot_fftSpectrum(varargin)
 % plot the FFT-made power spectrum of a field E
 % 
 % INPUT
 %  f : frequency [Hz]
 %  z : E field abscisse (1xN)
 %  E : E field (1xN)
+%  
+%  Or
+%  
+%  scenario : ALOHA scenario file
 %  
 %  OUPUT
 %   none
@@ -15,6 +19,19 @@ function varargout = aloha_plot_fftSpectrum(f,z,E)
 % LAST UPDATE:
 %  - 04/2009 : creation
  
+if nargin == 3
+    f = varargin{1};
+    z = varargin{2};
+    E = varargin{3};
+elseif nargin == 1 % only a scenario
+    sc= varargin{1};
+    f = sc.antenna.freq;
+    z = sc.results.abs_z;
+    E = sc.results.Efield;
+else
+    error('bad number of input arguments ! See help.');
+end
+
 
 % load usefull physical constants
 aloha_constants;
