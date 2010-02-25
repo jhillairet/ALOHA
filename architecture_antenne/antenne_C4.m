@@ -111,6 +111,8 @@ else
 	% nom_fichiers = ['S_C4_24h';'S_C4_23h';'S_C4_22h';'S_C4_21h';'S_C4_14h';'S_C4_13h';'S_C4_12h';'S_C4_11h'];
 end
 
+phase_rallonge = zeros(8,1);
+
 % parametres 1D
 
 T_grill = 2;                % periodicite du grill / diminue les tps de calcul
