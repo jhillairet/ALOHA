@@ -22,7 +22,7 @@ function aloha_plot_directivity(scenario)
     aloha_scenario_loadIntoWorkspace
 
 
-    if ~exist('directivite_tab')
+    if ~exist('directivite_cumulee')
         error(aloha_message('La directivite n''a pas ete calculee !'));
     end
 
@@ -46,11 +46,11 @@ function aloha_plot_directivity(scenario)
 
         h=aloha_plot_figure(figure, '-= ALOHA : directivity =-');  
   
-        plot(dnz:dnz:max(-nz_min,nz_max), directivite_tab)
+        plot(nz, directivite_cumulee)
         xlabel('indice n_z');
         ylabel('directivite normalisee');
 
         title( {letitre1;letitre2;letitre3} );  %title('directivite de l''antenne')
-        text( dnz , max(directivite_tab)*.95 , strcat('Nmh(TE) = ',num2str(Nmh)) );
-        text( dnz , max(directivite_tab)*.78 , strcat('Nme(TM) = ',num2str(Nme)) );
+        text( dnz , max(directivite_cumulee)*.95 , strcat('Nmh(TE) = ',num2str(Nmh)) );
+        text( dnz , max(directivite_cumulee)*.78 , strcat('Nme(TM) = ',num2str(Nme)) );
 
