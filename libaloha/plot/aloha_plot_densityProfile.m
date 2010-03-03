@@ -1,9 +1,9 @@
-function h=aloha_plot_densityProfile(varargin)
+function h=aloha_plot_densityProfile(scenario)
 %  Plot the density profile modelled in front of the antenna
 %  in function of the normalized radial position
 % 
 %  INPUT ARGUMENTS :
-%   
+%   - scenario
 %  
 %  OUPUT: 
 %   - h : figure handler
@@ -19,20 +19,26 @@ function h=aloha_plot_densityProfile(varargin)
     % large radius of the Tokamak
     R = 3;
 
+    
+
+    % retrieve scenario plasma configuration
+    ne0      = aloha_scenario_get(scenario,'ne0');
+    lambda_n = aloha_scenario_get(scenario, 'lambda_n');
+    d_couche = aloha_scenario_get(scenario, 'd_couche');
+    d_vide   = aloha_scenario_get(scenario, 'd_vide');
+
     % generate the profile line
-    switch(nargin)
-        case 2 % ne0, lambda_n0
-            ne0 = varargin{1};
-            lambda_n0 = varargin{2};
+    switch(aloha_scenario_get(scenario, 'version'))
+        case 3 % ne0, lambda_n0
+            ne0 = aloha_scenario_get()
+            lambda_n0 = lambda_n(1);
 
             X = [X_PLASMA, X_ANTENNA];
             Y = [ne0*(1+abs(X(end)-X(1))/lambda_n0), ne0];
 
-        case 4 % ne0, lambda_n0, d_couche, lambda_n1
-            ne0 = varargin{1};
-            lambda_n0 = varargin{2};
-            d_couche = varargin{3};
-            lambda_n1 = varargin{4};
+        case 6 % ne0, lambda_n0, d_couche, lambda_n1
+            lambda_n0 = lambda_n(1);
+            lambda_n1 = lambda_n(2);
 
             X = [X_PLASMA, X_ANTENNA-d_couche, X_ANTENNA];
             Y = [ne0*(1+d_couche/lambda_n0) * (1+abs(X_PLASMA-(X_ANTENNA-d_couche))/lambda_n1), ...

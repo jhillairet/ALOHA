@@ -8,11 +8,11 @@ function sc = aloha_ondemand_scenario(pulsenb, t_start, t_end, varargin)
 %   - t_start : start time (s)
 %   - t_end : end time (s)
 %   
-%  Other optinnal input arguments :
+%  IMPORTANT : Other optionnal input arguments :
 %  
 %   - [optionnal] ne : edge electron density [m^-3]
 %   - [optionnal] lambda : electron edge scrape-off length (lambda = ne/grad_ne) [m]
-%   - [optionnal] TSport 'Q6A' or 'Q6B'
+%   - [optionnal] TSport : Tore-Supra port 'Q6A' or 'Q6B'
 % 
 % OUTPUT
 %  ALOHA scenario (without results)

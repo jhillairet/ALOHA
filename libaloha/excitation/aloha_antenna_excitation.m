@@ -122,7 +122,7 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
     % incident doit se faire au niveau des fenetres. La phase en bout etant calculee grace
     % aux dephasages des rallonges et a la modelisation HFSS de C2
     % 
-    % Lecture des phases incidentes (entr� du module):
+    % Lecture des phases incidentes (entr??? du module):
     disp(aloha_message('Lecture des mesures de phases a l''entree des fenetres [gphic2]'));
     [phase_inc_mes,tps]=tsbase(choc,'gphic1');
  
@@ -134,7 +134,7 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
     phase_inc_mes=phase_inc_mes(tps_pos,:);
     % Lecture des puissances reflechies :
     [p_refl_mes,tps]=tsbase(choc,'gcrefc1');
-    % Lecture des phases reflechies (entr� du module):
+    % Lecture des phases reflechies (entr??? du module):
     [phase_refl_mes,tps]=tsbase(choc,'gphrc1');
     tps=tps(:,1);  
     tps_pos=find(tps>0);
@@ -173,36 +173,53 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
 
 function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
     % Lecture des puissances incidentes :
+    disp(aloha_message('[ALOHA] (INFO) : read measured power'));
     [p_inc_mes,tps]=tsbase(choc,'gpinjc2');
-    % Lecture des phases incidentes (entr� du module):
-    disp(aloha_message('[ALOHA] (INFO) : lecture des mesures de phases a l''entree des fenetres [gphic2]'));
-    [phase_inc_mes,tps]=tsbase(choc,'gphbc2');  % modif du 'gphic2' <-> 'gphbc2' le 15/05/2007
-    tps=tps(:,1);   % pour garder un seul vecteur pour le temps
+
+    % Lecture des phases incidentes (entree du module):
+    disp(aloha_message('[ALOHA] (INFO) : read measured phase'));
+    % 'gphic2' : phase before the antenna
+    % 'gphbc2' : phase calulated at the mouth of the antenna
+    [phase_inc_mes,tps]=tsbase(choc,'gphic2');  
+
+    % keep only one and positive time vector
+    tps=tps(:,1);
     tps_pos=find(tps>0);
+
+    % keep measured data for positive time
     p_inc_mes=p_inc_mes(tps_pos,:);
     phase_inc_mes=phase_inc_mes(tps_pos,:);
-    % Lecture des puissances reflechies :
+
+    % read measured reflected power
     [p_refl_mes,tps]=tsbase(choc,'gcrefc2');
-    % Lecture des phases reflechies (entr� du module):
+    % read measured reflected phase
     [phase_refl_mes,tps]=tsbase(choc,'gphrc2');
+
+    % keep only one and positive time vector
     tps=tps(:,1);  
     tps_pos=find(tps>0);
+    % keep measured data for positive time
     p_refl_mes=p_refl_mes(tps_pos,:);
     phase_refl_mes=phase_refl_mes(tps_pos,:);
-    
-    % calcul des moyennes sur l'intervalle [t1 t2]:
-    
-    p_inc_complex=p_inc_mes.*exp(i*phase_inc_mes*pi./180);
-    p_inc_real=mean(real(p_inc_complex(tps>tps_1&tps<tps_2,:)));
-    p_inc_imag=mean(imag(p_inc_complex(tps>tps_1&tps<tps_2,:)));
-    p_inc_mes=abs(p_inc_real+i*p_inc_imag);
-    phase_inc_mes=angle(p_inc_real+i*p_inc_imag);
-    
-    p_refl_complex=p_refl_mes.*exp(i*phase_refl_mes*pi./180);
-    p_refl_real=mean(real(p_refl_complex(tps>tps_1&tps<tps_2,:)));
-    p_refl_imag=mean(imag(p_refl_complex(tps>tps_1&tps<tps_2,:)));
-    p_refl_mes=abs(p_refl_real+i*p_refl_imag);
-    phase_refl_mes=angle(p_refl_real+i*p_refl_imag);
+
+    % calculate the average of the data between t1 and t2
+    p_inc_mes = mean(p_inc_mes(tps>tps_1&tps<tps_2,:));
+    phase_inc_mes = mean(phase_inc_mes(tps>tps_1&tps<tps_2,:));
+    p_refl_mes= mean(p_refl_mes(tps>tps_1&tps<tps_2,:));
+    phase_refl_mes= mean(phase_refl_mes(tps>tps_1&tps<tps_2,:));
+
+%  % OLD CODE
+%      p_inc_complex=p_inc_mes.*exp(i*phase_inc_mes*pi./180);
+%      p_inc_real=mean(real(p_inc_complex(tps>tps_1&tps<tps_2,:)));
+%      p_inc_imag=mean(imag(p_inc_complex(tps>tps_1&tps<tps_2,:)));
+%      p_inc_mes=abs(p_inc_real+i*p_inc_imag);
+%      phase_inc_mes=angle(p_inc_real+i*p_inc_imag);
+%      
+%      p_refl_complex=p_refl_mes.*exp(i*phase_refl_mes*pi./180);
+%      p_refl_real=mean(real(p_refl_complex(tps>tps_1&tps<tps_2,:)));
+%      p_refl_imag=mean(imag(p_refl_complex(tps>tps_1&tps<tps_2,:)));
+%      p_refl_mes=abs(p_refl_real+i*p_refl_imag);
+%      phase_refl_mes=angle(p_refl_real+i*p_refl_imag);
     
     
     % rangement des klystrons ds le code ALOHA, 
@@ -214,5 +231,9 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
     phase_inc_mes=phase_inc_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
     phase_refl_mes=phase_refl_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
     
+    % coupleur bas
     a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
-    a_phase = phase_inc_mes(1:8)';
+    a_phase = pi/180*phase_inc_mes(1:8)';
+%      % coupleur haut
+%      a_ampl = sqrt(p_inc_mes(9:16)*1e3)';
+%      a_phase = pi/180*phase_inc_mes(9:16)';

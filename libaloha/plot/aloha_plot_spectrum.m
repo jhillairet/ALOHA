@@ -33,12 +33,14 @@ for id_scen=1:length(scenarios) % for many scenarios
         letitre1 = strcat(letitre1,' sans mesure (cas ideal)');
     end
     if aloha_scenario_get(scenario, 'bool_lignes_identiques')
-        letitre2 = ['ne0 = ',num2str(ne0(1),'%1.2e'),', d\_couche = ',num2str(d_couche(1),'%1.2e'),','];
+        letitre2 = ['n_{e0} = ',num2str(ne0(1),'%1.2e'), 'm^{-3}, ', ...
+                    '\lambda_n = ', num2str(lambda_n(1),'%1.2e'), 'm '];
         switch aloha_scenario_get(scenario, 'version')
-            case 1 || 2 || 3
-                letitre3 = ['dne0 = ', num2str(dne0(1),'%1.2e')];
             case 6
-                letitre3 = ['dne0 = ', num2str(dne0(1),'%1.2e'),' et dne1 = ',num2str(dne1(1),'%1.2e') ];
+                letitre2 = [letitre2, ...
+                            ', d_{layer} =', num2str(d_couche(1),'%1.2e'),'m, ', ...
+                            '\lambda_{n1} = ', num2str(lambda_n(2), '%1.2e'), 'm' ];
+                
         end
     else
         letitre2 = strcat('ne0 = [',num2str(ne0(1),'%1.2e'),';',num2str(ne0(2),'%1.2e'),'], d-couche = [',num2str(d_couche(1),'%1.2e'),';',num2str(d_couche(2),'%1.2e'),']');
