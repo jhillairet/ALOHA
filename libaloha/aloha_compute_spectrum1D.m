@@ -72,6 +72,11 @@ eval(architecture);
    X0 = ne0./nc;
    D0 = k0*ne0./dne0;
 
+   % for version == 6 only
+   n1=ne0+dne0*d_couche;
+   X1=n1/nc;
+   D1=k0*n1/dne1;
+
    % calcul la matrice des spectres E et H des modes
 
    modes_E_sp = [];
@@ -83,6 +88,7 @@ eval(architecture);
         progress('init');
      end    
      for ind = 1:nb_g_pol
+    disp(['Ligne pol. ', num2str(ind)]);
 
      neta_0 = ((nzt.*nzt - 1).^(1/3))*((D0(ind)/X0(ind))^(2/3))*(X0(ind) - 1)*exp(-i*pi/3);
      Ys = -((airy(1,neta_0)./airy(0,neta_0))./((nzt.*nzt-1).^(2/3)))*((X0(ind)/D0(ind))^(1/3))*exp(i*pi/6);
@@ -188,10 +194,10 @@ eval(architecture);
      
    end
   
-  
+  size(modes_E_sp)
    E_spc = modes_E_sp.*(poids_E*ones(1,length(nyt)));
    H_spc = modes_H_sp.*(poids_E*ones(1,length(nyt)));
-
+  size(E_spc)
 
 
    % calcul de la densite de puissance
