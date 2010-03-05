@@ -164,35 +164,30 @@ contains
 
 ! ******************************************************
 !  subroutine d'integration de -1000 a 1000
+!  utilisee dans la version == 6
     Subroutine Int01AJF(epsrel,i,j,resultr,resulti,absrm)
 
         Use aloha_config, Only : nlimit, b, z, m, n, max_nz
         Use aloha_function, Only : rf_nz, if_nz 
 
-        Use quadpack, Only : qag
+        Use quadpack, Only : qag, qagi
 
         implicit none
         intrinsic epsilon
 
-!     Common/err/epsabs
-!     Common/integration/max_nz      
-!     Common/dim/b,z
-!     Common/mod/m,n
-!     Common/guid/i,j
+        ! Input
+        Integer, Intent(in) :: i, j
+        Real(kind=wp), Intent(in) :: epsrel 
+        ! Output
+        Real(kind=wp), Intent(out) :: resultr, resulti
+        Real(kind=wp), intent(out) :: absrm
 
-
-        Integer :: LW, LIW, i, j
-        Integer, Dimension(5000) :: IW
-
-        Real(kind=wp), Dimension(20000) :: W
-        Real(kind=wp) :: epsrel
-        Real(kind=wp) :: min_, max_, resultr, resulti
-        Real(kind=wp), Dimension(2) :: absr = 0
-        Real(kind=wp) :: absrm
+        Real(kind=wp) :: min_, max_ 
 
         ! quadpack, qag
+        Real(kind=wp), Dimension(2) :: absr 
         real(kind=wp) :: eps_rel=1.0e-4 
-        real(kind=wp) :: eps_abs=sqrt(epsilon(1.0_wp)) 
+        real(kind=wp) :: eps_abs=1.0e-3!sqrt(epsilon(1.0_wp)) 
         integer, Dimension(2) :: neval, ier
         integer :: key=1  
 
@@ -200,246 +195,253 @@ contains
         resultr = 0.0
         resulti = 0.0
     Else 
-        LW = 20000
-        LIW = LW/4
         min_ = -max_nz
         max_ = max_nz
+        ! INFINITE INTEGRATION
+        call qagi(rf_nz, 0.0_wp, 2, eps_abs, eps_rel, resultr, absr(1), neval(1), ier(1) )
+        call qagi(if_nz, 0.0_wp, 2, eps_abs, eps_rel, resulti, absr(2), neval(2), ier(2) )
+!         ! FINITE INTEGRATION
+!         call qag(rf_nz, min_, max_, eps_abs, eps_rel, key, resultr, absr(1), neval(1), ier(1))
+!         call qag(if_nz, min_, max_, eps_abs, eps_rel, key, resulti, absr(2), neval(2), ier(2))
+        !write (*,*) 'Int01AJF resultr, resulti=', resultr, resulti
+        !write (*,*) 'Int01AJF absr=', absr
+        !write (*,*) 'Int01AJF neval=',neval
+        !write (*,*) 'Int01AJF ier=',ier
 
-        call qag(rf_nz, min_, max_, eps_abs, eps_rel, key, resultr, absr(1), neval(1), ier(1))
-        call qag(if_nz, min_, max_, eps_abs, eps_rel, key, resulti, absr(2), neval(2), ier(2))
+        absrm=minval(absr)
     Endif
     End subroutine Int01AJF
 
-    ! Riemann sum (from the left)
-    ! Simplest approximation of the integral of f(t) for t in [a,b].
-    ! The integration is performed on N points.
-    !
-    ! Input :
-    !  - f : name of the function to perform
-    !  - a : lower integration point
-    !  - b : upper integration point
-    !  - N : number of integration points
-    !
-    ! Output : s
-    !
-    subroutine riemann_sum(func, a, b, N, s)
-        interface
-            function func(x)
-                use aloha_constants, only : wp
-                intrinsic size
-                real(kind=wp), intent(in) :: x(:)
-                real(kind=wp)             :: func(size(x))
-            end function func
-        end interface
-
-        integer, intent(in)         :: N
-        real(kind=wp), intent(in)   :: a, b
-        real(kind=wp), intent(out)  :: s
-
-        integer                     :: i
-        real(kind=wp)               :: delta, x(N)
-
-        delta = (b-a)/N;
-
-        do i=0,N-1
-            x(i) = a + i*delta
-        end do
-
-        s = delta*sum(func(x))
-    end subroutine riemann_sum
-
-    ! polynom interpolation
-    SUBROUTINE polint(xa,ya,n,x,y,dy)
-        integer       :: n
-        real(kind=wp) :: dy,x,y,xa(n),ya(n)
-        !         Largest anticipated value of n.            
-        integer, parameter :: NMAX=10 
-        !         Given arrays xa and ya, each of length n, and given a value x, this routine returns a
-        !         value y, and an error estimate dy. If P(x) is the polynomial of degree N ? 1 such that
-        !         P(xai) = yai, i = 1, . . . , n, then the returned value y = P(x).
-        INTEGER       :: i,m,ns
-        real(kind=wp) :: den,dif,dift,ho,hp,w,c(NMAX),d(NMAX)
-        ns=1
-        dif=abs(x-xa(1))
-        !         Here we find the index ns of the closest table entry,
-        do i=1,n 
-            dift=abs(x-xa(i))
-            if (dift.lt.dif) then
-                ns=i
-                dif=dift
-            endif
-        !         and initialize the tableau of c?s and d?s.
-            c(i)=ya(i) 
-            d(i)=ya(i)
-        enddo
-        !         This is the initial approximation to y.
-        y=ya(ns) 
-        ns=ns-1
-        !         For each column of the tableau,
-        do m=1,n-1 
-        !         we loop over the current c?s and d?s and update them.
-            do i=1,n-m 
-                ho=xa(i)-x
-                hp=xa(i+m)-x
-                w=c(i+1)-d(i)
-                den=ho-hp
-                if(den.eq.0.) write (*,*) 'failure in polint'
-        !         This error can occur only if two input xa?s are (to within roundoff) identical.
-                den=w/den
-        !         Here the c?s and d?s are updated.
-                d(i)=hp*den 
-                c(i)=ho*den
-            enddo
-            if (2*ns.lt.n-m) then 
-            !         After each column in the tableau is completed, we decide
-            !         which correction, ! or d, we want to add to our accumulating
-            !         value of y, i.e., which path to take through
-            !         the tableau?forking up or down. We do this in such a
-            !         way as to take the most ?straight line? route through the
-            !         tableau to its apex, updating ns accordingly to keep track
-            !         of where we are. This route keeps the partial approximations
-            !         centered (insofar as possible) on the target x. T he
-            !         last dy added is thus the error indication.
-                dy=c(ns+1)
-            else
-                dy=d(ns)
-                ns=ns-1
-            endif
-            y=y+dy
-        enddo
-        return
-    end subroutine polint
-
-
-    ! integration par la methode de Romberg        
-    Subroutine qromb(func,a,b,ss)
-        interface
-            function func(x)
-                use aloha_constants, only : wp
-                intrinsic size
-                real(kind=wp), intent(in) :: x(:)
-                real(kind=wp)             :: func(size(x))
-            end function func
-        end interface
-
-        real(kind=wp) :: a,b,ss
-
-        integer      , parameter :: JMAX=20
-        integer      , parameter :: JMAXP=JMAX+1
-        integer      , parameter :: K=5
-        integer      , parameter :: KM=K-1
-        real(kind=wp), parameter :: EPS=1.e-6
-        ! USES polint,trapzd
-        ! Returns as ss the integral of the function fun! from a to b. Integration is performed by
-        ! Romberg's method of order 2K, where, e.g., K=2 is Simpson?s rule.
-        ! Parameters: EPS is the fractional accuracy desired, as determined by the extrapolation
-        ! error estimate; JMAX limits the total number of steps; K is the number of points used in
-        ! the extrapolation.
-        integer       :: j
-        ! These store the successive trapezoidal approximations
-        real(kind=wp) ::  dss,h(JMAXP),s(JMAXP) 
-        ! and their relative stepsizes.
-        h(1)=1. 
-        do j=1,JMAX
-            call trapzd(func,a,b,s(j),j)
-            if (j.ge.K) then
-                call polint(h(j-KM),s(j-KM),K,0.0_wp,ss,dss)
-                if (abs(dss).le.EPS*abs(ss)) return
-            endif
-            s(j+1)=s(j)
-
-        ! This is a key step: The factor is 0.25 even though
-        ! the stepsize is decreased by only 0.5. This makes
-        ! the extrapolation a polynomial in h2 as allowed
-        ! by equation (4.2.1), not just a polynomial in h.
-
-            h(j+1)=0.25*h(j) 
-        enddo
-        !  write (*,*) 'too many steps in qromb'
-    end subroutine qromb
-
-    ! subroutine d'integration classique (trapeze)
-    ! This routine computes the nth stage of refinement of an extended trapezoidal rule. fun is
-    ! input as the name of the function to be integrated between limits a and b, also input. When
-    ! called with n=1, the routine returns as s the crudest estimate of integral from a to 0 of f(x)dx. 
-    ! Subsequent calls with n=2,3,... (in that sequential order) will improve the accuracy of s by adding 2^(n-2)
-    ! additional interior points. s should not be modified between sequential calls
-    Subroutine trapzd(func,a,b,s,n)
-        interface
-            function func(x)
-                use aloha_constants, only : wp
-                intrinsic size
-                real(kind=wp), intent(in) :: x(:)
-                real(kind=wp)             :: func(size(x))
-            end function func
-        end interface
-        
-        integer       :: n
-        real(kind=wp) :: a, b, s(1)
-    !     EXTERNAL func
-    
-        integer       :: it, j
-        real(kind=wp) :: del, som(1), tnm, x
-        
-        if (n == 1) then
-            s=0.5*(b-a)*(func((/a/))+func((/b/)))
-        else
-            it=2**(n-2)
-            tnm=it
-            ! This is the spacing of the points to be added
-            del=(b-a)/tnm 
-            x=a+0.5*del
-            som=0.
-            do j=1,it
-                som=som+func((/x/))
-                x=x+del
-            enddo
-            ! This replaces s by its refined value.
-            s=0.5*(s+(b-a)*som/tnm) 
-        endif
-        return
-    end subroutine trapzd
-
-    ! *********************************************************
-    ! Returns as s the integral of the function fun! from a to b. 
-    !  Integration is performed by the trapezoidal rule.
-    Subroutine qtrap(func,a,b,s)
-        interface
-            function func(x)
-                use aloha_constants, only : wp
-                intrinsic size
-                real(kind=wp), intent(in) :: x(:)
-                real(kind=wp)             :: func(size(x))
-            end function func
-        end interface
-        intrinsic epsilon 
-        ! On utilise un tableau s_tab(1) pour être copatible avec les fonctions
-        ! func qui sont generiques (ie : admette en entree un tableau et non un scalaire)
-        ! [ car en fortran, un scalaire ne correspond pas à un tableau(1) ! ]
-        real(kind=wp) :: a, b, s_tab(1), s
-        ! The parameters EPS can be set to the desired fractional accuracy 
-        ! and JMAX so that 2 to the power JMAX-1 is the maximum allowed number of steps.
-        ! MODIF JH : JMAX=12 au lieu de 20 (pour accelerer les calculs au detriment de la convergence)
-        integer      , parameter :: JMAX=12
-        real(kind=wp), parameter :: EPS=epsilon(8.0)
-    
-        integer       :: j
-        real(kind=wp) :: olds(1)
-        ! Any number that is unlikely to be the average of the function
-        ! at its endpoints will do here.
-        olds=-1.e30 
-        do j=1,JMAX 
-            call trapzd(func,a,b,s_tab,j)
-            ! Avoid spurious early convergence.
-            if (j > 5) then 
-                if (abs(s_tab(1)-olds(1)) < (EPS*abs(olds(1))).or.((s_tab(1) == 0).and.(olds(1) == 0))) return
-            endif
-            olds=s_tab(1)
-        enddo
-        s=s_tab(1)
-        ! pause 'too many steps in qtrap'
-        ! write (*,*) '[S_grill_version6] (WARNING) : too many steps in qtrap'
-    end subroutine qtrap
+!     ! Riemann sum (from the left)
+!     ! Simplest approximation of the integral of f(t) for t in [a,b].
+!     ! The integration is performed on N points.
+!     !
+!     ! Input :
+!     !  - f : name of the function to perform
+!     !  - a : lower integration point
+!     !  - b : upper integration point
+!     !  - N : number of integration points
+!     !
+!     ! Output : s
+!     !
+!     subroutine riemann_sum(func, a, b, N, s)
+!         interface
+!             function func(x)
+!                 use aloha_constants, only : wp
+!                 intrinsic size
+!                 real(kind=wp), intent(in) :: x(:)
+!                 real(kind=wp)             :: func(size(x))
+!             end function func
+!         end interface
+! 
+!         integer, intent(in)         :: N
+!         real(kind=wp), intent(in)   :: a, b
+!         real(kind=wp), intent(out)  :: s
+! 
+!         integer                     :: i
+!         real(kind=wp)               :: delta, x(N)
+! 
+!         delta = (b-a)/N;
+! 
+!         do i=0,N-1
+!             x(i) = a + i*delta
+!         end do
+! 
+!         s = delta*sum(func(x))
+!     end subroutine riemann_sum
+! 
+!     ! polynom interpolation
+!     SUBROUTINE polint(xa,ya,n,x,y,dy)
+!         integer       :: n
+!         real(kind=wp) :: dy,x,y,xa(n),ya(n)
+!         !         Largest anticipated value of n.            
+!         integer, parameter :: NMAX=10 
+!         !         Given arrays xa and ya, each of length n, and given a value x, this routine returns a
+!         !         value y, and an error estimate dy. If P(x) is the polynomial of degree N ? 1 such that
+!         !         P(xai) = yai, i = 1, . . . , n, then the returned value y = P(x).
+!         INTEGER       :: i,m,ns
+!         real(kind=wp) :: den,dif,dift,ho,hp,w,c(NMAX),d(NMAX)
+!         ns=1
+!         dif=abs(x-xa(1))
+!         !         Here we find the index ns of the closest table entry,
+!         do i=1,n 
+!             dift=abs(x-xa(i))
+!             if (dift.lt.dif) then
+!                 ns=i
+!                 dif=dift
+!             endif
+!         !         and initialize the tableau of c?s and d?s.
+!             c(i)=ya(i) 
+!             d(i)=ya(i)
+!         enddo
+!         !         This is the initial approximation to y.
+!         y=ya(ns) 
+!         ns=ns-1
+!         !         For each column of the tableau,
+!         do m=1,n-1 
+!         !         we loop over the current c?s and d?s and update them.
+!             do i=1,n-m 
+!                 ho=xa(i)-x
+!                 hp=xa(i+m)-x
+!                 w=c(i+1)-d(i)
+!                 den=ho-hp
+!                 if(den.eq.0.) write (*,*) 'failure in polint'
+!         !         This error can occur only if two input xa?s are (to within roundoff) identical.
+!                 den=w/den
+!         !         Here the c?s and d?s are updated.
+!                 d(i)=hp*den 
+!                 c(i)=ho*den
+!             enddo
+!             if (2*ns.lt.n-m) then 
+!             !         After each column in the tableau is completed, we decide
+!             !         which correction, ! or d, we want to add to our accumulating
+!             !         value of y, i.e., which path to take through
+!             !         the tableau?forking up or down. We do this in such a
+!             !         way as to take the most ?straight line? route through the
+!             !         tableau to its apex, updating ns accordingly to keep track
+!             !         of where we are. This route keeps the partial approximations
+!             !         centered (insofar as possible) on the target x. T he
+!             !         last dy added is thus the error indication.
+!                 dy=c(ns+1)
+!             else
+!                 dy=d(ns)
+!                 ns=ns-1
+!             endif
+!             y=y+dy
+!         enddo
+!         return
+!     end subroutine polint
+! 
+! 
+!     ! integration par la methode de Romberg        
+!     Subroutine qromb(func,a,b,ss)
+!         interface
+!             function func(x)
+!                 use aloha_constants, only : wp
+!                 intrinsic size
+!                 real(kind=wp), intent(in) :: x(:)
+!                 real(kind=wp)             :: func(size(x))
+!             end function func
+!         end interface
+! 
+!         real(kind=wp) :: a,b,ss
+! 
+!         integer      , parameter :: JMAX=20
+!         integer      , parameter :: JMAXP=JMAX+1
+!         integer      , parameter :: K=5
+!         integer      , parameter :: KM=K-1
+!         real(kind=wp), parameter :: EPS=1.e-6
+!         ! USES polint,trapzd
+!         ! Returns as ss the integral of the function fun! from a to b. Integration is performed by
+!         ! Romberg's method of order 2K, where, e.g., K=2 is Simpson?s rule.
+!         ! Parameters: EPS is the fractional accuracy desired, as determined by the extrapolation
+!         ! error estimate; JMAX limits the total number of steps; K is the number of points used in
+!         ! the extrapolation.
+!         integer       :: j
+!         ! These store the successive trapezoidal approximations
+!         real(kind=wp) ::  dss,h(JMAXP),s(JMAXP) 
+!         ! and their relative stepsizes.
+!         h(1)=1. 
+!         do j=1,JMAX
+!             call trapzd(func,a,b,s(j),j)
+!             if (j.ge.K) then
+!                 call polint(h(j-KM),s(j-KM),K,0.0_wp,ss,dss)
+!                 if (abs(dss).le.EPS*abs(ss)) return
+!             endif
+!             s(j+1)=s(j)
+! 
+!         ! This is a key step: The factor is 0.25 even though
+!         ! the stepsize is decreased by only 0.5. This makes
+!         ! the extrapolation a polynomial in h2 as allowed
+!         ! by equation (4.2.1), not just a polynomial in h.
+! 
+!             h(j+1)=0.25*h(j) 
+!         enddo
+!         !  write (*,*) 'too many steps in qromb'
+!     end subroutine qromb
+! 
+!     ! subroutine d'integration classique (trapeze)
+!     ! This routine computes the nth stage of refinement of an extended trapezoidal rule. fun is
+!     ! input as the name of the function to be integrated between limits a and b, also input. When
+!     ! called with n=1, the routine returns as s the crudest estimate of integral from a to 0 of f(x)dx. 
+!     ! Subsequent calls with n=2,3,... (in that sequential order) will improve the accuracy of s by adding 2^(n-2)
+!     ! additional interior points. s should not be modified between sequential calls
+!     Subroutine trapzd(func,a,b,s,n)
+!         interface
+!             function func(x)
+!                 use aloha_constants, only : wp
+!                 intrinsic size
+!                 real(kind=wp), intent(in) :: x(:)
+!                 real(kind=wp)             :: func(size(x))
+!             end function func
+!         end interface
+!         
+!         integer       :: n
+!         real(kind=wp) :: a, b, s(1)
+!     !     EXTERNAL func
+!     
+!         integer       :: it, j
+!         real(kind=wp) :: del, som(1), tnm, x
+!         
+!         if (n == 1) then
+!             s=0.5*(b-a)*(func((/a/))+func((/b/)))
+!         else
+!             it=2**(n-2)
+!             tnm=it
+!             ! This is the spacing of the points to be added
+!             del=(b-a)/tnm 
+!             x=a+0.5*del
+!             som=0.
+!             do j=1,it
+!                 som=som+func((/x/))
+!                 x=x+del
+!             enddo
+!             ! This replaces s by its refined value.
+!             s=0.5*(s+(b-a)*som/tnm) 
+!         endif
+!         return
+!     end subroutine trapzd
+! 
+!     ! *********************************************************
+!     ! Returns as s the integral of the function fun! from a to b. 
+!     !  Integration is performed by the trapezoidal rule.
+!     Subroutine qtrap(func,a,b,s)
+!         interface
+!             function func(x)
+!                 use aloha_constants, only : wp
+!                 intrinsic size
+!                 real(kind=wp), intent(in) :: x(:)
+!                 real(kind=wp)             :: func(size(x))
+!             end function func
+!         end interface
+!         intrinsic epsilon 
+!         ! On utilise un tableau s_tab(1) pour être copatible avec les fonctions
+!         ! func qui sont generiques (ie : admette en entree un tableau et non un scalaire)
+!         ! [ car en fortran, un scalaire ne correspond pas à un tableau(1) ! ]
+!         real(kind=wp) :: a, b, s_tab(1), s
+!         ! The parameters EPS can be set to the desired fractional accuracy 
+!         ! and JMAX so that 2 to the power JMAX-1 is the maximum allowed number of steps.
+!         ! MODIF JH : JMAX=12 au lieu de 20 (pour accelerer les calculs au detriment de la convergence)
+!         integer      , parameter :: JMAX=12
+!         real(kind=wp), parameter :: EPS=epsilon(8.0)
+!     
+!         integer       :: j
+!         real(kind=wp) :: olds(1)
+!         ! Any number that is unlikely to be the average of the function
+!         ! at its endpoints will do here.
+!         olds=-1.e30 
+!         do j=1,JMAX 
+!             call trapzd(func,a,b,s_tab,j)
+!             ! Avoid spurious early convergence.
+!             if (j > 5) then 
+!                 if (abs(s_tab(1)-olds(1)) < (EPS*abs(olds(1))).or.((s_tab(1) == 0).and.(olds(1) == 0))) return
+!             endif
+!             olds=s_tab(1)
+!         enddo
+!         s=s_tab(1)
+!         ! pause 'too many steps in qtrap'
+!         ! write (*,*) '[S_grill_version6] (WARNING) : too many steps in qtrap'
+!     end subroutine qtrap
 
 
 end module aloha_integration
