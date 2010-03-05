@@ -758,11 +758,8 @@ CONTAINS
         Real(kind=wp), intent(in) :: nz(:)
         Real(kind=wp)             :: rf_nz(size(nz))
 
-!         If (nz == 0) Then
-!             rf_nz = (0.,0.)
-!         Else  
-            rf_nz = real(f_nz(nz))
-!         Endif
+        rf_nz = real(f_nz(nz))
+
       End function rf_nz
 
       ! 
@@ -774,12 +771,9 @@ CONTAINS
         implicit none
         Real(kind=wp), intent(in) :: nz(:)
         Real(kind=wp)             :: if_nz(size(nz))
-! 
-!         If (nz == 0) Then
-!             if_nz = (0.,0.)
-!         Else  
-            if_nz = aimag(f_nz(nz))
-!         Endif
+
+        if_nz = aimag(f_nz(nz))
+
       End function if_nz
 
 END MODULE aloha_function
