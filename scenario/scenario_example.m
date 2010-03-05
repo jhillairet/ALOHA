@@ -332,9 +332,9 @@ end
 % aloha 2D may crash (seg fault). If it occurs, 
 % increase the dnz or dny values or decrease nz_min/max, ny_min/max ! 
 % TODO : aloha 2D spectrum/nz,ny memory bug
-options.nz_min = -15;   % depart en nz 
-options.nz_max = 15;        % arrivee en nz
-options.dnz = 0.005;     % pas en nz
+options.nz_min = -10;   % depart en nz 
+options.nz_max = 10;        % arrivee en nz
+options.dnz = 0.01;     % pas en nz
 
 options.ny_min = -2;    % depart en ny 
 options.ny_max = 2;     % arrivee en ny
