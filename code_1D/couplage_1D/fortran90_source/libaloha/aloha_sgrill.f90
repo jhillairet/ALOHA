@@ -77,7 +77,9 @@ contains
     Complex(kind=wp) :: Idg((Nme+Nmh)*Pg,(Nme+Nmh)*Pg), IdgpH((Nme+Nmh)*Pg,(Nme+Nmh)*Pg)
     Complex(kind=wp) :: IdgpHI((Nme+Nmh)*Pg,(Nme+Nmh)*Pg), IdgmH((Nme+Nmh)*Pg,(Nme+Nmh)*Pg)
 
-
+    ! initialisation des variables
+    Spr = 0.0
+    RZhegpr = 0.0
 
     write(*,*) 'Verification parametres en entree de SMgrill :'
     write(*,*) 'intg=', intg
@@ -692,15 +694,15 @@ contains
                                 Call Int01AJF(epsrel,i,j,resultrhh,resultihh,absrm)
                             endif
                         endif
-!                         write(*,*) 'resultrhh=',resultrhh,' resultihh=',resultihh
-!                         write(*,*) 'E-E :', resultrhh, resultihh
+
+                        write(*,*) 'E-E :', resultrhh, resultihh
                         Y(k,l+(Nmh+Nme)*(i-1))=Ej*Ei*cofm*cte*(resultrhh+(0.,1.)*resultihh)
                         absrr(ct)=absrm
                         ct=ct+1
                     end do
                 end do
 
-!                 write(*,*) 'premier quadrant: sum(Y)=', sum(Y)
+                write(*,*) 'premier quadrant: sum(Y)=', sum(Y)
 
                 Do k=1,Nmh
                     Do l=1,Nme
@@ -723,14 +725,15 @@ contains
                                 Call Int01AJF(epsrel,i,j,resultrhe,resultihe,absrm)
                             endif
                         endif
-!                         write(*,*) 'E-M :', resultrhe, resultihe
+                        write(*,*) 'E-M :', resultrhe, resultihe
+                        write(*,*) Ej, Di, cofm, cte
                         
                         Y(k,l+Nmh+(Nmh+Nme)*(i-1))=Ej*Di*cofm*cte*(resultrhe+(0.,1.)*resultihe)
                             absrr(ct)=absrm
                             ct=ct+1
                     end do
                 end do
-
+                write(*,*) 'deuxieme quadrant : sum(Y)=',sum(Y)
                 Do l=1,Nme
                     Do k=1,Nmh
                         Call CM(j,a,b,mej(1,l),mej(2,l),Dj,sgp)
@@ -752,13 +755,13 @@ contains
                                 Call Int01AJF(epsrel,i,j,resultreh,resultieh,absrm)
                             endif
                         endif
-!                         write(*,*) 'M-E :', resultreh, resultieh
+                        write(*,*) 'M-E :', resultreh, resultieh
                         Y(Nmh+l,k+(Nmh+Nme)*(i-1))=Dj*Ei*cofm*cte*(resultreh+(0.,1.)*resultieh)
                         absrr(ct)=absrm
                         ct=ct+1
                     end do
                 end do
-
+                write(*,*) 'troisieme quadrant : sum(Y)=',sum(Y)
                 Do l=1,Nme
                     Do k=1,Nme
                         Call CM(j,a,b,mej(1,l),mej(2,l),Dj,sgp)
@@ -780,7 +783,7 @@ contains
                                 Call Int01AJF(epsrel,i,j,resultree,resultiee,absrm)
                             endif
                         endif
-!                         write(*,*) 'M-M :', resultree, resultiee
+                        write(*,*) 'M-M :', resultree, resultiee
                         Y(Nmh+l,k+Nmh+(Nmh+Nme)*(i-1))=Dj*Di*cofm*cte*(resultree+(0.,1.)*resultiee)
                         
                         absrr(ct)=absrm
@@ -794,7 +797,7 @@ contains
 
         !  DEBUG      
         !if (p<=T_grill) then
-        write(*,*) 'DEBUG : sum(Y)=',sum(Y)
+        write(*,*) 'DEBUG : final sum(Y)=',sum(Y)
         !endif
     End subroutine CalcouPgi
 
