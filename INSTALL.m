@@ -1,15 +1,20 @@
 %  INSTALLATION :
 %  
-%  A priori, le code doit pouvoir tourner apres checkout.
-%  
-%  Au prealable, le repertoire contenant les librairies
-%  d'ALOHA doit etre charge dans le PATH matlab. Pour cela, 
-%  on doit effectuer dans matlab : 
-%  
+%  Normally, the code should be able to run after the SVN checkout. 
+%  Since the fortran code part used by matlab depends of the
+%  computer architecture, some all-ready made
+%  binaries exist for i686 32 and 64 bits (Linux). 
+%  It is however possible that you need to compile the code on your
+%  platform.
+% 
+%  Before using ALOHA, the directory which contain all the librairies
+%  needed by the code has to be included into the Matlab PATH. In order 
+%  to do so, one must type into matlab prompt the following command :
+%    
 %  addpath(genpath([chemin_absolu_du_code_ALOHA_V2/libaloha'])); 
 %  
-%  Cette commande peut etre rajoutee dans le fichier startup.m de 
-%  matlab pour effectuer cette operation a chaque demarrage de matlab
+%  This command can be added to the matlab file startup.m
+%  in order to automatically run this command at the matlab startup.
 %  (cf help matlab)
 disp('You must add the "libaloha" directory to the MATLAB PATH');
 disp('In order to do so, please change directory (cd) to the aloha root directory, ');

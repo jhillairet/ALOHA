@@ -1,5 +1,9 @@
 %  ALOHA (MAJORS) CHANGE-LOG
 %  
+%  05/2010 : the code repository has been moved from CVS to the partenaires zone SVN server.
+%           Many little changes have made since last year : mostly improvement of usability or
+%           performance improvements (especially for the 2 gradients version). 
+%  
 %  05/2009 : The C3 Antenna description has been modified in order to take into account its real
 %  shape. In particular, the septum width for passive waveguide (between modules) is different than
 %  the septum width between all other waveguide.
