@@ -102,7 +102,8 @@ contains
             resulti0112=(0.,0.)
             absr(1:4)=0.
 
-                ! Integration quadpack
+            ! Integration quadpack
+            ! FINITE INTEGRATION
             call qag(rf0131, d, f, eps_abs, eps_rel, key, resultr0131, absr(5), neval(5), ier(5))
             call qag(if0131, d, f, eps_abs, eps_rel, key, resulti0131, absr(6), neval(6), ier(6))
             call qag(rf0132, d, f, eps_abs, eps_rel, key, resultr0132, absr(7), neval(7), ier(7))
@@ -163,7 +164,7 @@ contains
 
 
 ! ******************************************************
-!  subroutine d'integration de -1000 a 1000
+!  subroutine d'integration 
 !  utilisee dans la version == 6
     Subroutine Int01AJF(epsrel,i,j,resultr,resulti,absrm)
 
