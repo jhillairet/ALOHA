@@ -18,9 +18,8 @@ addpath(genpath([ALOHA_ROOT, '/S_HFSS']));
 
 % TODO : Determine la constant ALOHA_PATH qui contient le chemin absolu vers le dossier racine d'ALOHA
 
-%  charge les constantes usuelles
-disp(aloha_message('Defition des constantes physiques usuelles.'))
+%  load physical constants and version
 aloha_constants;
+disp(aloha_message('Load usual physical constants.'))
 
-
-disp(aloha_message(' --------- debut du calcul.---------'));
+disp(aloha_message(' --------- computation start ---------'));

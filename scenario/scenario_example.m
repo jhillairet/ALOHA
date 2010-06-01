@@ -41,7 +41,7 @@ options.comment = [''];
 %  Ces valeurs correspondent aux noms des fichiers disponibles dans
 %  le dossier 'achitecture_antenne'.
 % 
-antenna.architecture = 'antenne_C2';      
+antenna.architecture = 'antenne_C4';      
 
 %% #####################
 % Antenna excitation
@@ -56,7 +56,7 @@ antenna.freq = 3.7e9;
 % - true : on dispose de mesures reelles 
 % - false : on utilise les valeurs predefinies (dans aloha_antenna_excitation)
 % 
-options.bool_mesure = false;    
+options.bool_mesure = true;    
 
 % Use a predefenite excitation (true) 
 % or a user excitation (false) [only if bool_mesure = false]
@@ -77,19 +77,19 @@ antenna.a_phase = [];
 % Which Tore Supra port should we use for feeding antenna input ?
 % 
 % 'Q6A' [C2 before 2009, C3 after] ou 'Q6B' [C3 before 2009, C4 after]
-options.TSport = 'Q6A';   
+options.TSport = 'Q6B';   
 
 % [bool_mesure=true only]
 % numero du choc Tore Supra 
 % Tore Supra pulse number
-options.choc = 39286; 
+options.choc = 45155; 
 
 % [bool_mesure=true only]
 % Temps debut et fin de lecture [s]. 
 % Les valeurs mesurees sont moyennees entre ces deux valeurs.
 % Start and stop times for averaging experimental data [s]
-options.tps_1 = 4; % s
-options.tps_2 = 7; % s
+options.tps_1 = 7; % s
+options.tps_2 = 8; % s
 
 
 
@@ -148,7 +148,7 @@ options.bool_lignes_identiques = true;
 % Densite electronique minimale devant l'antenne (x=0). [m^-3] 
 % Rappels : 
 %  - densite de coupure 3.7GHz sur TS : 1.71e17 m^-3
-plasma.ne0 = 5e17;        
+plasma.ne0 = 1.1e17;        
 
 %% #####################
 % longueur de decroissance a l'embouchure de l'antenne

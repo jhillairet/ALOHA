@@ -83,8 +83,7 @@ if (nargin == 1)
             a_phase = zeros(4,1);
             
         otherwise
-          disp(architecture);
-          error('[ALOHA] (ERREUR): quelle architecture antenne ?')     
+          error(aloha_message(['Antenna architecture unknow ! : ', architecture]));
     end
 
 % 
@@ -115,6 +114,7 @@ end
 
 function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
     % Lecture des puissances incidentes :
+    disp(aloha_message('Reading power measurements on Q6A [gpinjc1]'));
     [p_inc_mes,tps]=tsbase(choc,'gpinjc1');
     % MODIF 12/11/2008 JH
     % Le dephasage du aux rallonges (entre fenetres et jonction hybride) a ete
@@ -123,7 +123,7 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
     % aux dephasages des rallonges et a la modelisation HFSS de C2
     % 
     % Lecture des phases incidentes (entr??? du module):
-    disp(aloha_message('Lecture des mesures de phases a l''entree des fenetres [gphic2]'));
+    disp(aloha_message('Reading phase measurements on Q6A (before RF windows) [gphic1]'));
     [phase_inc_mes,tps]=tsbase(choc,'gphic1');
  
 %      disp(aloha_message('Lecture des mesures de phases au bout de l''antenne [gphbc2]'));
@@ -167,17 +167,17 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
 
    
     a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
-    a_phase = phase_inc_mes(1:8)';
+    a_phase = pi/180*phase_inc_mes(1:8)';
 
 
 
 function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
     % Lecture des puissances incidentes :
-    disp(aloha_message('[ALOHA] (INFO) : read measured power'));
+    disp(aloha_message('Reading power measurements on Q6B [gpinjc2]'));
     [p_inc_mes,tps]=tsbase(choc,'gpinjc2');
 
     % Lecture des phases incidentes (entree du module):
-    disp(aloha_message('[ALOHA] (INFO) : read measured phase'));
+    disp(aloha_message('Reading phase measurements on Q6B (before RF windows) [gphic2]'));
     % 'gphic2' : phase before the antenna
     % 'gphbc2' : phase calulated at the mouth of the antenna
     [phase_inc_mes,tps]=tsbase(choc,'gphic2');  

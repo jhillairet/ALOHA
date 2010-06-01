@@ -85,20 +85,20 @@ for idx_sc = 1:length(scenarios)
     
     %%%%%%%%%%%%%%%%%%%%%%%%
     % architecture, geometrie de l'antenne
-    disp(aloha_message(['Prise en compte de l''architecture de l''antenne : ', architecture]));
+    disp(aloha_message(['Take into account antenna architecture : ', architecture]));
     eval(architecture);
     
     %%%%%%%%%%%%%%%%%%%%%%%%
     % coordonnees des guides
     
-    disp(aloha_message('Prise en compte des coordonnees des guides'));
+    disp(aloha_message('Take into account waveguide coordinates'));
     %coordonnees_guides;   
     [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinates(architecture);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % calcul de la matrice S du plasma
     % pour le cas 1D ou 2D
-    disp(aloha_message('Calcul de la matrice S plasma'));
+    disp(aloha_message('Compute plasma Scattering matrix'));
     switch version_code
         case '1D'
             S_plasma_1D;    
@@ -107,29 +107,29 @@ for idx_sc = 1:length(scenarios)
             S_plasma_2D;
         
         otherwise
-            error('version_code not (correctly) defined !');
+            error('Version_code not (correctly) defined !');
     end
     scenario.options = aloha_setfield(scenario.options, chemin_binaire_fortran); 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % voies passives et voies actives
     
-    disp(aloha_message('Prise en compte des voies passives'));
+    disp(aloha_message('Take into account passive waveguides (if any)'));
     voies_actives_passives;
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % calcul de la matrice S antenne
-    disp(aloha_message('Lecture des matrices S antenne'));
+    disp(aloha_message('Take into account Antenna Scattering matrices'));
     S_antenne;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % calcul du comportement de l'antenne face au plasma 
-    disp(aloha_message('Calcul des interactions antenne/plasma'));
+    disp(aloha_message('Compute antenna/plasma interactions'));
     reponse_antenne;
     
     % affichage des coefficients de reflexion 
-    disp(aloha_message('Coefficients de reflexion par module :'));
+    disp(aloha_message('Reflexion Coefficients (RC) per module :'));
     disp(CoeffRefPuiss);
     
     % sauvegarde resultats dans le scenario
@@ -148,7 +148,7 @@ for idx_sc = 1:length(scenarios)
     % Antenna spectrum 
     if (bool_compute_spectrum)
         try
-            disp(aloha_message('Compute the power spectrum'));  
+            disp(aloha_message('Compute of the power spectrum'));  
             tic;
             switch version_code
                 case '1D'
