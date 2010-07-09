@@ -83,7 +83,7 @@ if (nargin == 1)
             a_phase = zeros(4,1);
             
         otherwise
-          error(aloha_message(['Antenna architecture unknow ! : ', architecture]));
+          error(aloha_message(['Antenna excitation unknow for architecture : ', architecture, '. Use an home made excitation']));
     end
 
 % 
