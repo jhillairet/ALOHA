@@ -43,28 +43,46 @@ for idx_sc = 1:length(scenarios)
       lambda_n0 = lambda_n(1);
       lambda_n1 = lambda_n(2);    
     else
-      dne0=dne(1,:); 
-      dne1=dne(2,:); 
-      lambda_n0 = lambda_n(1,:);
-      lambda_n1 = lambda_n(2,:);
+      dne0=dne(:,1); 
+      dne1=dne(:,2); 
+      lambda_n0 = lambda_n(:,1);
+      lambda_n1 = lambda_n(:,2);
     end
     Nmh = scenario.options.modes(1); 
     Nme = scenario.options.modes(2);
 
     % test the validity of the plasma gradient variable. 
     % they must be consistant, i.e. the dne value must be related to lambda_n
-    if (dne0 ~= ne0./lambda_n0)
-        disp(aloha_message('WARNING: Non consistent plasma gradient dne0 definition ! forcing value using lambda_n as reference : '));
-        dne0 = ne0./lambda_n0;
-        disp(aloha_message(['WARNING: lambda_n0=', num2str(lambda_n0)]));
-        disp(aloha_message(['WARNING: ==> dne0=', num2str(dne0)]));
-    end
-
-    if (dne1 ~= (1+d_couche./lambda_n0).*ne0./lambda_n1)     
-        disp(aloha_message('WARNING: Non consistent plasma gradient dne1 definition ! forcing value using lambda_n as reference : '));
-        dne1 = (1+d_couche./lambda_n0).*ne0./lambda_n1;
-        disp(aloha_message(['WARNING: lambda_n1=', num2str(lambda_n1)]));
-        disp(aloha_message(['WARNING: ==> dne1=', num2str(dne1)]));
+    if bool_lignes_identiques
+        if (dne0 ~= ne0./lambda_n0)
+            disp(aloha_message('WARNING: Non consistent plasma gradient dne0 definition ! forcing value using lambda_n as reference : '));
+            dne0 = ne0./lambda_n0;
+            disp(aloha_message(['WARNING: lambda_n0=', num2str(lambda_n0)]));
+            disp(aloha_message(['WARNING: ==> dne0=', num2str(dne0)]));
+        end
+    
+        if (dne1 ~= (1+d_couche./lambda_n0).*ne0./lambda_n1)     
+            disp(aloha_message('WARNING: Non consistent plasma gradient dne1 definition ! forcing value using lambda_n as reference : '));
+            dne1 = (1+d_couche./lambda_n0).*ne0./lambda_n1;
+            disp(aloha_message(['WARNING: lambda_n1=', num2str(lambda_n1)]));
+            disp(aloha_message(['WARNING: ==> dne1=', num2str(dne1)]));
+        end
+    else
+        for idx=1:length(ne0)
+            if (dne0(idx) ~= ne0(idx)./lambda_n0(idx))
+                disp(aloha_message('WARNING: Non consistent plasma gradient dne0 definition ! forcing value using lambda_n as reference : '));
+                dne0(idx) = ne0(idx)./lambda_n0(idx);
+                disp(aloha_message(['WARNING: lambda_n0=', num2str(lambda_n0(idx))]));
+                disp(aloha_message(['WARNING: ==> dne0=', num2str(dne0(idx))]));
+            end
+        
+            if (dne1(idx) ~= (1+d_couche./lambda_n0(idx)).*ne0(idx)./lambda_n1(idx))     
+                disp(aloha_message('WARNING: Non consistent plasma gradient dne1 definition ! forcing value using lambda_n as reference : '));
+                dne1(idx) = (1+d_couche./lambda_n0(idx)).*ne0(idx)./lambda_n1(idx);
+                disp(aloha_message(['WARNING: lambda_n1=', num2str(lambda_n1(idx))]));
+                disp(aloha_message(['WARNING: ==> dne1=', num2str(dne1(idx))]));
+            end
+        end
     end
     % MODIF JH 23/10/2009
     % Jua found that the gradient values dne wasn't save into the scenario 
@@ -75,9 +93,18 @@ for idx_sc = 1:length(scenarios)
 
 
     % display main plasma parameters
-    disp(aloha_message(['Main plasma parameters : ', ...
+    if bool_lignes_identiques
+        disp(aloha_message(['Main plasma parameters : ', ...
                         'ne0=', num2str(ne0/1e17) , 'x10^17 m^-3, '...
                         'lambda0=', num2str(lambda_n0*1e3), ' mm. ']));
+    else
+        disp(aloha_message('Main plasma parameters : '));
+        for idx=1:length(ne0)
+         disp(aloha_message(['row #', num2str(idx), ' ne0=', ...
+                         num2str(ne0(idx)/1e17) , 'x10^17 m^-3, '...
+                        'lambda0=', num2str(lambda_n0(idx,:)*1e3), ' mm. ']));    
+        end
+    end
 
     %%%%%%%%%%%%%%%%%%%%%%%%
     % load physicals constants
@@ -124,21 +151,22 @@ for idx_sc = 1:length(scenarios)
     S_antenne;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % calcul du comportement de l'antenne face au plasma 
+    % Calculte the coupling response of the antenna 
     disp(aloha_message('Compute antenna/plasma interactions'));
     reponse_antenne;
     
-    % affichage des coefficients de reflexion 
+    % show the reflexion coefficient 
     disp(aloha_message('Reflexion Coefficients (RC) per module :'));
     disp(CoeffRefPuiss);
     
-    % sauvegarde resultats dans le scenario
+    % save coupling results into scenario
     scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe); 
     % save some constants into the scenario (for check purpose essentially)
     scenario.results = aloha_setfield(scenario.results, k0);
 
-    % show execution time
+    % show and save execution time
     disp(aloha_message(['Execution time : ', num2str(toc), ' s']));
+    scenario.results.computationTime = toc;
 
     % moyenne du coefficient de reflexion en puissance
     R = mean( abs(b_acces./a_acces).^2 ) ;
