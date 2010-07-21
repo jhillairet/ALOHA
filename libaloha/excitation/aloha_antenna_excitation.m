@@ -81,6 +81,12 @@ if (nargin == 1)
         case {'antenne_PAM_TOPLHA_4modules'} % test
             a_ampl = sqrt(0.113e6)*ones(4,1);
             a_phase = zeros(4,1);
+
+        case {'antenne_JET', 'antenne_JET_1row'} % 8 modules of 4(t)x2(p) waveguides each
+           a_ampl = sqrt(1e3*130)*ones(8,1);  % 25 MW/m^2 
+           a_phase = 0*(pi/180)*(0:7)';
+           
+  
             
         otherwise
           error(aloha_message(['Antenna excitation unknow for architecture : ', architecture, '. Use an home made excitation']));
