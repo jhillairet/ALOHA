@@ -1,7 +1,31 @@
-function [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(filename, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max, ind,type_swan_aloha)
-% extraction des donnees du fichier S_plasma.dat
-% 
-% 
+function [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(filename, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max, ind,type_swan_aloha, architecture, freq)
+%  data extraction from binary file S_plasma.dat (fortran77 output)
+%  
+%  EXAMPLE:
+%  [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(...
+%          filename, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max, ind,type_swan_aloha, architecture, freq)
+%  
+%  INPUTS:
+%  - filename : 
+%  - S_plasma : matrice S plasma
+%  - rac_Zhe : 
+%  - Nme, 
+%  - Nmh, 
+%  - nb_g_pol, 
+%  - nb_g_total_ligne, 
+%  - D_guide_max, 
+%  - ind,
+%  - type_swan_aloha
+%  - architecture
+%  - freq
+%  OUTPUTS:
+%  - S_plasma, 
+%  - rac_Zhe]
+%  
+%  
+%  AUTHOR(S) : DV,JH
+
+
 
     tableau = zeros(1,nb_g_pol);
     tableau(ind) = 1;     
@@ -31,9 +55,14 @@ function [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(filename, S_plasma, 
 
            
     if (type_swan_aloha == 0)
+        % load physical constants in workspace
+        aloha_constants  
+        % load geometry properties
+        [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinates(architecture);
     
         Zc_swan = [];
         for i_ind = 1:nb_g_total_ligne
+            % waveguide impedance for parallel plate waveguide is Z0 for TEM and value below for TM
             Zc_swan = [Zc_swan,120*pi,-i*120*pi.*sqrt((1:Nme)*((celerite/(2*b(i_ind)*freq))^2-1))];
         end
     Z_ligne = rac_Zhe_ligne*(eye((Nme+Nmh)*nb_g_total_ligne)+S_ligne)*inv(eye((Nme+Nmh)*nb_g_total_ligne)-S_ligne)*rac_Zhe_ligne;

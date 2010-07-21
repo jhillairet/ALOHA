@@ -180,10 +180,10 @@ end
         % Autrement, il s'agit de fichier ascii
         if strcmp(aloha_getArchitecture, 'alpha')
             disp(aloha_message([textInd, 'Lecture du fichier binaire']));
-            [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(fortranOutputBinaryFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha);
+            [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(fortranOutputBinaryFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
         else
             disp(aloha_message([textInd, 'Lecture du fichier ascii']));
-            [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(fortranOutputAsciiFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha);
+            [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(fortranOutputAsciiFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
         end
 
         if isempty(S_plasma)
