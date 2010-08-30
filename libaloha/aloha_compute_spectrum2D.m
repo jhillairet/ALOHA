@@ -13,6 +13,7 @@ elseif nargin == 2
     ascii_file_path = varargin{1};
 end
 
+aloha_message(['Reading result file:', 'Spect_plasma2.dat...'])
 fid = fopen(ascii_file_path,'r');
     % read nb of mode and nb of guides
     C = textscan(fid, '%f %f', 1, 'headerLines', 2);

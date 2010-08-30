@@ -49,7 +49,7 @@ k0 = 2*pi*freq/celerite;
 chemin_retour = pwd;
 chemin_binaire_fortran = '/code_1D/couplage_1D';
 
-% on se place dans le repertoire des binaires fortran
+% change dir to the fortran binary directory
 cd([aloha_utils_getRootPath, chemin_binaire_fortran]);
 
 if (bool_lignes_identiques)
@@ -69,95 +69,89 @@ S_plasma = zeros(nb_g_total_ligne*nb_g_pol*(Nmh+Nme),nb_g_total_ligne*nb_g_pol*(
 rac_Zhe = zeros(nb_g_total_ligne*nb_g_pol*(Nmh+Nme),nb_g_total_ligne*nb_g_pol*(Nmh+Nme));
 
 
-disp(aloha_message(['Calcul du couplage version ', num2str(version)]));
+disp(aloha_message(['Coupling calculation ; version ', num2str(version)]));
 
 if bool_debug
     disp('Appuyez sur une touche pour lancer le calcul');
     pause;
 end
 
-%  if ~isempty(aloha_scenario_get(scenario, 'S_plasma'))
-%  %  MODIF TEMPORAIRE JH : mise en commentaire 
-%  %  juillet 2009     
-%      disp(aloha_message('WARNING: S_plasma a deja ete calcule!! On passe a l''etape suivante'));
-%      S_plasma = squeeze(aloha_scenario_get(scenario, 'S_plasma'));
-%      rac_Zhe = squeeze(aloha_scenario_get(scenario, 'rac_Zhe'));
-%  else
-    for ind = 1:nb_g_pol
-        textInd = ['[Couplage ligne poloidale ', num2str(ind),'/', num2str(nb_g_pol),'] : '];
+% for all poloidal rows
+for ind = 1:nb_g_pol
+    textInd = ['[row #', num2str(ind),'/', num2str(nb_g_pol),'] : '];
+    % execute binary only if:
+    %  - this is the first row and bool_lignes_identiques == true
+    %  - bool_lignes_identiques == false (then do for all rows)
+    if ((bool_lignes_identiques == true) & (ind > 1))
+        disp(aloha_message([textInd, '[bool_lignes_identiques=true]']));
+        disp(aloha_message([textInd, '--> No need to calculate this row! taking previous result ']));
+    else
         % 
-        % creation du fichier texte contenant les parametres 
-        % pour les binaires "coupl_plasma_" 
+        % Writing the ascii file containing binary parameters 
+        % This file depends on the binary version
         % 
-        if (((bool_lignes_identiques)&(ind == 1)) | not(bool_lignes_identiques))
-            % 
-            % Creation des parametres. 
-            % Dependent de la version du code
-            % 
-            if (version == 3)
-    
-                tampon1 = ne0(ind);
-                tampon2 = dne0(ind);
-    
-                varCell = {Nmh, Nme, freq, tampon1, tampon2,  ...
-                        nb_g_total_ligne, a, b, z, T_grill, ...
-                        D_guide_max, erreur_rel, max_nz}; 
-    
-            elseif (version == 4)
-    
-                tampon1 = ne0(ind);
-                tampon2 = dne0(ind);
-                varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
-                        nb_g_total_ligne, a, b, z, T_grill, ...
-                        D_guide_max, erreur_rel, pertes, max_nz};
-    
-            elseif (version == 5)
-    
-                tampon1 = ne0(ind);
-                tampon2 = dne0(ind);
-    
-                varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
-                        nb_g_total_ligne, a, b, z, T_grill, ...
-                        D_guide_max, erreur_rel, pertes, max_nz, d_vide}; 
-    
-            elseif (version == 6)
-    
-                ne1 = ne0+dne0.*d_couche;            % densite electronique couche ne2
-                %if (lignes_identiques == 1)
-                %    ne1 = ones(1,nb_g_pol)*ne1;% Modif du 10/05/2007
-                %    dne1 = ones(1,nb_g_pol)*dne1;	
-                %end
-                X1 = ne1./nc;
-                D1 = k0*ne1./dne1;
-                tampon1 = ne0(ind);
-                tampon2 = dne0(ind);
-                tampon3 = d_couche(ind);
-                tampon4 = dne1(ind);  
-    
-                varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
-                        tampon3, tampon4, nb_g_total_ligne, a, b, z, ...
-                        T_grill, D_guide_max, erreur_rel, pertes max_nz};
-    
-            elseif (version == 7)
-    
-                tampon1 = ne0(ind);
-                tampon2 = dne0(ind);
-    
-                varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
-                        B0_version7, nb_g_total_ligne, a, b, z, ...
-                        T_grill, D_guide_max, erreur_rel, pertes, max_nz};
-            end
-    
-            disp(aloha_message([textInd,'Creation du fichier contenant les arguments']));
-            aloha_saveFortranInputFile(fortranInputAsciiFileName, varCell);
-    
+        if (version == 3)
+
+            tampon1 = ne0(ind);
+            tampon2 = dne0(ind);
+
+            varCell = {Nmh, Nme, freq, tampon1, tampon2,  ...
+                    nb_g_total_ligne, a, b, z, T_grill, ...
+                    D_guide_max, erreur_rel, max_nz}; 
+
+        elseif (version == 4)
+
+            tampon1 = ne0(ind);
+            tampon2 = dne0(ind);
+            varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
+                    nb_g_total_ligne, a, b, z, T_grill, ...
+                    D_guide_max, erreur_rel, pertes, max_nz};
+
+        elseif (version == 5)
+
+            tampon1 = ne0(ind);
+            tampon2 = dne0(ind);
+
+            varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
+                    nb_g_total_ligne, a, b, z, T_grill, ...
+                    D_guide_max, erreur_rel, pertes, max_nz, d_vide}; 
+
+        elseif (version == 6)
+
+            ne1 = ne0+dne0.*d_couche;            % densite electronique couche ne2
+            %if (lignes_identiques == 1)
+            %    ne1 = ones(1,nb_g_pol)*ne1;% Modif du 10/05/2007
+            %    dne1 = ones(1,nb_g_pol)*dne1;	
+            %end
+            X1 = ne1./nc;
+            D1 = k0*ne1./dne1;
+            tampon1 = ne0(ind);
+            tampon2 = dne0(ind);
+            tampon3 = d_couche(ind);
+            tampon4 = dne1(ind);  
+
+            varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
+                    tampon3, tampon4, nb_g_total_ligne, a, b, z, ...
+                    T_grill, D_guide_max, erreur_rel, pertes max_nz};
+
+        elseif (version == 7)
+
+            tampon1 = ne0(ind);
+            tampon2 = dne0(ind);
+
+            varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
+                    B0_version7, nb_g_total_ligne, a, b, z, ...
+                    T_grill, D_guide_max, erreur_rel, pertes, max_nz};
         end
-    
+
+        disp(aloha_message([textInd,'Writing parameters file for the binary']));
+        aloha_saveFortranInputFile(fortranInputAsciiFileName, varCell);
+
         %
-        % execution du binaire fortran
+        % Fortran Binary execution
         % 
         try
-            disp(aloha_message([textInd, 'Lancement du binaire ', binary_name]));
+            disp(aloha_message([textInd, 'Run binary ', binary_name]));
             [status,result] = system(['./',binary_name]);
 
             if bool_debug
@@ -172,33 +166,33 @@ end
             cd(chemin_retour);
             error(aloha_message('?! Binary execution problem ?!'));
         end
+    end
+    % determine quel fichier de resultat
+    % utiliser en fonction de l'architecture
+    % Les resultats sont ecrits dans des fichiers binaires lorsqu'on utilise
+    % les binaires F77, soit sur la plateforme alpha (deneb)
+    % Autrement, il s'agit de fichier ascii
+    if strcmp(aloha_getArchitecture, 'alpha')
+        disp(aloha_message([textInd, 'Reading binary result file']));
+        [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(fortranOutputBinaryFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
+    else
+        disp(aloha_message([textInd, 'Reading ascii result file']));
+        [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(fortranOutputAsciiFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
+    end
 
-        % determine quel fichier de resultat
-        % utiliser en fonction de l'architecture
-        % Les resultats sont ecrits dans des fichiers binaires lorsqu'on utilise
-        % les binaires F77, soit sur la plateforme alpha (deneb)
-        % Autrement, il s'agit de fichier ascii
-        if strcmp(aloha_getArchitecture, 'alpha')
-            disp(aloha_message([textInd, 'Lecture du fichier binaire']));
-            [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(fortranOutputBinaryFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
-        else
-            disp(aloha_message([textInd, 'Lecture du fichier ascii']));
-            [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(fortranOutputAsciiFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
+    if isempty(S_plasma)
+        error(aloha_message([textInd, 'S_plasma is empty !!']));
+    else
+        disp(aloha_message([textInd, 'Results reading: OK']));
+
+        if bool_debug
+            disp(aloha_message(['Sum(S_plasma)=', num2str(sum(S_plasma(:)))]));
+            disp(aloha_message(['Sum(rac_Zhe)=', num2str(sum(rac_Zhe(:)))]));
         end
-
-        if isempty(S_plasma)
-            error(aloha_message([textInd, 'S_plasma is empty !!']));
-        else
-            disp(aloha_message([textInd, 'Lecture des resultats : OK']));
+    end
     
-            if bool_debug
-                disp(aloha_message(['Sum(S_plasma)=', num2str(sum(S_plasma(:)))]));
-                disp(aloha_message(['Sum(rac_Zhe)=', num2str(sum(rac_Zhe(:)))]));
-            end
-        end
-        
-    end % for ind = 1:nb_g_pol
-%  end % if ~isempty(aloha_scenario_get(scenario, 'S_plasma'))
+end % for ind = 1:nb_g_pol
 
+% back to working dir
 cd(chemin_retour);
 

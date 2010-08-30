@@ -56,7 +56,7 @@ antenna.freq = 3.7e9;
 % - true : on dispose de mesures reelles 
 % - false : on utilise les valeurs predefinies (dans aloha_antenna_excitation)
 % 
-options.bool_mesure = true;    
+options.bool_mesure = false;    
 
 % Use a predefenite excitation (true) 
 % or a user excitation (false) [only if bool_mesure = false]
@@ -148,27 +148,33 @@ options.bool_lignes_identiques = true;
 % Densite electronique minimale devant l'antenne (x=0). [m^-3] 
 % Rappels : 
 %  - densite de coupure 3.7GHz sur TS : 1.71e17 m^-3
-plasma.ne0 = 1.1e17;        
+% Examples:
+plasma.ne0 = 5e17; % if bool_lignes_identiques = true
+%  plasma.neO = [3;4;5]*1e17; % if bool_lignes_identiques = false
 
 %% #####################
 % longueur de decroissance a l'embouchure de l'antenne
 % pour la premiere couche de plasma en partant de l'antenne. [m]
 % 
-% Exemple : 2e-3 (2mm)
-plasma.lambda_n(1) = 2e-3;   
+% Example : 
+plasma.lambda_n(1) = 2e-3; % 2mm if bool_lignes_identiques = true
+%  plasma.lambda_n(:,1) = [2;2;2]*1e-3; % if bool_lignes_identiques = false
+
 
 %% #####################
 % Epaisseur de la premiere couche de plasma [version=6 only]. [m]
 % 
-% Exemple : 2e-3 (2mm)
+% Example : 2e-3 (2mm)
 plasma.d_couche = 2e-3;   
 
 %% #####################
 % longueur de decroissance a l'embouchure de l'antenne
 % pour la deuxieme couche de plasma (version=6). [m]
 % 
-% Exemple : 2e-2 (2cm)
-plasma.lambda_n(2) = 2e-2;   
+% Exemple :
+plasma.lambda_n(2) = 2e-2; % 2cm if bool_lignes_identiques = true
+%  plasma.lambda_n(:,2) = [2;2;2]*1e-2; % if bool_lignes_identiques = false
+ 
 
 
 %% #####################
@@ -280,9 +286,9 @@ else
 end
 
 % gradient de la premiere couche de plasma
-plasma.dne(1) = plasma.ne0./plasma.lambda_n(1);   
+plasma.dne(:,1) = plasma.ne0./plasma.lambda_n(:,1);   
 % gradient de densite couche ne2 [version=6 only]
-plasma.dne(2) = (1+plasma.d_couche./plasma.lambda_n(1)).*plasma.ne0./plasma.lambda_n(2);
+plasma.dne(:,2) = (1+plasma.d_couche./plasma.lambda_n(:,1)).*plasma.ne0./plasma.lambda_n(:,2);
 
 % EM modes
 options.modes = [Nmh, Nme]; 
