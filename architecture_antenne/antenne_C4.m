@@ -109,6 +109,7 @@ else
 end
 
 phase_rallonge = zeros(8,1);
+phase_rallonge = -pi/180.*[-56.5;-44.7;-36.5;0;0;-36.5;-44.7;-56.5];
 
 % parametres 1D
 
