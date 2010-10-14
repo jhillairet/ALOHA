@@ -17,6 +17,9 @@ a_acces = a_ampl.*exp(i*a_phase);
 a_plasma = inv(eye(length(S_plasma)) - S_ant_22*S_plasma)*S_ant_21*a_acces;
 b_plasma = S_plasma*a_plasma;
 
+% reflexion coefficient @ the mouth of the antenna
+RC_mouth = 100*abs(b_plasma./a_plasma).^2;
+
 %  Then we plug output from antenna S matrix to input of grill/plasma S matrix
 %  to obtain the plasma coupled antenna scattering matrix
 S_acces = S_ant_11 + S_ant_12*S_plasma*inv(eye(length(S_plasma)) - S_ant_22*S_plasma)*S_ant_21; 
@@ -24,8 +27,9 @@ S_acces = S_ant_11 + S_ant_12*S_plasma*inv(eye(length(S_plasma)) - S_ant_22*S_pl
 %  reflected wave vector from antenna
 b_acces = S_acces*a_acces; 
 
-% power reflexion coefficient 
+% power reflexion coefficient @ input of a module
 CoeffRefPuiss = 100*abs(b_acces./a_acces).^2;
+RC=CoeffRefPuiss;
 
 %% Rajout du 16/05/2007 par Izacard Olivier :
 %'moyenne du coefficient de reflexion en puissance (en %)'
