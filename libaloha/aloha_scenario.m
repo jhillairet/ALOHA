@@ -120,7 +120,7 @@ for idx_sc = 1:length(scenarios)
     
     disp(aloha_message('Take into account waveguide coordinates'));
     %coordonnees_guides;   
-    [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinates(architecture);
+    [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor,scenario]=aloha_utils_getAntennaCoordinates(architecture,scenario);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % calcul de la matrice S du plasma
@@ -160,7 +160,7 @@ for idx_sc = 1:length(scenarios)
     disp(CoeffRefPuiss);
     
     % save coupling results into scenario
-    scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe); 
+    scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, RC, RC_mouth, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe); 
     % save some constants into the scenario (for check purpose essentially)
     scenario.results = aloha_setfield(scenario.results, k0);
 
