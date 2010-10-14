@@ -19,7 +19,7 @@ function [scenario, varargout] = aloha_compute_directivity1D(scenario, varargin)
 %   over total power. This results may be considered in percents.
 %  
 %  * definition_directivite=2 : 
-%       D = delta_cd = (1-R)*nz0^2/P*( int{nz=+1,+inf}(dP) - int{nz=-inf,-1}(dP))
+%       D = delta_cd = (1-R)*nz0^2/P*( int{nz=+1,+inf}(dP/nz^2) - int{nz=-inf,-1}(dP/nz^2))
 %  This is the 'weighted directivity' as defined in [Litaudon & Moreau, Nucl Fusion 30 (1990), 471]
 %  This directivity definition is based on the Fish current drive efficiency of the LH waves.
 %  It is a quantitative measure, based on the CD efficiency which decrease as 1/n//^2, 
