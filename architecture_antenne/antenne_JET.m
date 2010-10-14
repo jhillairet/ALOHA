@@ -26,7 +26,8 @@ antenne_standard = 0; % = 0 il faut decrire l'antenne sur une ligne : tableaux b
                       % = 1 parametres scalaires : b_g_actif, b_g_pass e et lcc
 
 % largeur des guides 
-b =[9,9, repmat([9 9 9 9],1,nb_modules_tor),9,9]*1e-3;
+b_g_pass_ext = 9e-3;
+b =[b_g_pass_ext,b_g_pass_ext, [repmat([9 9 9 9],1,nb_modules_tor)]*1e-3, b_g_pass_ext,b_g_pass_ext];
 
 % epaisseur entre les guides 
 e =[2, 2, repmat([2,2,2,2],1,nb_modules_tor),2]*1e-3;
