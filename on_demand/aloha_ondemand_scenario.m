@@ -11,7 +11,10 @@ function sc = aloha_ondemand_scenario(pulsenb, t_start, t_end, varargin)
 %  IMPORTANT : Other optionnal input arguments :
 %  
 %   - [optionnal] ne : edge electron density [m^-3]
-%   - [optionnal] lambda : electron edge scrape-off length (lambda = ne/grad_ne) [m]
+%   - [optionnal] lambda : electron edge scrape-off length (lambda = ne/grad_ne) [m] :
+%                   1 value for one gradient
+%                   OR
+%                   2 value in an array [lambda0,lambda1] for 2 gradients
 %   - [optionnal] TSport : Tore-Supra port 'Q6A' or 'Q6B'
 % 
 % OUTPUT
@@ -36,10 +39,22 @@ elseif nargin == 4
     disp(['Default scrape-off length : lambda0=', num2str(sc.plasma.lambda_n(1)), ' m']);
 elseif nargin == 5
     sc.plasma.ne0 = varargin{1};
-    sc.plasma.lambda_n(1) = varargin{2};
+    if length(varargin{2}) ==1
+        sc.plasma.version = 3;
+        sc.plasma.lambda_n(1) = varargin{2};
+    else
+        sc.plasma.version = 6;
+        sc.plasma.lambda_n = varargin{2};
+    end
 elseif nargin == 6
     sc.plasma.ne0 = varargin{1};
-    sc.plasma.lambda_n(1) = varargin{2};
+    if length(varargin{2}) ==1
+        sc.plasma.version = 3;
+        sc.plasma.lambda_n(1) = varargin{2};
+    else
+        sc.plasma.version = 6;
+        sc.plasma.lambda_n = varargin{2};
+    end
     TSport = varargin{3}; 
 else
     error('Bad number of input arguments. See help.')
