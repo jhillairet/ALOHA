@@ -2,11 +2,12 @@ function aloha_plot_spectra(scenarios, varargin)
 % Plot 1D (ie nz) spectra for different scenarios
 %  
 % EXAMPLE
-%  aloha_plot_spectrum(scenario)
+%  aloha_plot_spectra(scenario)
 %  
 % INPUT
 %  - scenario [struct(1)] : structure scenario
 %  [optionnal] - 'legend' : string vector which contains the legend of the plot
+%  [optionnal] - 'normalization', true : normalize spectrum to unity
 %  
 % AUTHOR: JH
 % LAST CHANGES
@@ -51,6 +52,7 @@ for id_scen=1:length(scenarios) % for many scenarios
     ylabel('Power density [W]');
     title('Power density spectrum');
     grid on;
+%      set(gca, 'XLim', [-10, 10]);
 
 end % id_scen
 
