@@ -67,6 +67,9 @@ e = [ep_mod,ep_mod,ep_mod,ep_mod,ep_mod,ep_mod,ep_mod,ep_mod];
 %lcc = 1/4;			% longueur du court-circuit (en lambda guidee);   passive WG length normalized to lambdag
 lcc = 1/4*ones(1,17);
 
+% passive waveguide scattering parameter for a non ideal depth of lambdag/4.
+pwg_s = 9.910618E-001 - i*1.334034E-001;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
 
