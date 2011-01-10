@@ -22,6 +22,8 @@ if ~isempty(pass_tot)
     else
         lcc=kron(ones(1,nb_g_pol),lcc);
         S_ant_22(1,pass_tot) = -exp(+i*4*pi*lcc);
+%          % passive waveguide scattering parameter for a non ideal depth of lambdag/4.
+%          S_ant_22(1,pass_tot) = 9.910618E-001 - i*1.334034E-001;
     end
 end
 S_ant_22 = diag(S_ant_22);
