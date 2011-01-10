@@ -24,8 +24,10 @@ end
 [b, h, z, y, nb_g_total_ligne, nbre_guides,act_module_tor] = aloha_utils_getAntennaCoordinates(architecture); 
 
 h=aloha_plot_figure(figure, [architecture, ' geometry']);
+
 % view from the plasma, the z axes goes from left to right
 % and y axes goes from top to bottom
+% in this direct frame (x,y,z), x goes toward the plasma... 
 set(gca, 'YDir', 'reverse');
 
 % plot all waveguides for all poloidal line 
@@ -51,6 +53,6 @@ hold off;
 
 % plot legends & options 
 axis equal;
-xlabel('z (m)');
-ylabel('y (m)');
+xlabel('z [m]');
+ylabel('y [m]');
 title(['Antenna architecture :',  aloha_utils_str4fig(architecture), sprintf('\n'), '(as view from the plasma)']);
