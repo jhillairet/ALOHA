@@ -25,10 +25,16 @@ function sc = aloha_ondemand_scenario(pulsenb, t_start, t_end, varargin)
 %  - 09/10/2009 : creation
 
 % We use the defaut ALOHA scenario example and we adapt it after
-actual_dir=pwd;
-cd('../scenario');
-sc=scenario_example;
-cd(actual_dir);
+% We search for the scenario_example.m on the Matlab PATH. If it not exist
+% we look into the scenario directory. This assumes that this directory exist...
+if exist('scenario_example') == 2
+    sc=scenario_example;
+else 
+    actual_dir=pwd;
+    cd('../scenario');
+    sc=scenario_example;
+    cd(actual_dir);
+end
 
 % check for optionnal input arguments
 if nargin == 3
