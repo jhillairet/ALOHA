@@ -22,7 +22,7 @@ eval(architecture);
 
 
 % Modification JH 04/2009
-% Precedemment, l'echantillonnage n'était pas régulier : les champs dans les guides etaient 
+% Precedemment, l'echantillonnage n'etait pas regulier : les champs dans les guides etaient 
 % decrit sur 100 points, tandis que le champs au niveau des septums etaient decrit avec 1 seul point.
 % Lorsqu'on faisait la transformee de fourier du champ total, on obtenait alors un resultat "suprenant".
 % 
@@ -47,7 +47,7 @@ for idx_pol = 1:nb_g_pol
     fztot = [];
     % for all waveguides in a poloidal line
     for idx_tor = 1:nb_g_total_ligne
-        % Coefficients modaux (pas de dépendance spatiale : elle est ajoutée plus bas)
+        % Coefficients modaux (pas de dependance spatiale : elle est ajoutee plus bas)
         % TE mode(s) (Nmh,1)
         coeff_h = - sqrt(2/(a*b(idx_tor)));
         % TM mode(s) (Nme,1)
