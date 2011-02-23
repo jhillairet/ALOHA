@@ -3,6 +3,7 @@ function scenario=aloha_compute_spectrum2D(scenario, varargin)
 %  
 %  INPUT
 %   - ALOHA scenario
+%   - [optionnal, string] file (with path) containing the spectrum
 %  OUPUT
 %   - ALOHA scenario with suppl. fields into the sub-field 'results"
 %     corresponding to the spectrum parameters (dP, dP_nz, nz, ny)
@@ -30,6 +31,45 @@ fid = fopen(ascii_file_path,'r');
     Hy_r = C{5};Hy_i = C{6};
     Hz_r = C{7};Hz_i = C{8};
 fclose(fid);
+
+%  nb = nbre_modes*nbre_guides*(nbre_ny+1)*(nbre_nz+1)
+%  
+%  fname =  [scenario.options.aloha_path,scenario.options.chemin_binaire_fortran, '/Spect_plasma.dat'];
+%  
+%  byteorder = 'ieee-be';            % IEEE Big-Endian format  (use "ieee-le" for Little-Endian)
+%  [fid,msg] = fopen(fname, 'r', byteorder) ;
+%  % read the trailing number of records...
+%  [Ey_r,count] = fread(fid, nb,'float'); 
+%  [Ey_i,count] = fread(fid, nb,'float'); 
+%  [Ez_r,count] = fread(fid, nb,'float');
+%  [Ez_i,count] = fread(fid, nb,'float');
+%  [Hy_r,count] = fread(fid, nb,'float'); 
+%  [Hy_i,count] = fread(fid, nb,'float'); 
+%  [Hz_r,count] = fread(fid, nb,'float');
+%  [Hz_i,count] = fread(fid, nb,'float');
+%  fclose(fid);
+
+
+
+% JH 06/10/2010
+% Il y'a un bug dans la taille du vecteur lu. Je pense que le 
+% bug est lie au fait que les tailles des vecteurs sont fixes
+% dans le code fortran, ce qui genere un gag quelque part. 
+% 
+% Si la taille des vecteurs n'est pas celle que l'on attend,
+% on bourre par des zeros :
+array_size = round((nbre_ny+1)*(nbre_nz+1)*nbre_modes*nbre_guides);
+
+%  if length(Ey_r) ~= array_size 
+%      Ey_r = [Ey_r; zeros(array_size-length(Ey_r),1)];
+%      Ey_i = [Ey_i; zeros(array_size-length(Ey_i),1)];
+%      Ez_r = [Ez_r; zeros(array_size-length(Ez_r),1)];
+%      Ez_i = [Ez_i; zeros(array_size-length(Ez_i),1)];
+%      Hy_r = [Hy_r; zeros(array_size-length(Hy_r),1)];
+%      Hy_i = [Hy_i; zeros(array_size-length(Hy_i),1)];
+%      Hz_r = [Hz_r; zeros(array_size-length(Hz_r),1)];
+%      Hz_i = [Hz_i; zeros(array_size-length(Hz_i),1)];
+%  end
 
 
 Ey_ny_nz=reshape(complex(Ey_r, Ey_i), (nbre_ny+1)*(nbre_nz+1), nbre_modes*nbre_guides).';
