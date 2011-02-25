@@ -1,29 +1,39 @@
-function [struct_name] = aloha_scenario_convert2cpo(scenario, name)
-% ALOHA function : convert an ALOHA scenario to ITM CPOs matlab structures.
+function [antenna_lh] = aloha_scenario_convert2cpo(scenario, name)
+% Convert an ALOHA scenario into an ITM 'antenna_lh' CPO.
+% 
+% The 'antenna_lh' CPO contains :
+%  member       type            description
+%  name         vecstring_type  Antenna name, Vector of strings (nantenna_lh)
+%  frequency    vecflt_type     Frequency [Hz], Vector (nantenna_lh)
+%  power        exp1D           Power [W], Vector (nantenna_lh). Time-dependent
+%  n_par        vecflt_type     Main parallel refractive index of the launched spectrum,
+%                               for multi-junction antennas. Vectors (nantenna_lh). Time-dependent
+%  position     rzphi1Dexp      Reference global antenna position. Vectors (nantenna_lh). Time-dependent
+%  setup        antennalh_setup     Detailed description of LH antennas.
+%  plasmaedge   plasmaedge      Plasma edge characteristics in front of the antenna.
+%  beam         rf_beam         Beam characteristics
 % 
 % INPUT
 %  - scenario : ALOHA scenario
-%  - name ; 'antenna_lh' or 'launchs'
 % 
 % OUPUT
-%  - struct_name : matlab CPO structure :
-%        antenna_lh (Lower Hybrid antennas CPO) 
-%       or 
-%        launchs (RF waves launch conditions CPO)
+%  - antenna_lh : matlab CPO structure : antenna_lh (Lower Hybrid antennas CPO) 
 % 
 % J.Hillairet
 % 
 % 
 
-switch name
-    case 'antenna_lh'
+
+
+%  switch name
+%      case 'antenna_lh'
     % -------------------------------------
     % creation of the antenna_lh structure
     % -------------------------------------
     antenna_lh.name = scenario.antenna.architecture; % antenna name
     antenna_lh.frequency = scenario.antenna.freq; % frequency [Hz]
     antenna_lh.power = sum(scenario.antenna.a_ampl.^2); % total input power [W]
-    antenna_lh.mode = +1; % slow wave
+    antenna_lh.mode = +1; % slow wave [OBSOLETE]
     
     % position
     position.r = []; % major radius [m]
@@ -86,35 +96,36 @@ switch name
     beam.phaseellipse = [];
     antenna_lh.beam = beam;
 
-    struct_name = antenna_lh;
 
-case 'launchs'
-    % -------------------------------------
-    % creation of the launchs structure
-    % -------------------------------------
-    launchs.name = scenario.antenna.architecture;
-    launchs.frequency = scenario.antenna.freq;
-    launchs.type = 'LH';
-    % TODO : fill the launchs structure fields ?
-    launchs.mode = [];
-    launchs.datainfo = [];
-    launchs.position = [];
-    launchs.beam = [];
-    launchs.codeparam = [];
-    launchs.time = [];
-    
-    if isfield(scenario.results, 'dP')
-        launchs.spectrum.nn_phi = scenario.options.nbre_ny;
-        launchs.spectrum.nn_theta = scenario.options.nbre_nz;
-        launchs.spectrum.n_phi = scenario.results.ny;
-        launchs.spectrum.n_theta = scenario.results.nz;
-        launchs.spectrum.power = scenario.results.dP;
-    else
-        disp('No spectrum in the scenario !');
-        launchs.spectrum = [];
-    end
-    struct_name = launchs;
 
-otherwise
-    error('bad structure name! ');
-end
+%  [OBSOLETE]
+%  case 'launchs'
+%      % -------------------------------------
+%      % creation of the launchs structure
+%      % -------------------------------------
+%      launchs.name = scenario.antenna.architecture;
+%      launchs.frequency = scenario.antenna.freq;
+%      launchs.type = 'LH';
+%      % TODO : fill the launchs structure fields ?
+%      launchs.mode = [];
+%      launchs.datainfo = [];
+%      launchs.position = [];
+%      launchs.beam = [];
+%      launchs.codeparam = [];
+%      launchs.time = [];
+%      
+%      if isfield(scenario.results, 'dP')
+%          launchs.spectrum.nn_phi = scenario.options.nbre_ny;
+%          launchs.spectrum.nn_theta = scenario.options.nbre_nz;
+%          launchs.spectrum.n_phi = scenario.results.ny;
+%          launchs.spectrum.n_theta = scenario.results.nz;
+%          launchs.spectrum.power = scenario.results.dP;
+%      else
+%          disp('No spectrum in the scenario !');
+%          launchs.spectrum = [];
+%      end
+%      struct_name = launchs;
+%  
+%  otherwise
+%      error('bad structure name! ');
+%  end
