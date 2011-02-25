@@ -66,14 +66,14 @@ for idx_pol = 1:nb_g_pol
         % compute fields for all modes
         for m = [0:Nmh-1+Nme]; % mode index
 
-            % electric field
+            %% electric field
             coeffx_wg = j/Y0*m*pi./k0./b(idx_tor).*Phi_m_prime(m, b(idx_tor), z_g);
             coeffy_wg = zeros(size(z_g));
             coeffz_wg = Phi_m(m, b(idx_tor), z_g);
 
             E_wg_m(:, :, m+1) = [coeffx_wg;coeffy_wg;coeffz_wg]*poids_E(mode_idx(m+1));
             
-            % magnetic field
+            %% magnetic field
             coeffx_wg = zeros(size(z_g));
             coeffy_wg = -Phi_m(m, b(idx_tor), z_g);
             coeffz_wg = zeros(size(z_g));
@@ -122,7 +122,7 @@ for idx_pol = 1:nb_g_pol
    H_mouth(:,:,idx_pol) = H_idx_pol; 
    
    Poynting_mouth(:,:,idx_pol) = 1/2*real(cross(E_idx_pol, conj(H_idx_pol)));
-   disp(aloha_message(['Summation of the poynting vector in x direction : ', num2str(sum(Poynting_mouth(1,:,idx_pol))*dz), ' W']))
+   Poynting_mouth_total = trapz(abs_z(idx_pol,:), Poynting_mouth(1,:,idx_pol));   disp(aloha_message(['Summation of the poynting vector in x direction : ', num2str(Poynting_mouth_total), ' W']))
     
 end % idx_pol
 
