@@ -10,7 +10,7 @@ function scenarios = aloha_scenario(scenarios)
 % OUPUT
 %  - scenario <structure length=N>: structure passee en argument, 
 %               mais contenant en plus les resultats de calcul 
-%               effectués par ALOHA (matrices S plasma, etc...)
+%               effectues par ALOHA (matrices S plasma, etc...)
 %               
 % AUTHOR: S.Berio / O.Izacard / D.Voyer / J.Hillairet
 % LAST UPDATE:
@@ -272,6 +272,9 @@ for idx_sc = 1:length(scenarios)
             disp(aloha_message(['ERROR:',s.message]));
         end  
     end
+
+    %% Add ITM antenna_lh CPO to the scenario
+    scenario.ITM.CPO.antenna_lh = aloha_scenario_convert2cpo(scenario);
     
     disp(aloha_message('Sauvegarde des resultats dans le scenario.'));
     scenarios(idx_sc) = scenario;
