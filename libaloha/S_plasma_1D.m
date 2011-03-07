@@ -25,6 +25,7 @@
 % plasma step 
 
 %  Determine le nom du binaire a utiliser
+% TODO : use tempname for generate a temporary file - fortran bin should accept args 
 binary_name = aloha_getBinaryName(aloha_getArchitecture, version);
 % noms des fichiers d'échange avec le code fortran
 fortranInputAsciiFileName = 'par_grill.dat';
@@ -35,7 +36,7 @@ fortranOutputAsciiFileName = 'S_plasma2.dat';
 max_nz = 100; 
 
 %%%%%%%%%%%%%%%%%%%%%%%
-k0 = 2*pi*freq/celerite;
+k0 = 2*pi*scenario.antenna.freq/celerite;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%

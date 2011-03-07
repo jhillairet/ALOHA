@@ -1,15 +1,16 @@
 function scenario = scenario_example 
-% ALOHA scenario structure generation example
+% ALOHA scenario example
 % 
-% Ce fichier est une fonction qui genere un scenario pour ALOHA
+% This file is a function which create an ALOHA scenario.
+%
+% All the parameters needed by ALOHA to make a run are stored inside
+% this file, except the antenna description. All the parameters are detailled below.
 % 
-% Tous les parametres necessaires a une simulation d'ALOHA sont contenus
-% dans ce fichier. Ces parametres sont detailles ci-dessous.
-% 
-% La fonction renvoie une structure "scenario", qui contient tous les parametres
-% d'entree d'ALOHA. Ce fichier scenario est utilise comme parametre d'entree d'ALOHA.
-% La fonction 'aloha_1D', une fois son calcul termine, va renvoyer cette structure, 
-% ou les resultats de la simulation y sont enregistres.
+% This function returns a matlab stucture "scenario" which contains all the parameters
+% used in ALOHA. This structure is used an input argument of the "aloha_scenario"
+% functiion. Once its calculation done, ALOHA returns a similar structure "scenrio"
+% which contains the results in addition (in the field scenario.results). 
+%
 % 
 %  INPUT: none
 %  
@@ -41,7 +42,8 @@ options.comment = [''];
 %  Ces valeurs correspondent aux noms des fichiers disponibles dans
 %  le dossier 'achitecture_antenne'.
 % 
-antenna.architecture = 'antenne_C4';      
+antenna.architecture = 'antenne_C4'; % Old fashioned antenna description. [OBSOLETE]
+%antenna.architecture = 'antenna_C4_ITM';      
 
 %% #####################
 % Antenna excitation
@@ -60,7 +62,7 @@ options.bool_mesure = false;
 
 % Use a predefenite excitation (true) 
 % or a user excitation (false) [only if bool_mesure = false]
-options.bool_homeMadeExcitation = false;
+options.bool_homeMadeExcitation = true;
 
 % User-made excitation.
 % [only if bool_homeMadeExcitation = true & bool_mesure = false]
@@ -68,8 +70,8 @@ options.bool_homeMadeExcitation = false;
 % Warning : the length of the array must be correct 
 % in respect to the number of module of your antenna !
 % help aloha_antenna_excitation for some examples
-antenna.a_ampl = [];
-antenna.a_phase = [];
+antenna.a_ampl = sqrt(2.6725e6/16)*ones(8,1);
+antenna.a_phase = 1*(180*pi/180)*(0:7)';
 
 
 % [bool_mesure=true only]
@@ -233,16 +235,16 @@ options.bool_display_directivity = false;
 %       D = (1/P)*int{+1,+inf}(dP/nz^2);
 options.definition_directivite = 1; 
 
-% champ electrique dans l'embouchure de l'antenne
+% Compute and display the Efield in the waveguides at the mouth of the antenna
 options.bool_compute_total_field = true;       
 options.bool_display_total_field = false;
 
-% champ dans le plasma
+% Compute and display the Efield inside the few mm of the plasma
+% The domain of calculation (a rectangle in front of the waveguides)
+% should be defined in the parameters below.  
 options.bool_compute_plasma_field = true;
 options.bool_display_plasma_field = false;
 
-
-options.bool_fichier_Ez_x_variable = false; % Cree le fichier .mat contenant Ez pour differentes valeurs de x
 
 
 
@@ -365,11 +367,18 @@ options.pas_nz_fig_plasma = 0.1;    % description du chp spatial e partir de la 
 options.fig_Ez_ou_EzHy = 1;     % description chp Ez ou vecteur de poynthing S = Ez.Hy* :  = 1 Ez  / = 0 Ez.Hy*
 options.lig_fig_plasma = 1;     % numero de la ligne
 
-%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% making void structures in order to avoid bugs later in filling the structure...
 results.S_plasma = [];
+antenna_lh.setup = [];
 
 % #####################
 %  Creation du scenario
 %  
 scenario = aloha_setfield([], plasma, antenna, options, results); 
 
+% Load the antenna structure into the scenario
+%
+% NB : in previous version of ALOHA, this was made inside the aloha_scenario function. 
+% However, in order to allow batch on antenna's dimension, the antenne dimensions have 
+% been inserted into the scenario : this must be done before aloha_scenario, thus here.
+scenario = aloha_setAntenna(scenario, antenna.architecture);

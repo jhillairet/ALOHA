@@ -4,7 +4,13 @@ function aloha_plot_champEmbouchure1D(scenario)
   aloha_scenario_loadIntoWorkspace
   % Load into workspace the geometrical parameter of the scenario architecture 
   % and get the main geometrical parameters.
-  eval(architecture);
+ if aloha_isAntennaITM(scenario)
+      disp(aloha_message('assuming ITM antenna description')); 
+	nb_g_pol = aloha_scenario_get(scenario, 'nwm_theta');
+
+else
+	eval(architecture);
+end
 
   %  Trace le champ dans l'embouchure (si il existe)
   %  

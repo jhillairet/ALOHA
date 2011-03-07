@@ -3,7 +3,9 @@ function [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAn
 % 
 % 
 
-%% Shortcuts and constants
+
+
+%% Shortcuts
 mod= antenna_lh.setup.modules;
 wg = antenna_lh.setup.modules.waveguides;
 
@@ -41,7 +43,7 @@ e = wg.e_phi;
 % in the toroidal direction
 z = zeros(1,nwr);
 for ind = 2:nwr
-    z(ind) = z(ind-1) + b(ind-1) + e(ind);
+    z(ind) = z(ind-1) + b(ind-1) + e(ind-1);
 end
 
 %% y

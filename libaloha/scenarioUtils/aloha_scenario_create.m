@@ -34,6 +34,7 @@ end
 
 % empty results sub-group
 results = struct('S_acces', [], 'S_plasma', []);
+antenna_lh.setup = [];
 
 %%%% scenario
-scenario = aloha_setfield([], antenna, plasma, options, results);
+scenario = aloha_setfield([], antenna, plasma, options, results, antenna_lh);

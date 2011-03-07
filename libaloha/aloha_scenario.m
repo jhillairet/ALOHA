@@ -113,15 +113,34 @@ for idx_sc = 1:length(scenarios)
     %%%%%%%%%%%%%%%%%%%%%%%%
     % architecture, geometrie de l'antenne
     disp(aloha_message(['Take into account antenna architecture : ', architecture]));
-    eval(architecture);
-    
+    % read the architecture as a function which should return a structure 
+    % in the ITM antenna_lh CPO. If there is an error in this attempt, this should mean
+    % that the file is not function but a script, as it was before ALOHA ITM compliance
+    if aloha_isAntennaITM(scenario)
+      disp(aloha_message('ITM antenna description')); 
+      aloha_utils_ITM2oldAntenna; % convert ITM data to old fashioned ALOHA parameters
+	
+    else
+      disp(aloha_message('Old-fashioned antenna description'));
+      eval(architecture);
+    end
+
+	
     %%%%%%%%%%%%%%%%%%%%%%%%
     % coordonnees des guides
     
     disp(aloha_message('Take into account waveguide coordinates'));
     %coordonnees_guides;   
-    [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor,scenario]=aloha_utils_getAntennaCoordinates(architecture,scenario);
+    % if the field antenna_lh exist, this means that we use the ITM ALOHA version
     
+    if aloha_isAntennaITM(scenario)
+      disp(aloha_message('ITM antenna description'));
+      [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinatesFromCPO(aloha_getAntenna(scenario));
+    else
+      disp(aloha_message('Old-fashioned antenna description'));
+      [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor,scenario]=aloha_utils_getAntennaCoordinates(architecture,scenario);
+    end
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % calcul de la matrice S du plasma
     % pour le cas 1D ou 2D
@@ -272,11 +291,8 @@ for idx_sc = 1:length(scenarios)
             disp(aloha_message(['ERROR:',s.message]));
         end  
     end
-
-    %% Add ITM antenna_lh CPO to the scenario
-    scenario.ITM.CPO.antenna_lh = aloha_scenario_convert2cpo(scenario);
-    
-    disp(aloha_message('Sauvegarde des resultats dans le scenario.'));
+   
+    disp(aloha_message('Saving results into the scenario.'));
     scenarios(idx_sc) = scenario;
 end
 

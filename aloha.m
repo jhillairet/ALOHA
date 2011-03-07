@@ -56,16 +56,19 @@ scenario_filename = 'sim_test.mat';
 %  Ces valeurs correspondent aux noms des fichiers disponibles dans
 %  le dossier achitecture_antenne.
 % 
-architecture = 'antenne_orso1';      
-
+architecture = 'antenna_C4_ITM';      
+%architecture = 'antenne_C4';% Old fashioned antenna description. [OBSOLETE]
 
 %% #####################
 % Antenna excitation
 %  
 
 % source frequency [Hz]
-% 
-freq = 4.6e9; 
+%
+% [OBSOLETE] : for compatibility with previous version
+% NB : Following the new antenna definition (ITM)
+% the source frequency should now be defined in the antenna description. 
+freq = 3.7e9; 
 
 % Use Tore Supra data ? true/false
 % 
@@ -76,16 +79,16 @@ bool_mesure = false;
 
 % Use a predefenite excitation (true) 
 % or a user excitation (false) [only if bool_mesure = false]
-bool_homeMadeExcitation = false;
+bool_homeMadeExcitation = true;
 
 % User-made excitation.
 % [only if bool_homeMadeExcitation = true & bool_mesure = false]
 % 
 % Warning : the length of the array must be correct 
 % in respect to the number of module of your antenna !
-a_ampl = sqrt(2.0672e6/16)*ones(8,1); 
-a_ampl([1,2,8]) = 0; % example of disfunctionnal klystrons : number 1,2 & 8
-a_phase = zeros(8,1);
+a_ampl = sqrt(1)*ones(8,1); 
+% a_ampl([1,2,8]) = 0; % example of disfunctionnal klystrons : number 1,2 & 8
+a_phase = (270*pi/180)*(0:7)';
 
 
 % [bool_mesure=true only]
@@ -252,11 +255,8 @@ bool_display_total_field = true;
 
 % (Parallel) Electric field in some mm into the plasma
 % [Plane-Wave propagation]
-bool_compute_plasma_field = true;
-bool_display_plasma_field = true;
-
-% Cree le fichier .mat contenant Ez pour differentes valeurs de x [TODO]
-bool_fichier_Ez_x_variable = false;
+bool_compute_plasma_field = false;
+bool_display_plasma_field = false;
 
 
 %  ==================================================================
@@ -392,6 +392,14 @@ lig_fig_plasma = 1;     % numero de la ligne
 %  creation de la structure 'scenario' 
 %  contenant tous les parametres de la simulation
 aloha_scenario_create;
+
+
+% Load the antenna structure into the scenario
+%
+% NB : in previous version of ALOHA, this was made inside the aloha_scenario function. 
+% However, in order to allow batch on antenna's dimension, the antenne dimensions have 
+% been inserted into the scenario : this must be done before aloha_scenario, thus here.
+scenario = aloha_setAntenna(scenario, architecture);
 
 
 % #####################

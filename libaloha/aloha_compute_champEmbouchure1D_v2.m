@@ -24,9 +24,14 @@ end
 
 % Load into workspace the geometrical parameter of the scenario architecture 
 % and get the main geometrical parameters.
-eval(architecture);
-[b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinates(architecture);
-
+if aloha_isAntennaITM(scenario)
+      disp(aloha_message('assuming ITM antenna description')); 
+      aloha_utils_ITM2oldAntenna; % convert ITM data to old fashioned ALOHA global parameters
+    [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinatesFromCPO(aloha_getAntenna(scenario));
+else
+    eval(architecture);
+    [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinates(architecture);
+end
 
 % Modification JH 04/2009
 % Precedemment, l'echantillonnage n'était pas régulier : les champs dans les guides etaient 
