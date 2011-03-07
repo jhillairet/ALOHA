@@ -1,5 +1,9 @@
 %  ALOHA (MAJORS) CHANGE-LOG
-%  
+%
+%  02/2011 : The antenna description now follows the ITM standard (antenna_lh CPO). Moreover, the 
+%           antenna parameters, such as the waveguide dimensions, are now stored into the scenarios.
+%           This allows batch calculation on antenna parameters.   
+%
 %  05/2010 : the code repository has been moved from CVS to the partenaires zone SVN server.
 %           Many little changes have made since last year : mostly improvement of usability or
 %           performance improvements (especially for the 2 gradients version). 
