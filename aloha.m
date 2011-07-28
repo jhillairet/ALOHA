@@ -42,7 +42,7 @@ comment = ['test'];
 % #####################
 %  Save results in a matlab file (.mat) option
 %  
-bool_sauvegarde = false;
+bool_save = true;
 % matlab result filename
 scenario_filename = 'sim_test.mat';
 
@@ -353,7 +353,7 @@ end
 %  end
 
 % #####################
-% spectre computing parameters
+% spectrum computing parameters
 %  
 nz_min = -10;   % depart en nz 
 nz_max = 10;    % arrivee en nz
@@ -369,9 +369,10 @@ nbre_nz=(nz_max-nz_min)/dnz;
 
 
 % ##################### 
-% trace du chp dans le plasma 
-% (pour les versions 3 et 6)
-%  
+% Field in the plasma parameters
+% These parameters represents the dimension and the steps
+% of a box located at the mouth of the antenna in the plasma
+% 
 z_coord_min = -0.005;   % coordonnees dans le plasma
 z_coord_max = 0.06;
 nbre_z_coord = 3000;
@@ -411,10 +412,10 @@ scenario = aloha_scenario(scenario);
 % #####################
 %  Results saving
 %  
-if (bool_sauvegarde)
-    disp(aloha_message(['Sauvegarde des results dans le fichier ', scenario_filename]));
-    status = aloha_scenario_appendScenarioToFile(scenario, scenario_filename);
+if (bool_save)
+    disp(aloha_message(['Saving the results (scenario) into file : ', scenario_filename]));
+    status = aloha_scenario_save(scenario, scenario_filename);
 end
 
 
-disp(aloha_message('--------- fin du calcul.---------'));
+disp(aloha_message('--------- end of computation.---------'));
