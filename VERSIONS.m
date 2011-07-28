@@ -1,5 +1,11 @@
 %  ALOHA (MAJORS) CHANGE-LOG
 %
+%  06/2011 : the antenna description has been changed to be compliant with ITM LH antenna description 
+%           In order to keep the compatibility with old scenarios, the previous antenna description should
+%           still work.
+%           The code has been also improved to read the Tore Supra database (see the aloha_ondemand... functions)
+%
+%
 %  02/2011 : The antenna description now follows the ITM standard (antenna_lh CPO). Moreover, the 
 %           antenna parameters, such as the waveguide dimensions, are now stored into the scenarios.
 %           This allows batch calculation on antenna parameters.   
