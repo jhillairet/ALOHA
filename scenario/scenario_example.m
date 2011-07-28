@@ -24,8 +24,8 @@ function scenario = scenario_example
 % ##################################################################
 %  RESULTS SAVING 
 % ##################################################################
-% Sauvegarde automatique du scenario resultat dans un fichier ?
-options.bool_sauvegarde = false;
+% Automatic saving of the scenario (once calculated) ?
+options.bool_save = false;
 % matlab result filename
 % (avoid spaces if possible)
 options.scenario_filename = ''; 
@@ -43,7 +43,8 @@ options.comment = [''];
 %  le dossier 'achitecture_antenne'.
 % 
 antenna.architecture = 'antenne_C4'; % Old fashioned antenna description. [OBSOLETE]
-%antenna.architecture = 'antenna_C4_ITM';      
+%  antenna.architecture = 'antenna_C4_ITM';      
+%  antenna.architecture = 'antenna_PA_ITM';
 
 %% #####################
 % Antenna excitation
@@ -199,7 +200,7 @@ options.B0 = 2.95;
 % NB :
 % = 0 : valable uniquement pour les coefficient de reflexion ; 
 % En champ, il y a un pb de normalisation a regler [TODO]
-options.type_swan_aloha = 1;    
+options.type_swan_aloha = 1;
 
 
 % ==================================================================
@@ -340,8 +341,8 @@ end
 % aloha 2D may crash (seg fault). If it occurs, 
 % increase the dnz or dny values or decrease nz_min/max, ny_min/max ! 
 % TODO : aloha 2D spectrum/nz,ny memory bug
-options.nz_min = -10;   % depart en nz 
-options.nz_max = 10;        % arrivee en nz
+options.nz_min = -20;   % depart en nz 
+options.nz_max = 20;        % arrivee en nz
 options.dnz = 0.01;     % pas en nz
 
 options.ny_min = -2;    % depart en ny 
