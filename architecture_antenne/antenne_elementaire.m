@@ -28,10 +28,10 @@ antenne_standard = 1; % = 0 il faut decrire l'antenne sur une ligne : tableaux b
                       % = 1 parametres scalaires : b_g_actif, b_g_pass et e
 
 
-b_g_actif = 8e-3;		% largeur des guides actifs 
+b_g_actif = 6.5e-3;		% largeur des guides actifs 
 b_g_pass = NaN;		% largeur des guides passifs 
 
-e = 2e-3;			% epaisseur des parois des guides dans le sens toroidal 
+e = 1e-3;			% epaisseur des parois des guides dans le sens toroidal 
 
 lcc = 1/4;			% longueur du court-circuit (en lambda guidee); 
 
