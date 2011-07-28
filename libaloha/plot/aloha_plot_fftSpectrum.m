@@ -44,6 +44,17 @@ aloha_constants;
 k0=2*pi*f/celerite;
 lambda=celerite/f;
 
+
+
+% artificially increase the spatial domain size z in order to decrease 
+% the spectral step dnz. The Efield is completed by zero padding. 
+dz=z(2)-z(1);
+z_add_left = [min(z)-5:dz:min(z)-dz];
+z_add_right= [max(z)+dz:dz:max(z)+5];
+z = [z_add_left, z, z_add_right];
+
+E=[zeros(1,length(z_add_left)),E,zeros(1,length(z_add_right))];
+
 % E field fft
 Efft = fftshift(fft(E));
 
@@ -65,7 +76,7 @@ h=aloha_plot_figure(figure);
     plot(n_parallel, abs(Efft).^2./norma);
     xlabel('n_{//}');
     ylabel('|FFT[E]|^2');
-    set(gca, 'XLim', [-20, 20]);
+    set(gca, 'XLim', [-10, 10]);
     grid on;
 
 if (nargout == 2)

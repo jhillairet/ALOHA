@@ -101,10 +101,16 @@ for idx_sc = 1:length(scenario)
                 n_parallel_0 = nz(idx_max);
             end 
         
-            D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
-                (dnz*sum(dP_nz(find(nz>1))./nz(find(nz>1)).^2) ...
-                 - dnz*sum(dP_nz(find(nz<1))./nz(find(nz<1)).^2));
-    
+            if n_parallel_0 > 0
+                D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
+                    (dnz*sum(dP_nz(find(nz>1))./nz(find(nz>1)).^2) ...
+                    - dnz*sum(dP_nz(find(nz<1))./nz(find(nz<1)).^2));
+            else
+                D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
+                    (dnz*sum(dP_nz(find(nz<1))./nz(find(nz<1)).^2) ...
+                    - dnz*sum(dP_nz(find(nz>1))./nz(find(nz>1)).^2));
+            end    
+
             % compute the cumulated directivity, function of nz
             for idx=1:length(nz)
                  D_cumulated(idx) = 1 - (1/P)*dnz*(sum(dP_nz([idx:end])./nz([idx:end]).^2));

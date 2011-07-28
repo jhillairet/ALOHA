@@ -8,8 +8,18 @@ function vargout=aloha_plot_figure(varargin)
 %   - increasing the line width to 2
 %     
 %  INPUT
+%   none
+%  or
+%   - integer : number of the figure to be created
+%  or
+%   - h : figure handle
+%  or
+%   - figure_name (string)
+%  or 
 %   - h : figure handle
 %   - figure_name (string) : the name of the figure [optionnal]
+% 
+%
 %  
 %  OUPUT
 %   - h [optionnal]: figure handle
@@ -33,8 +43,11 @@ function vargout=aloha_plot_figure(varargin)
       case 1
         if ishandle(varargin{1})
             h = varargin{1};
-        elseif isint(varargin{1});
+        elseif isnumeric(varargin{1}) & isint(varargin{1});
             h = figure(varargin{1});
+        elseif isstr(varargin{1}) 
+            h = figure;
+            set(h, 'Name', ['-= ', varargin{1}, ' =-']);
         else
             error('Bad argument type. See help.');
         end

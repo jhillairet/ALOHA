@@ -61,13 +61,21 @@ for id_scen=1:length(scenarios) % for many scenarios
 
 
     % figure spectre 2D  
-    % Rajout le 11/06/2007 par Izacard Olivier :
-        h=aloha_plot_figure(figure, 'ALOHA : ny,nz spectrum');
-         
-        mesh(nz , ny , real(dP));
+      h=aloha_plot_figure(figure, 'ALOHA : ny,nz spectrum');
+      [NNy, NNz]=ndgrid(ny,nz);
+%        subplot(121)
+        pcolor(NNz, NNy, real(dP));
+        shading interp, colorbar;
         xlabel('n_z');
         ylabel('n_y');
-        zlabel('dP');
+        title('2D Power spectrum [Real part] ')
+%        subplot(122)
+%          pcolor(NNz, NNy, imag(dP));
+%          shading interp, colorbar;
+%          xlabel('n_z');
+%          ylabel('n_y');
+%          title('Power spectrum [Imag part] ')
+
 
 
 %      % calcul et affichage du spectre de l'antenne entiere

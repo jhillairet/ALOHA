@@ -8,6 +8,8 @@
 % AUTHOR: JH
 % LAST UPDATE
 %  - 2008: creation
+%  - 2011: changed T_grill and erreur_rel to increase default precision
+global ALOHA_VERSION
 
 ALOHA_ROOT = aloha_utils_getRootPath;
 
@@ -24,11 +26,11 @@ aloha_constants;
 
 disp(aloha_message('Define some ALOHA constants.'));
 % parametres 1D
-T_grill = 2;                % periodicite du grill / diminue les tps de calcul
+T_grill = 7;                % periodicite du grill / diminue les tps de calcul
 D_guide_max = 100;          % decouplage : pr |i-j| > D_guide_max, Kij = 0 avec {i,j} numeros de deux guides => S  
                             % puis pr |i-j| > D_guide_max -5, Sij = 0 	/ diminue encore les tps de calcul
-			    	  
-erreur_rel = 1e-4;  	    % erreur sur les integrales
+
+erreur_rel = 1e-6;  	    % erreur sur les integrales
 pertes = 1e-6;              % tangente delta pour eviter les singularites
 
 

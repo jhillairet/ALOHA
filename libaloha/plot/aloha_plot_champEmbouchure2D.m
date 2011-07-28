@@ -1,4 +1,18 @@
 function aloha_plot_champEmbouchure1D(scenario)
+% ALOHA
+% 
+% aloha_plot_champEmbouchure2D(scenario)
+%
+% Plot the electric field (parallel component) at the mouth of the antenna
+% 
+% INPUT
+%  - scenario (1x1) : ALOHA scenario (2D plasma)
+% 
+% OUTPUT : none
+% 
+% AUTHORS: DV,JH
+% 
+% 
 
 %%%%%%% AMPLITUDE in 2D
 
@@ -55,8 +69,8 @@ colorbar;
 
 %%%%%% AMPLITUDE in 1D
 aloha_plot_figure
-hold on
-
+hold on;
+ 
 for idx_wg = 1:scenario.results.nbre_guides
     Ey_g = squeeze(scenario.results.Ey(idx_wg,:,:));
     Ez_g = squeeze(scenario.results.Ez(idx_wg,:,:));
@@ -73,10 +87,13 @@ for idx_wg = 1:scenario.results.nbre_guides
     Ez_g = Ez_g(idx_y_middle,:);
     norm_E = sqrt(abs(Ey_g).^2+abs(Ez_g).^2);
 
-    plot(z_g, [abs(Ez_g)]);
+    % plot the field
+    plot(z_g, abs(Ez_g));
 
 end
+
 hold off;
 xlabel('z [m]');
 ylabel('|E_z| [V/m]');
+grid on;
 title('Parallel electric field amplitude');

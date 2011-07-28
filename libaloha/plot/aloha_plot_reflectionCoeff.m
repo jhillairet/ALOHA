@@ -40,6 +40,8 @@ aloha_plot_figure(figure, 'ALOHA : module reflection coefficients');
     grid on;
     xlabel('module #');
     ylabel('Reflection coefficient (%)');
+    % x label is only integer !
+    set(gca, 'XTick', 1:size(RC,2));
 
 elseif nargin >= 2
     x = varargin{1};

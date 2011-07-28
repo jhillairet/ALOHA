@@ -41,7 +41,9 @@ end
 % La modification du code consiste donc a exprimer les champs avec un pas constant et controle.
 dz = 1e-4; % ATTENTION : doit etre absolument inferieur a la plus petite decimale des dimensions b ou e
 
-
+% the ponderative factor are normalized to the waveguide largest side, 
+% in order to have the same unit than Efield calculated with the 2D ALOHA mode (or any 3D FEM code).
+% If one would compare this Efield with a 2D FEM code, then he has to remove the /a factor below...
 poids_E = sqrt(2/a)*sqrt(2)*rac_Zhe*(a_plasma + b_plasma);
 poids_H = sqrt(2/a)*sqrt(2)/2*(a_plasma - b_plasma);
 

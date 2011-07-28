@@ -38,7 +38,7 @@ if isempty(x_coord)
 end
   
 
-nz_fig_plasma = -100:pas_nz_fig_plasma:100;
+nz_fig_plasma = -100:pas_nz_fig_plasma/2:100;
 
 poids_E = rac_Zhe*(a_plasma + b_plasma);
 poids_H = inv(rac_Zhe)*(a_plasma - b_plasma);
@@ -66,6 +66,10 @@ k0 = 2*pi*freq/celerite;
 nc = ((2*pi*freq)^2)*me*Eps0/(qe^2);
 X0 = ne0./nc;
 D0 = k0*ne0./dne0;
+
+ne1 = ne0+dne0.*d_couche;
+D1 = k0*ne1./dne1;
+X1 = ne1./nc;
 
 ind = lig_fig_plasma;% indice de la ligne
    

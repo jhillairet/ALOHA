@@ -32,7 +32,7 @@ S_ant_22 = diag(S_ant_22);
 % 
 % Pour tous les modules situes sur une ligne poloidale de modules
 for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
-    % introduit les variables S, Z et f lues dans fichier issu de HFSS
+    % introduit les variables S [, Z et f] lues dans fichier issu de HFSS
     nom = nom_fichiers(ind,:);
     eval(nom);
 
@@ -64,9 +64,17 @@ for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
     %  l'entree du diviseur de puissance. 
     if (bool_mesure)   
       disp('[ALOHA] (INFO) : correction de la phase pour chaque module entre entree fenetres et disp. div. puissance');
-      S_module_11 = S_module_11*exp(+i*2*phase_rallonge(ind)); 
-      S_module_12 = S_module_12*exp(+i*phase_rallonge(ind)); 
-      S_module_21 = S_module_21*exp(+i*phase_rallonge(ind));
+
+        % if ITM antenna description 
+        if aloha_isAntennaITM(scenario)
+            phase_rallonge = scenario.antenna_lh.setup.modules.Sparameters.phase_deembedded;
+        else % old antenna description
+            % phase_rallonge has allready been defined in the antenna description
+        end
+
+        S_module_11 = S_module_11*exp(+i*2*phase_rallonge(ind)); 
+        S_module_12 = S_module_12*exp(+i*phase_rallonge(ind)); 
+        S_module_21 = S_module_21*exp(+i*phase_rallonge(ind));
     end
    
     S_ant_11 = [S_ant_11,S_module_11];

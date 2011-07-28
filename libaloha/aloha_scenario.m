@@ -96,13 +96,15 @@ for idx_sc = 1:length(scenarios)
     if bool_lignes_identiques
         disp(aloha_message(['Main plasma parameters : ', ...
                         'ne0=', num2str(ne0/1e17) , 'x10^17 m^-3, '...
-                        'lambda0=', num2str(lambda_n0*1e3), ' mm. ']));
+                        'lambda1=', num2str(lambda_n0*1e3), ' mm. ' ...
+                        '(lambda2=', num2str(lambda_n1*1e3), ' mm.) ']));
     else
         disp(aloha_message('Main plasma parameters : '));
         for idx=1:length(ne0)
          disp(aloha_message(['row #', num2str(idx), ' ne0=', ...
                          num2str(ne0(idx)/1e17) , 'x10^17 m^-3, '...
-                        'lambda0=', num2str(lambda_n0(idx,:)*1e3), ' mm. ']));    
+                        'lambda1=', num2str(lambda_n0(idx,:)*1e3), ' mm. ' ...
+                        '(lambda2=', num2str(lambda_n1*1e3), ' mm.) ']));
         end
     end
 
@@ -125,6 +127,11 @@ for idx_sc = 1:length(scenarios)
       eval(architecture);
     end
 
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    % antenna's module loading
+    disp(aloha_message('Module''s excitation:'))
+    disp(a_ampl.*exp(-j*a_phase));
+
 	
     %%%%%%%%%%%%%%%%%%%%%%%%
     % coordonnees des guides
@@ -132,7 +139,6 @@ for idx_sc = 1:length(scenarios)
     disp(aloha_message('Take into account waveguide coordinates'));
     %coordonnees_guides;   
     % if the field antenna_lh exist, this means that we use the ITM ALOHA version
-    
     if aloha_isAntennaITM(scenario)
       disp(aloha_message('ITM antenna description'));
       [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinatesFromCPO(aloha_getAntenna(scenario));
