@@ -192,15 +192,32 @@ plasma.d_vide = 0;
 options.B0 = 2.95;        
 
 %% #####################
-% Definition de l'impedance caracteristique, de type ALOHA ou SWAN, 
-% pour la renormalisation de la matrice de scattering S_grill-plasma.
+% 2D or 3D normalization choice
 % 
-% = 0 impedance de mode ds le plasma type SWAN (mode TEM)
-% = 1 impedance de mode ds le plasma type ALOHA (mode TE)
-% NB :
-% = 0 : valable uniquement pour les coefficient de reflexion ; 
-% En champ, il y a un pb de normalisation a regler [TODO]
-options.type_swan_aloha = 1;
+% In SWAN, the waveguides were described as parallel plate waveguides (2D). 
+% In ALOHA-1D, the waveguides are parallel plate waveguides (2D)
+% In ALOHA-2D, the waveguides are rectangular waveguides (3D). 
+% 
+% In order to be able to compare the Electric field amplitudes given 
+% between ALOHA-1D and ALOHA-2D, one must renormalize the ALOHA-1D results
+% and to take into account the height of the waveguide ("a" parameter).
+% 
+% Moreover, if one want to compare the scattering parameters given
+% by ALOHA-1D/2D and SWAN, the scattering parameters reference impedance is
+% not the same between the two codes. So a impedance renormalization if necessary.
+% (in SWAN, the ref impedance is the vaccuum impedance, while it is the rectangular
+% waveguide impedance in ALOHA)
+% 
+% type_swan_aloha = 0:
+%  - SWAN reference impedance in S-parameters (parallel plate wg, TEM+TM mode)
+%  - Electric field does not depends of the height of the waveguide ("a")
+%    ALOHA-1D E-field should be of the same order than a 2D full wave simulation
+%
+% type_swan_aloha = 1: (default)
+%  - ALOHA reference impedance in S-parameters (rectangular waveguide, TE+TM modes)
+%  - Electric field depends of the waveguide height ("a"). 
+%    ALOHA-1D or ALOHA-2D E-field should be of the same order.
+ptions.type_swan_aloha = 1;
 
 
 % ==================================================================
