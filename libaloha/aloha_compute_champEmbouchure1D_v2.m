@@ -44,10 +44,22 @@ dz = 1e-4; % ATTENTION : doit etre absolument inferieur a la plus petite decimal
 % the ponderative factor are normalized to the waveguide largest side, 
 % in order to have the same unit than Efield calculated with the 2D ALOHA mode (or any 3D FEM code).
 % If one would compare this Efield with a 2D FEM code, then he has to remove the /a factor below...
-poids_E = sqrt(2/a)*sqrt(2)*rac_Zhe*(a_plasma + b_plasma);
-poids_H = sqrt(2/a)*sqrt(2)/2*(a_plasma - b_plasma);
-
-
+%  
+% Bug correction JH 13/11/2011
+% The magnetic field amplitude was lower than expected. This has an impact on
+% the amplitude of the spectrum when calculated from Electric & Magnetic field by FFT.
+% It seems that the ratio 1/Z0=Y0 has been taken into account two times, so one time too much !
+% Below I've added the inv(rac_Zhe) term to the 'poids_H' term (H field coupling weight), 
+% and removed the YO term in the H-field calculation.
+% Moreover, I've added the if bloc to take into account the 2D/3D Efield normalization 
+% as explained before.
+if type_swan_aloha == 1 % "a" normalization (rectangular waveguide, 3D)
+    poids_E = sqrt(2/a)*sqrt(2)*rac_Zhe*(a_plasma + b_plasma);
+    poids_H = sqrt(2/a)*sqrt(2)*inv(rac_Zhe)*(a_plasma - b_plasma);
+elseif type_swan_aloha == 0 % no "a" dependance (parallel-plate waveguide, 2D)
+    poids_E = sqrt(2)*rac_Zhe*(a_plasma + b_plasma);
+    poids_H = sqrt(2)*inv(rac_Zhe)*(a_plasma - b_plasma);
+end
 
 Efield=[];
 % for all poloidal lines
@@ -87,8 +99,8 @@ for idx_pol = 1:nb_g_pol
             % guided wavenumber 
             km = (k0^2>(m*pi/b(idx_tor)).^2).*sqrt(k0^2-(m*pi/b(idx_tor)).^2) ...
                 -j*(k0^2<(m*pi/b(idx_tor)).^2).*sqrt((m*pi/b(idx_tor)).^2 - k0^2);
-            % characteric admittance
-            Ym = k0*Y0/km;
+            % modal normalization
+            Ym = k0/km; % = 1 if m=0 (TEM)
 
             H_wg_m(:, :, m+1) = Ym*[coeffx_wg;coeffy_wg;coeffz_wg]*poids_H(mode_idx(m+1));
         end
@@ -127,18 +139,29 @@ for idx_pol = 1:nb_g_pol
 
    E_mouth(:,:,idx_pol) = E_idx_pol;
    H_mouth(:,:,idx_pol) = H_idx_pol; 
-   
-   Poynting_mouth(:,:,idx_pol) = 1/2*real(cross(E_idx_pol, conj(H_idx_pol)));
-   Poynting_mouth_total = trapz(abs_z(idx_pol,:), Poynting_mouth(1,:,idx_pol));   disp(aloha_message(['Summation of the poynting vector in x direction : ', num2str(Poynting_mouth_total), ' W']))
+
+   if type_swan_aloha == 1 % "a" normalization (rectangular waveguide, 3D)
+    Poynting_mouth(:,:,idx_pol) = (a/2)*1/2*real(cross(E_idx_pol, conj(H_idx_pol)));
+    % JH 12/09/2011
+    % I have to admit that the (a/2) term before is mainly ad-hoc, found by comparizon with
+    % COMSOL results. The a term is logical in order to transform the power density (W/m) into
+    % power (W), but I have no clue for the additional /2 factor (which does not comes from 
+    % the RMS definition, since there is already a 1/2 factor before the Poynting vector...).  
+   elseif type_swan_aloha == 0 % no "a" dependance (parallel-plate waveguide, 2D)
+    Poynting_mouth(:,:,idx_pol) = 1/2*real(cross(E_idx_pol, conj(H_idx_pol)));
+   end
+   Poynting_mouth_total = trapz(abs_z(idx_pol,:), Poynting_mouth(1,:,idx_pol));   
+
+   disp(aloha_message(['Summation of the poynting vector in x direction : ', num2str(Poynting_mouth_total), ' W']))
     
 end % idx_pol
 
 
 
 % add the calculated results to the scenario
-scenario.results.abs_z=abs_z;
+scenario.results.abs_z=abs_z; 
 scenario.results.dz=dz;
-scenario.results.Efield=Efield;
+scenario.results.Efield=Efield; % compatibility output paramerters with previous ALOHA version
 scenario.results.E_mouth=E_mouth;
 scenario.results.H_mouth=H_mouth;
 scenario.results.Poynting_mouth=Poynting_mouth;
