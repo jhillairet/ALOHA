@@ -66,18 +66,18 @@ end
 
 title({letitre1;letitre2;letitre3}); 
 
-
-% phase
-h=aloha_plot_figure(figure, 'ALOHA parallel electric field phase in the antenna mouth');
-% for all poloidal lines
-nb_g_pol=size(Efield,1);
-for idx_pol = 1:nb_g_pol 
-    subplot(nb_g_pol,1,idx_pol)
-    plot(abs_z(idx_pol,:), 180/pi*angle(Efield(idx_pol,:)), ...
-        abs_z(idx_pol,:), 180/pi*Efield_average_phase(idx_pol,:));
-    grid on;
-    xlabel('z [m]')
-    ylabel('\angle E_z (deg)')
-end % idx_pol
-
-% if magnetic field exists
+%  
+%  % phase
+%  h=aloha_plot_figure(figure, 'ALOHA parallel electric field phase in the antenna mouth');
+%  % for all poloidal lines
+%  nb_g_pol=size(Efield,1);
+%  for idx_pol = 1:nb_g_pol 
+%      subplot(nb_g_pol,1,idx_pol)
+%      plot(abs_z(idx_pol,:), 180/pi*angle(Efield(idx_pol,:)), ...
+%          abs_z(idx_pol,:), 180/pi*Efield_average_phase(idx_pol,:));
+%      grid on;
+%      xlabel('z [m]')
+%      ylabel('\angle E_z (deg)')
+%  end % idx_pol
+%  
+%  % if magnetic field exists

@@ -256,7 +256,9 @@ for idx_sc = 1:length(scenarios)
             disp(aloha_message('Compute the parallel E field in the mouth'));
             switch version_code
                 case '1D'
-                    scenario=aloha_compute_champEmbouchure1D(scenario);
+                    % JH 12/09/2011
+                    % Changed aloha_compute_champEmbouchure1D to aloha_compute_champEmbouchure1D_v2
+                    scenario=aloha_compute_champEmbouchure1D_v2(scenario);
                 case '2D'
                     scenario=aloha_compute_champEmbouchure2D(scenario);
             end
