@@ -1,3 +1,9 @@
+%% aloha_scenario_create()
+% PRIVATE script, used only in aloha.m
+%
+% DO NOT MODIFY
+
+
 %  Creation d'un scenario a partir des variables contenues dans la session en cours
 %  
 %  
