@@ -10206,8 +10206,8 @@ c     print the message
       do 50 kunit = 1,nunit
          iunit = lun(kunit)
          if (iunit.eq.0) iunit = i1mach(4)
-         if (nword.gt.0) write (iunit,f) (messg(i),i=1,nword)
-         if (nchrem.gt.0) write (iunit,g) (messg(i),i=nword1,nword2)
+c         if (nword.gt.0) write (iunit,f) (messg(i),i=1,nword)
+c         if (nchrem.gt.0) write (iunit,g) (messg(i),i=nword1,nword2)
 50    continue
       return
       end
@@ -10454,7 +10454,7 @@ c           print table header
 c           print body of table
             do 20 i=1,10
                if (kount(i).eq.0) go to 30
-               write (iunit,f) mestab(i),nertab(i),levtab(i),kount(i)
+c               write (iunit,f) mestab(i),nertab(i),levtab(i),kount(i)
    20       continue
    30       continue
 c           print number of other errors
