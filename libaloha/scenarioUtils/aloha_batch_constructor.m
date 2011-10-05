@@ -31,7 +31,7 @@ batch_filename = [regexprep(batch_name, ' ', '_'),'.m'];
 
 % copy the latest default example ALOHA batch to the current directory
 aloha_path = aloha_utils_getRootPath;
-source = [aloha_path,'/scenario/batch_example.m'];
+source = [aloha_path,'/scenario/batch_exemple.m'];
 destination = [cur_path,'/',batch_filename];
 [status,message,messageid] = copyfile(source, destination);
 aloha_message(message);
