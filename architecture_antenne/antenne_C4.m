@@ -87,8 +87,10 @@ chemin_aller = 'S_HFSS/matrices_HFSS_C4';  % path to get the HFSS matrix
 %  dans le document .doc situee dans le repertoire des .m
 bool_newSmatrix = true;
 
+
 % modules C4
 if bool_newSmatrix
+	disp('[ALOHA] (C4): utilisation des nouvelles matrices S antenne');
     nom_fichiers = strvcat('Module_bas_plaque_long7_ext2', ...
                     'Module_bas_plaque_long6_long7', ...     
                     'Module_bas_plaque_long5_long6', ...                
@@ -107,12 +109,13 @@ if bool_newSmatrix
 %               'Module_haut_plaque_ext1_long1'];
 
 else
+	disp('[ALOHA] (C4): utilisation des anciennes matrices S antenne');         
 	nom_fichiers = ['S_C4_24b';'S_C4_23b';'S_C4_22b';'S_C4_21b';'S_C4_14b';'S_C4_13b';'S_C4_12b';'S_C4_11b'];   
 	% nom_fichiers = ['S_C4_24h';'S_C4_23h';'S_C4_22h';'S_C4_21h';'S_C4_14h';'S_C4_13h';'S_C4_12h';'S_C4_11h'];
 end
 
 phase_rallonge = zeros(8,1);
-phase_rallonge = -pi/180.*[-56.5;-44.7;-36.5;0;0;-36.5;-44.7;-56.5];
+%phase_rallonge = -pi/180.*[-56.5;-44.7;-36.5;0;0;-36.5;-44.7;-56.5];
 
 % parametres 1D
 
