@@ -1,5 +1,6 @@
 function scenario = scenario_example 
 % ALOHA scenario example
+% VERSION : 1.5 (20/09/2011)
 % 
 % This file is a function which create an ALOHA scenario.
 %
@@ -18,8 +19,6 @@ function scenario = scenario_example
 %   - scenario <structure>: ALOHA scenario
 % 
 % AUTHOR:JH
-% LAST UPDATE:
-%  - 10/2008: creation
 
 % ##################################################################
 %  RESULTS SAVING 
