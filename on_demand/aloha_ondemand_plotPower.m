@@ -20,11 +20,12 @@ switch upper(port)
     case 'Q6A' % C2 or C3
         sig_power = 'GPINJC1';
         sig_phase = 'GPHIC1';
+        sig_RC    = 'GCREFC1';
 
     case 'Q6B' % C3 or C4
         sig_power = 'GPINJC2';
         sig_phase = 'GPHIC2';
-
+        sig_RC    = 'GCREFC2';
     otherwise
         error('bad port definition. See help');
 end
@@ -42,6 +43,7 @@ end
 %% retrieving the signal
 [power, t_power] = tsbase(pulsenb, sig_power); % in kW
 [phase, t_phase] = tsbase(pulsenb, sig_phase);
+[refpow, t_refpow] = tsbase(pulsenb, sig_RC);
 
 %% define some constants
 upper_modules = [1:2:15];
@@ -94,5 +96,27 @@ aloha_plot_figure('Phase per modules - lower (blue) - upper (red)');
             end
             if exist('t_start')
                 rectangle('Position', [t_start 0 t_stop-t_start 360]);
+            end
+    end
+
+
+%% plotting the reflexion coefficient
+aloha_plot_figure('RC per modules - lower (blue) - upper (red)');
+    set(gcf, 'Position', [20+FIG_WIDTH 100 FIG_WIDTH FIG_HEIGHT])
+    for idx=1:length(upper_modules)
+        subplot(4,2,idx)
+            plot(t_refpow(:,lower_modules(idx)), refpow(:,lower_modules(idx)), 'b', ...
+                 t_refpow(:,upper_modules(idx)), refpow(:,upper_modules(idx)), 'r');
+            set(gca, 'YLim', [0 20]);
+            set(gca, 'XLim', [T_MIN, T_MAX]);
+            title(['Module: #',num2str(lower_modules(idx)), '(blue)', ...
+                          ' #',num2str(upper_modules(idx)), '(red)']);
+            ylabel('RC [%]');
+            grid on;
+            if idx==length(upper_modules)-1 | idx==length(upper_modules) % last two
+                xlabel('t [s]');
+            end
+            if exist('t_start')
+                rectangle('Position', [t_start 0 t_stop-t_start 20]);
             end
     end
