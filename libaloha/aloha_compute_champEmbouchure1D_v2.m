@@ -1,4 +1,4 @@
-function scenario=aloha_compute_champEmbouchure1D(scenario)
+function scenario=aloha_compute_champEmbouchure1D_v2(scenario)
 % Compute the parallel component of electric field (Ez) in the  mouth of the antenna.
 % Calcule le champ electrique parallele (Ez) dans l'embouchure de l'antenne
 % 
@@ -134,12 +134,14 @@ for idx_pol = 1:nb_g_pol
 
 
    % variables pour sortie & sauvegarde
+   abs_z = []
    abs_z(idx_pol,:) = abs_z_idx_pol;
    Efield(idx_pol,:)= E_idx_pol(3,:); % z
 
    E_mouth(:,:,idx_pol) = E_idx_pol;
    H_mouth(:,:,idx_pol) = H_idx_pol; 
 
+   
    if type_swan_aloha == 1 % "a" normalization (rectangular waveguide, 3D)
     Poynting_mouth(:,:,idx_pol) = (a/2)*1/2*real(cross(E_idx_pol, conj(H_idx_pol)));
     % JH 12/09/2011
@@ -153,6 +155,7 @@ for idx_pol = 1:nb_g_pol
    Poynting_mouth_total = trapz(abs_z(idx_pol,:), Poynting_mouth(1,:,idx_pol));   
 
    disp(aloha_message(['Summation of the poynting vector in x direction : ', num2str(Poynting_mouth_total), ' W']))
+
     
 end % idx_pol
 
