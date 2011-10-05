@@ -217,7 +217,7 @@ options.B0 = 2.95;
 %  - ALOHA reference impedance in S-parameters (rectangular waveguide, TE+TM modes)
 %  - Electric field depends of the waveguide height ("a"). 
 %    ALOHA-1D or ALOHA-2D E-field should be of the same order.
-ptions.type_swan_aloha = 1;
+options.type_swan_aloha = 1;
 
 
 % ==================================================================
