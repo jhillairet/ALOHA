@@ -3,6 +3,7 @@ include Makefile.config
 # le code suivant est assez 'rustique', car les possibilites de make sont limitees avec la version disponible sur deneb.
 all: LIB \
     coupl_plasma_version3 \
+    coupl_plasma_version5 \
     coupl_plasma_version6
 
 LIB:
