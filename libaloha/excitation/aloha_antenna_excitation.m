@@ -50,6 +50,32 @@ if (nargin == 1)
             a_ampl = sqrt(2.0672e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = 1*(0*pi/180)*(0:7)';
 
+        case 'antenne_COMPASS_old2'
+            a_ampl = sqrt(1)*ones(8,1);   
+            a_phase = 1*(-60*pi/180)*(0:7)';
+            
+         case 'antenne_COMPASS_old2_TEST'
+            a_ampl = sqrt(2.0672e6/16)*ones(20,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(60*pi/180)*(0:19)';   
+            
+        case 'antenne_COMPASS_old3'
+            a_ampl = sqrt(2.0672e6/16)*ones(6,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(60*pi/180)*(0:5)';
+        
+        case 'antenne_COMPASS_6wg_HAMAC'
+            a_ampl = sqrt(2.0672e6/16)*ones(2,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(0*pi/180)*(0:1)';
+        
+        case 'antenne_COMPASS_8wg_HAMAC'
+            a_ampl = sqrt(2.0672e6/16)*ones(2,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(0*pi/180)*(0:1)';   
+         
+        case 'antenne_COMSOL_16WG_HAMAC'
+            a_ampl = sqrt(2.0672e6/16)*ones(2,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(0*pi/180)*(0:1)';   
+          
+        case 'antenne_C3'
+
         case {'antenne_C3', 'antenne_C3_referenceModule', 'antenna_C3_ITM'}
             a_ampl = sqrt(4.0320e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = -90*(pi/180)*(0:7)';
@@ -58,9 +84,53 @@ if (nargin == 1)
             a_ampl = sqrt(4.0320e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = +90*(pi/180)*(0:7)';
 
+        case 'antenne_C3_COMSOL'
+            a_ampl = 1*ones(16,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(-90*pi/180)*(0:15)';
+  
+        case 'antenne_C3_Coupled_COMSOL'
+            a_ampl = sqrt(1e5)*ones(8,1);   % En champ elect 
+            a_phase = 1*(-90*pi/180)*(0:7)';
+            
+        case 'antenne_PAM_Coupled_COMSOL'
+            a_ampl = sqrt(1e5)*ones(8,1);   % En champ elect 
+            a_phase = 1*(270*pi/180)*(0:7)';
+ 
+        case 'antenne_C3_16WG_Coupled_COMSOL'
+            a_ampl = sqrt(4e5)*ones(2,1);   % En champ elect 
+            a_phase = 1*(-90*pi/180)*(0:1)';
+ 
+        case 'antenne_C3_COMSOL_SupportCase'
+            a_ampl = 1*ones(4,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(-90*pi/180)*(0:3)';
+
         case {'antenne_C4'}
             a_ampl = sqrt(2.6725e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = 1*(180*pi/180)*(0:7)';
+        
+        case {'antenne_C4_dphi_D'}
+            a_ampl = sqrt(2.6725e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(-140*pi/180)*(0:7)';
+            
+        case {'antenne_C4_mod'}
+            a_ampl = sqrt(2.6725e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(180*pi/180)*(0:7)';    
+
+        case {'antenne_C4_1module'}
+            a_ampl = sqrt(2.6725e6/16)*ones(1,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(180*pi/180)*(0:0)';      
+            
+        case {'antenne_C4_perfect_1module'}
+            a_ampl = sqrt(2.6725e6/16)*ones(1,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(180*pi/180)*(0:0)';      
+        
+        case {'antenne_C4_perfect2_1module'}
+            a_ampl = sqrt(2.6725e6/16)*ones(1,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(180*pi/180)*(0:0)';      
+         
+        case {'antenne_C4_3guides'}
+            a_ampl = sqrt(2.6725e6/16)*ones(1,1);   % En champ elect pour 25 MW/m^2 !!!
+            a_phase = 1*(180*pi/180)*(0:0)';    
 
         case 'antenne_ITER' 
             a_ampl = sqrt(5e6/12)*ones(3,1);   % Antenne ITER
