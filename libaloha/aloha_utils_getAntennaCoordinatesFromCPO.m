@@ -11,7 +11,7 @@ wg = antenna_lh.setup.modules.waveguides;
 
 % (total) number of waveguides per row
 % = (nb wg in a module) + 2*(nb ext wg) + (nb of wg between modules)
-nwr = mod.nma_phi * wg.nwm_phi  + 2*wg.npwbm_phi + (mod.nma_phi-1)*wg.npwbm_phi;
+nwr = mod.nma_phi * wg.nwm_phi  + 2*wg.npwe_phi + (mod.nma_phi-1)*wg.npwbm_phi;
 
 % (total) number of waveguides per column
 nwc = mod.nma_theta*wg.nwm_theta;
