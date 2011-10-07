@@ -134,7 +134,7 @@ for idx_pol = 1:nb_g_pol
 
 
    % variables pour sortie & sauvegarde
-   abs_z = []
+   abs_z = [];
    abs_z(idx_pol,:) = abs_z_idx_pol;
    Efield(idx_pol,:)= E_idx_pol(3,:); % z
 
