@@ -31,7 +31,7 @@ if exist('scenario_example') == 2
     sc=scenario_example;
 else 
     actual_dir=pwd;
-    cd('../scenario');
+    cd([aloha_utils_getRootPath,'/scenario']);
     sc=scenario_example;
     cd(actual_dir);
 end
