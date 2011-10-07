@@ -15,7 +15,7 @@ for ind = 1:nb_modules_tor-1
     
 end
 
-pass_ligne = [pass_ligne,pass_module_tor + nb_g_passifs_bord + (nb_modules_tor-1)*(nb_g_module_tor+nb_g_passifs_inter_modules)];   
+pass_ligne = [pass_ligne,reshape(pass_module_tor,1,length(pass_module_tor)) + nb_g_passifs_bord + (nb_modules_tor-1)*(nb_g_module_tor+nb_g_passifs_inter_modules)];   
 act_ligne = [act_ligne,act_module_tor + nb_g_passifs_bord + (nb_modules_tor-1)*(nb_g_module_tor+nb_g_passifs_inter_modules)];
 
 pass_ligne = [pass_ligne,(1:nb_g_passifs_bord) + (nb_g_total_ligne - nb_g_passifs_bord)];
