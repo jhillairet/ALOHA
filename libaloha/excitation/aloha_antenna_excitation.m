@@ -74,8 +74,6 @@ if (nargin == 1)
             a_ampl = sqrt(2.0672e6/16)*ones(2,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = 1*(0*pi/180)*(0:1)';   
           
-        case 'antenne_C3'
-
         case {'antenne_C3', 'antenne_C3_referenceModule', 'antenna_C3_ITM'}
             a_ampl = sqrt(4.0320e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = -90*(pi/180)*(0:7)';
@@ -104,7 +102,7 @@ if (nargin == 1)
             a_ampl = 1*ones(4,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = 1*(-90*pi/180)*(0:3)';
 
-        case {'antenne_C4'}
+        case {'antenne_C4', 'antenna_C4_ITM'}
             a_ampl = sqrt(2.6725e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
             a_phase = 1*(180*pi/180)*(0:7)';
         
