@@ -17,4 +17,6 @@
 % has been converted in fortran 90 and doesn't use anymore the commercial 
 % NAG lib (J.Hillairet).
 % 
-% Code maintenance is made by J.Hillairet (CEA/IRFM/GCHF)
+% Code maintenance is made by J.Hillairet (CEA/IRFM/GCHF) 
+% 
+% Contact: julien.hillairet@cea.fr

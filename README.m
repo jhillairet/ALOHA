@@ -57,7 +57,7 @@
 %  NB : au prealable, le repertoire contenant les librairies
 %  d'ALOHA doit etre charge dans le PATH matlab. Pour cela, 
 %  on doit effectuer dans matlab : 
-%  addpath(genpath([chemin_du_code_ALOHA_V2/libaloha'])); 
+%  addpath(genpath([chemin_du_code_ALOHA/libaloha'])); 
 %  Cette commande peut etre rajoutee dans le fichier startup.m de 
 %  matlab pour effectuer cette operation a chaque demarrage de matlab
 %  (cf help matlab)

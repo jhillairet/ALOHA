@@ -1,10 +1,11 @@
 %  ALOHA (MAJORS) CHANGE-LOG
+% 10/2011 : the default ALOHA usage is now to create and process scenarios. The script file aloha.m has thus
+%           been removed from SVN. A tutorial directory has been added to introduce the ALOHA usage.  
 %
 %  06/2011 : the antenna description has been changed to be compliant with ITM LH antenna description 
 %           In order to keep the compatibility with old scenarios, the previous antenna description should
 %           still work.
 %           The code has been also improved to read the Tore Supra database (see the aloha_ondemand... functions)
-%
 %
 %  02/2011 : The antenna description now follows the ITM standard (antenna_lh CPO). Moreover, the 
 %           antenna parameters, such as the waveguide dimensions, are now stored into the scenarios.
