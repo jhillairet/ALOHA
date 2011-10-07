@@ -36,3 +36,12 @@ destination = [cur_path,'/',batch_filename];
 [status,message,messageid] = copyfile(source, destination);
 aloha_message(message);
 
+% show error or OK message
+switch status
+    case 1
+        disp(aloha_message(['Batch file ', batch_filename,' created successfully in the current directory']));
+    case 0
+        disp(aloha_message('An error occured during the creation of the batch file...'));
+        disp(message);
+        disp(messageid);
+end
