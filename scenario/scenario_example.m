@@ -42,7 +42,7 @@ options.comment = [''];
 %  le dossier 'achitecture_antenne'.
 % 
 antenna.architecture = 'antenne_C4'; % Old fashioned antenna description. [OBSOLETE]
-%  antenna.architecture = 'antenna_C4_ITM';      
+antenna.architecture = 'antenna_C4_ITM';      
 %  antenna.architecture = 'antenna_PA_ITM';
 
 %% #####################
