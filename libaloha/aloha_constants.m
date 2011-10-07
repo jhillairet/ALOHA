@@ -22,4 +22,4 @@ Y0 = 1/(Z0);
 celerite = 2.99792458e8;
 
 % version of the code
-ALOHA_VERSION = '06.2011';
+ALOHA_VERSION = '10.2011';
