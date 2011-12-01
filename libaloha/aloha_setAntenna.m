@@ -19,7 +19,8 @@ function scenario = aloha_setAntenna(scenario, antenna_name)
 % (in contrast to a simple script)
 try   
    scenario.antenna_lh = eval(antenna_name);
-catch
-   disp(aloha_message('Old fashioned antenna description... passing.'));
+catch ME
+   disp(aloha_message(ME.message));
+   disp(aloha_message('Antenna description file not found or old fashioned antenna description... '));
    scenario.antenna_lh.setup = [];
 end
