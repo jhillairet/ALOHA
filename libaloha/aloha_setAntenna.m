@@ -40,6 +40,7 @@ catch ME
    % as it is for old fashioned antenna: this means that it is a old antenna description
     if strcmp(ME.identifier, 'MATLAB:scriptNotAFunction')
         disp(aloha_message('Old fashioned antenna description... passing...'));
+        scenario(idscen).antenna_lh = [];
         scenario(idscen).antenna_lh.setup = [];
     elseif strcmp(ME.identifier, 'MATLAB:UndefinedFunction')
         % or simply because the file has not been found (in the PATH)
