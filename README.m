@@ -74,5 +74,4 @@
 %  ALOHA:
 %   - S.Berio, Developpement de coupleurs a la frequence hybride pour la generation
 %     non inductive de courant dans un tokamak, 1996
-%   - D.Voyer, Advanced modeling of the coupling of LH antenna to tokamak plasmas, 200x  
-%     
+%   - J. Hillairet et al, ALOHA: an Advanced LOwer Hybrid Antenna coupling code, 2010 Nucl. Fusion, 50.

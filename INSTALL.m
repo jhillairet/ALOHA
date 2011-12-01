@@ -10,8 +10,8 @@
 %  Before using ALOHA, the directory which contain all the librairies
 %  needed by the code has to be included into the Matlab PATH. In order 
 %  to do so, one must type into matlab prompt the following command :
-%    
-%  addpath(genpath([chemin_absolu_du_code_ALOHA_V2/libaloha'])); 
+%
+%  addpath(genpath([absolute_path_to_aloha/libaloha'])); 
 %  
 %  This command can be added to the matlab file startup.m
 %  in order to automatically run this command at the matlab startup.

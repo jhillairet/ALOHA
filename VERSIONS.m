@@ -1,4 +1,7 @@
 %  ALOHA (MAJORS) CHANGE-LOG
+% 12/2011 : Corrected bugs about the ITM antenna description (with on-demand compatibility)
+%          and in the EM field evaluation at the antenna mouth.
+%  
 % 10/2011 : the default ALOHA usage is now to create and process scenarios. The script file aloha.m has thus
 %           been removed from SVN. A tutorial directory has been added to introduce the ALOHA usage.  
 %
