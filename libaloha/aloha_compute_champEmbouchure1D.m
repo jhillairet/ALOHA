@@ -1,4 +1,7 @@
 function scenario=aloha_compute_champEmbouchure1D(scenario)
+% 
+% scenario=aloha_compute_champEmbouchure1D(scenario)
+% 
 % Compute the parallel component of electric field (Ez) in the  mouth of the antenna.
 % Calcule le champ electrique parallele (Ez) dans l'embouchure de l'antenne
 % 
