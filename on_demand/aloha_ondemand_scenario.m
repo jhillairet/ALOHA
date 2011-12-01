@@ -102,6 +102,14 @@ switch TSport
         end
 end
 
+% JH 01/12/2011
+% ITM compatibility
+% This line avoid a bug, which could lead to creating a scenario working
+% with two disctincts antennas... this bug was due to the matlab PATH
+% 
+% clear the ITM antenna description and reload it with the antenna described upstair
+sc = aloha_setAntenna(sc, sc.antenna.architecture);
+
 % In any case, the frequency in the same : 3.7GHz;
 sc.antenna.freq = 3.7e9;
 
