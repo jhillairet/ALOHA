@@ -43,7 +43,6 @@ options.comment = [''];
 % 
 antenna.architecture = 'antenne_C4'; % Old fashioned antenna description. [OBSOLETE]
 antenna.architecture = 'antenna_C4_ITM';      
-%  antenna.architecture = 'antenna_PA_ITM';
 
 %% #####################
 % Antenna excitation
@@ -147,6 +146,8 @@ version_plasma_2D = 2;
 options.bool_lignes_identiques = true;     
  
 %% #####################
+% Initial electron density of the first plasma layer [m^-3]
+% 
 % Densite electronique minimale devant l'antenne (x=0). [m^-3] 
 % Rappels : 
 %  - densite de coupure 3.7GHz sur TS : 1.71e17 m^-3
@@ -155,7 +156,9 @@ plasma.ne0 = 5e17; % if bool_lignes_identiques = true
 %  plasma.neO = [3;4;5]*1e17; % if bool_lignes_identiques = false
 
 %% #####################
-% longueur de decroissance a l'embouchure de l'antenne
+% Scrape-off length (lambda_n) of the first plasma layer [m]
+% 
+% longueur de decroissance 
 % pour la premiere couche de plasma en partant de l'antenne. [m]
 % 
 % Example : 
@@ -164,13 +167,18 @@ plasma.lambda_n(1) = 2e-3; % 2mm if bool_lignes_identiques = true
 
 
 %% #####################
+% Width of the first plasma layer [version=6 only]. [m]
+% 
 % Epaisseur de la premiere couche de plasma [version=6 only]. [m]
 % 
 % Example : 2e-3 (2mm)
 plasma.d_couche = 2e-3;   
+%  plasma.d_couche = [2;2;2]*1e-3; % if bool_lignes_identiques = false
 
 %% #####################
-% longueur de decroissance a l'embouchure de l'antenne
+% Scrape-off length of the second plasma layer [m]
+% 
+% longueur de decroissance 
 % pour la deuxieme couche de plasma (version=6). [m]
 % 
 % Exemple :
@@ -180,10 +188,12 @@ plasma.lambda_n(2) = 2e-2; % 2cm if bool_lignes_identiques = true
 
 
 %% #####################
-% Epaisseur de la couche de vide entre l'antenne et 
-% la premiere couche de plasma (version=5). [m]
+% Vacuum gap width between the antenna [m]
+% and the first layer of the plasma [m]
+% 
+% Epaisseur de vide entre l'antenne et le plasma [m]
 plasma.d_vide = 0;
-
+%  plasma.d_vide = [0;0;0]*1e-3; % if bool_lignes_identiques = false
 
 %% ####################
 %  Intensite du champ magnetique devant l'antenne. [T]
