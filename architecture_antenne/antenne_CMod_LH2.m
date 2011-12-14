@@ -1,12 +1,12 @@
 % JH 02/2009
 % Nouvelle Antenne LH du Tokamak ALCATOR C-Mod
-% Grill classique composé de 4x4 guides d'ondes phasés
+% Grill classique composé de 1x16 guides d'ondes phasés
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % architecture
 
-nb_g_pol = 4;% nbre de lignes de guides poloidales 
-nb_modules_tor = 4;% nbre de modules sur une ligne poloidale 
+nb_g_pol = 1;% nbre de lignes de guides poloidales 
+nb_modules_tor = 16;% nbre de modules sur une ligne poloidale 
 
 nb_g_module_pol = 1;    % nbre de guides par module dans le sens poloidal
 

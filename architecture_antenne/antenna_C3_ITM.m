@@ -1,4 +1,4 @@
-function antenna_lh = antenna_ITM
+function antenna_lh = antenna_C3_ITM
 % ALOHA description of an LH antenna
 % 
 % Tore Supra C3 antenna (half antenna)

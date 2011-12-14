@@ -17,10 +17,10 @@ S_ant_22 = zeros(1,length(S_plasma));
 % MODIF JH 29/10/2008 : ajout de la condition ~isempty(pass_tot) qui permet 
 % de modeliser des antennes sans voies passives.
 if ~isempty(pass_tot)
-    if (antenne_standard == 1)
+    if (antenne_standard == 1) 
         S_ant_22(1,pass_tot) = -exp(+i*4*pi*lcc);
     else
-        lcc=kron(ones(1,nb_g_pol),lcc);
+        lcc=kron(ones(1,nb_g_pol),lcc); % replicates for the number of poloidal rows
         S_ant_22(1,pass_tot) = -exp(+i*4*pi*lcc);
 %          % passive waveguide scattering parameter for a non ideal depth of lambdag/4.
 %          S_ant_22(1,pass_tot) = 9.910618E-001 - i*1.334034E-001;
@@ -81,7 +81,7 @@ for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
     S_ant_12(ind,modules_act(ind,:)) = S_module_12;
     S_ant_21(modules_act(ind,:),ind) = S_module_21;
     S_ant_22(modules_act(ind,:),modules_act(ind,:)) = S_module_22;
-    
+   
     
 end
 
