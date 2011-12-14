@@ -24,8 +24,8 @@ if bool_lignes_identiques
   dne0 = dne(1); 
   dne1 = dne(2);
 else
-  dne0 = dne(1,:); 
-  dne1 = dne(2,:);
+  dne0 = dne(:,1); 
+  dne1 = dne(:,2);
 end
 
 Nmh = modes(1);
