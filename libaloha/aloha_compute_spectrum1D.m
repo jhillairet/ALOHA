@@ -16,6 +16,7 @@ function scenario=aloha_compute_spectrum1D(scenario)
 
 % for easier matlab manipulation, load all the fields of the input scenario 'scenario'
 % into matlab workspace
+
 aloha_scenario_loadIntoWorkspace;
 
 % test if the main results, such as the plasma scattering matrix, 
@@ -66,6 +67,7 @@ end
       % Rajout le 16/05/2007 par Izacard Olivier
       dne1 = ones(1,nb_g_pol)*dne1;
       d_couche = ones(1,nb_g_pol)*d_couche;
+      d_vide = ones(1,nb_g_pol)*d_vide;
       % MODIF JH 05/2009
       % Si les lignes sont identiques, 
       % Il n'y a pas besoin de faire le meme calcul plusieurs fois.
@@ -77,7 +79,7 @@ end
    nc = ((2*pi*freq)^2)*me*Eps0/(qe^2);
    X0 = ne0./nc;
    D0 = k0*ne0./dne0;
-
+    
    % for version == 6 only
    n1=ne0+dne0.*d_couche;
    X1=n1/nc;
@@ -157,6 +159,19 @@ end
        				Ya.*airy(1,neta_d)./airy(1,neta_0) + Yb.*airy(3,neta_d)./airy(3,neta_0);
 				
        Ys = num./denom;
+       
+       %% admittance propagation trough the vacuum gap of width d_vide
+       alph = 1;%-i*pertes; % BUG?"pertes" is not always in the matlab memory?
+       gamm = k0*(nzt.^2-alph).^(1/2); 
+       u = gamm*d_vide(ind);
+       % Hyperbolic tangent calculation: Taylor expansion (source: wikipedia) 
+       %tanh_d_vide = u - (u.^3)/3 + 2*(u.^5)/15 - 17*(u.^7)/315; 
+       tanh_d_vide = tanh(u);
+
+       y2 = i*k0./gamm;
+       Ys = y2.*(Ys+y2.*tanh_d_vide)./(Ys.*tanh_d_vide+y2);
+
+       
    
        for k = 1:nb_g_total_ligne
   
