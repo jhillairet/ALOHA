@@ -14,6 +14,7 @@ module aloha_config
     real(kind=wp)       :: epsabs
     ! plasma ??
     real(kind=wp)       :: X0, D0
+    real(kind=wp)       :: d_vide !V5
     real(kind=wp)       :: X1, D1, d_couche, pertes !V6
     !modmn/
     integer             :: m, n

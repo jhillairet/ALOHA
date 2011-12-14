@@ -4,7 +4,8 @@ Use aloha_constants
 
 contains
     ! INTegration de 0 a 1 routine NAG D01AHF
-    ! 
+    ! Routine utilisée dans la version 3
+    !
     ! INPUT
     !  - epsrel
     !  - i
@@ -171,7 +172,7 @@ contains
         Use aloha_config, Only : nlimit, b, z, m, n, max_nz
         Use aloha_function, Only : rf_nz, if_nz 
 
-        Use quadpack, Only : qag, qagi
+        Use quadpack, Only : qag, qagi, qk15i
 
         implicit none
         intrinsic epsilon
@@ -201,13 +202,16 @@ contains
         ! INFINITE INTEGRATION
         call qagi(rf_nz, 0.0_wp, 2, eps_abs, eps_rel, resultr, absr(1), neval(1), ier(1) )
         call qagi(if_nz, 0.0_wp, 2, eps_abs, eps_rel, resulti, absr(2), neval(2), ier(2) )
-!         ! FINITE INTEGRATION
+
+        ! FINITE INTEGRATION
 !         call qag(rf_nz, min_, max_, eps_abs, eps_rel, key, resultr, absr(1), neval(1), ier(1))
 !         call qag(if_nz, min_, max_, eps_abs, eps_rel, key, resulti, absr(2), neval(2), ier(2))
-        !write (*,*) 'Int01AJF resultr, resulti=', resultr, resulti
-        !write (*,*) 'Int01AJF absr=', absr
-        !write (*,*) 'Int01AJF neval=',neval
-        !write (*,*) 'Int01AJF ier=',ier
+
+!         DEBUG
+!         write (*,*) 'Int01AJF resultr, resulti=', resultr, resulti
+!         write (*,*) 'Int01AJF absr=', absr
+!         write (*,*) 'Int01AJF neval=',neval
+!         write (*,*) 'Int01AJF ier=',ier
 
         absrm=minval(absr)
     Endif

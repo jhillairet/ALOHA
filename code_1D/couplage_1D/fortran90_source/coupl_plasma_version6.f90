@@ -2,7 +2,7 @@
 ! Programme de calcul de matrice de scattering
 ! Couplage Grill Plasma avec differents cas poloidaux
 ! ********************************************************************* 
-program coupl_plasma_version3
+program coupl_plasma_version6
       ! Physics and mathematics constants
       Use aloha_constants
       ! Simulation configuration variables
@@ -15,7 +15,7 @@ program coupl_plasma_version3
       !       Common /onde/ k0
       !       Common /plasma/ X0,D0
       !       Common /integration/ max_nz
-      Use aloha_config, Only : epsabs, nlimit, b, z, bcte, k0, X0, D0, max_nz, Gmax, Nmhm, Nmem, X1, D1, d_couche, pertes
+      Use aloha_config, Only : epsabs, nlimit, b, z, bcte, k0, X0, D0, max_nz, Gmax, Nmhm, Nmem, X1, D1, d_couche, pertes, d_vide
       ! aloha main routines 
       Use aloha_sgrill
 
@@ -73,6 +73,7 @@ program coupl_plasma_version3
       Read(10,*) epsrel
       Read(10,*) pertes !V6
       Read(10,*) max_nz
+      Read(10,*) d_vide !V6 couche de vide
       
       Rewind 10
       Close(10)
@@ -147,5 +148,5 @@ program coupl_plasma_version3
       Close(20)
     
       Stop
-end program coupl_plasma_version3
+end program coupl_plasma_version6
 ! Fin du programme principal

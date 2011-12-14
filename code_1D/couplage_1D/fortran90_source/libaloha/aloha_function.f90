@@ -671,7 +671,7 @@ CONTAINS
       !*********
       function f_nz(nz)
 
-        use aloha_config, only : b, z, m, n, i, j, k0, X0, D0, d_couche, X1, D1, pertes
+        use aloha_config, only : b, z, m, n, i, j, k0, X0, D0, d_couche, X1, D1, pertes, d_vide
 
         implicit none
 
@@ -683,8 +683,10 @@ CONTAINS
         Complex(kind=wp), Dimension(size(nz)) :: neta
         Complex(kind=wp), Dimension(size(nz)) :: Ai, Aid, Ai_0, Aid_0, Ai_d, Aid_d
         Real(kind=wp)   , Dimension(size(nz)) :: Bi_0, Bid_0, Bi_d, Bid_d 
-        Complex(kind=wp), Dimension(size(nz)) :: ya, y_L, yb, num, denom, ys, ys_sur_factor
+        Complex(kind=wp), Dimension(size(nz)) :: ya, y_L, yb, num, denom, ys, ys_sur_factor, gamma, tanh_d_vide, y0
         Integer  :: ierc, p
+        Real(kind=wp) :: z_r, z_i
+        Complex(kind=wp) :: u
 
         alpha=(1.,0.)-(0.,1.)*pertes
 
@@ -736,15 +738,58 @@ CONTAINS
     
             ys(p)=num(p)/denom(p)
     
+!             ! Special cases to avoid : nz=+/-1
+!             If (abs(nz(p)) == 1.0)then
+!                 write(*,*) 'nz=1, ys(nz)=',ys(p)
+!                 ys(p) = 0.0
+!             EndIf
+
+
+            ! Admittance propagation inside the vacuum layer of length d_vide
+            gamma(p) = k0*(nz(p)**2-alpha)**(1./2.)
+
+            ! Hyperbolic tangent calculation : tanh(gamma*v_dide)
+            ! This calculation may generate NaN, which ultimatly lead to crappy NaN integration results... 
+            ! 
+            ! Expression 1 (definition) --> produces NaN
+            !tanh_d_vide(p) = (exp(2*gamma(p)*d_vide)-1)/(exp(2*gamma(p)*d_vide)+1)
+            ! Expression 2 (built in function)  --> Complex tanh only in Fortran 2008 !
+            !tanh_d_vide(p) = tanh(gamma(p)*d_vide) 
+            ! Expression 3 (alternate x+iy form) --> produces NaN
+            !z_r = real(gamma(p)*d_vide)
+            !z_i = aimag(gamma(p)*d_vide)
+            !tanh_d_vide(p) = (sinh(2*z_r) + (0.,1.)*sin(2*z_i))/(cosh(2*z_r) + cos(2*z_i))
+            ! Expression 4 : limit --> works !
+            !tanh_d_vide(p) = gamma(p)*d_vide
+            ! Expression 5 : Taylor expansion of the tanh function (source: wikipedia) --> works also !
+            u = gamma(p)*d_vide
+            tanh_d_vide(p) = u - (u**3.)/3. + 2.*(u**5.)/15. - 17.*(u**7.)/315.
+
+
+            y0(p) = (0.,1.)*k0/gamma(p)
+
+            ys(p) = y0(p)*(ys(p)+y0(p)*tanh_d_vide(p))/(ys(p)*tanh_d_vide(p)+y0(p))
+
             ys_sur_factor(p)=ys(p)/((X0/D0)**(1./3.))
+
+            If (isnan(real(ys(p)))) then
+                write(*,*) 'NaN detected ! '
+                write(*,*) 'nz=',nz(p)
+                write(*,*) 'gamma=', gamma(p)
+                write(*,*) 'tanh_d_vide', tanh_d_vide(p)
+                write(*,*) 'y0(p)', y0(p)
+                write(*,*) 'ys(p)', ys(p)
+            EndIf
+
         endDo
+       
 
         f_nz = nz**2.*ys_sur_factor*(1.-(-1.)**n*exp((0.,1.)*k0*nz*b(i)))* &
          1/(nz**2-(n*pi/(k0*b(i)))**2)* &
          (1.-(-1.)**m*exp((0.,-1.)*k0*nz*b(j)))* &
          1/(nz**2-(m*pi/(k0*b(j)))**2)* &
          exp((0.,1.)*k0*nz*(z(i)-z(j)))
-
+        
 
       End function f_nz
 

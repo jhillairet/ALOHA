@@ -26,7 +26,7 @@ contains
     ! 
     Subroutine SMGrill(version, intg,ni,epsrel,T_grill,D_guide_max,Nmh,Nme,Pg,a,prh,pre,S,RZheg,Spr,RZhegpr,K_cpl)
 
-    Use aloha_config, Only : Nmhm,Nmem,app,epsabs,nlimit,Nmax,Gmax,b,z,bcte,k0,X0,D0,max_nz
+    Use aloha_config, Only : Nmhm,Nmem,app,epsabs,nlimit,Nmax,Gmax,b,z,bcte,k0,X0,D0,max_nz,d_vide
 
     ! NAG
     !Use nag_gen_lin_sys, Only : nag_gen_lin_sol
@@ -108,7 +108,7 @@ contains
     write(*,*) 'X0=', X0
     write(*,*) 'D0=', D0
     write(*,*) 'max_nz=',max_nz    
-
+    write(*,*) 'd_vide=',d_vide
 
     Nmhm=Nmh
     Nmem=Nme
@@ -126,7 +126,7 @@ contains
 
     ! Boucle sur les differents guides
     Do i=1,Pg
-    
+        ! calcule les impedances caracteristiques des guides selon les modes
         Call CalRZh(i,a,b,Nmh,RZh,RYh)
         Call CalRZe(i,a,b,Nme,RZe,RYe)
 
@@ -623,7 +623,7 @@ contains
     ! ***
     Subroutine CalcouPgi(version,intg,p,a,epsrel,T_grill,D_guide_max,Nmh,Nme,Pg,Y)
 
-        use aloha_config, only : knout, Nmax, b, z, m, n, i, j, k0, X0, D0, X1, D1, d_couche, pertes
+        use aloha_config, only : knout, Nmax, b, z, m, n, i, j, k0, X0, D0, X1, D1, d_couche, pertes, d_vide
         use aloha_function, only : Calresiduy
         use aloha_integration
 
@@ -702,7 +702,7 @@ contains
                     end do
                 end do
 
-                !write(*,*) 'premier quadrant: sum(Y)=', sum(Y)
+!                 write(*,*) 'premier quadrant: sum(Y)=', sum(Y)
 
                 Do k=1,Nmh
                     Do l=1,Nme
@@ -733,7 +733,7 @@ contains
                             ct=ct+1
                     end do
                 end do
-                !write(*,*) 'deuxieme quadrant : sum(Y)=',sum(Y)
+!                 write(*,*) 'deuxieme quadrant : sum(Y)=',sum(Y)
                 Do l=1,Nme
                     Do k=1,Nmh
                         Call CM(j,a,b,mej(1,l),mej(2,l),Dj,sgp)
@@ -761,7 +761,7 @@ contains
                         ct=ct+1
                     end do
                 end do
-                !write(*,*) 'troisieme quadrant : sum(Y)=',sum(Y)
+!                 write(*,*) 'troisieme quadrant : sum(Y)=',sum(Y)
                 Do l=1,Nme
                     Do k=1,Nme
                         Call CM(j,a,b,mej(1,l),mej(2,l),Dj,sgp)
