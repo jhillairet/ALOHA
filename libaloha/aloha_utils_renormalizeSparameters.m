@@ -11,7 +11,7 @@ function S_ren=aloha_utils_renormalizeSparameters(S, Zref, Zref_new)
 %  - S_ren (NxN) : renormalized S-matrix
 % 
 % Author: JH
-% Date: July 2011
+% Date: July 2011. Tested OK with both HFSS and Marks1992 formulae.
 
 %% Check the size of the reference impedances. 
 % if scalar -> transform into vector
@@ -25,19 +25,22 @@ if length(Zref_new) == 1
     Zref_new = repmat(Zref_new, 1, length(S));
 end
 
-%% creating impedance matrix
+Id = eye(length(S)); % identity matrix
+
+%  %% Method 1 (OK)
+%  % Ref: HFSS documentation (Renormalized S-Matrices)
+%  % Generates impedance matrix
+%  sqrt_z = diag(sqrt(Zref));
+%  Z = sqrt_z*(Id+S)*inv(Id-S)*sqrt_z;
+%  % Tranform the Z-matrix into a new renormalized S-matrix
+%  S_ren = inv(diag(sqrt(Zref_new)))*(Z-diag(Zref_new))*inv(Z+diag(Zref_new))*diag(sqrt(Zref_new));
+
+%% Method 2 (also OK). Should this one works also with complex valued impedances??
+% Ref: Marks1992 
+% creating impedance matrix
 U = diag(sqrt(real(Zref))./abs(Zref));
 U_new = diag(sqrt(real(Zref_new))./abs(Zref_new));
-
-%% Transform the input S-matrix into a Z-matrix
-% Ref: Marks1992 or Wikipedia http://en.wikipedia.org/wiki/Impedance_parameters 
-Id = eye(length(S)); % identity matrix
-Z = inv(Id - inv(U)*S*U) * (Id + inv(U)*S*U);
-% should be equivalent to:
-Z = diag(sqrt(Zref))*(Id+S)*inv(Id-S)*diag(sqrt(Zref));
-
-%% Tranform the Z-matrix into a new renormalized S-matrix
-% ref: Marks1992 or Wikipedia http://en.wikipedia.org/wiki/Impedance_parameters
+% Transform the input S-matrix into a Z-matrix
+Z = inv(Id - inv(U)*S*U) * (Id + inv(U)*S*U) * diag(Zref);
+% Ref: Marks1992 or Wikipedia http://en.wikipedia.org/wiki/Impedance_parameters
 S_ren = U*(Z-diag(Zref_new))*inv(Z+diag(Zref_new))*inv(U);
-% should be equivalent to
-S_ren = inv(diag(sqrt(Zref_new)))*(Z-diag(Zref_new))*inv(Z+diag(Zref_new))*diag(sqrt(Zref_new));
