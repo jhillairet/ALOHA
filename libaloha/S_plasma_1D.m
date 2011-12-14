@@ -98,7 +98,7 @@ for ind = 1:nb_g_pol
 
             varCell = {Nmh, Nme, freq, tampon1, tampon2,  ...
                     nb_g_total_ligne, a, b, z, T_grill, ...
-                    D_guide_max, erreur_rel, max_nz}; 
+                    D_guide_max, erreur_rel, max_nz,d_vide}; 
 
         elseif (version == 4)
 
@@ -124,16 +124,12 @@ for ind = 1:nb_g_pol
             %    ne1 = ones(1,nb_g_pol)*ne1;% Modif du 10/05/2007
             %    dne1 = ones(1,nb_g_pol)*dne1;	
             %end
-            X1 = ne1./nc;
-            D1 = k0*ne1./dne1;
-            tampon1 = ne0(ind);
-            tampon2 = dne0(ind);
-            tampon3 = d_couche(ind);
-            tampon4 = dne1(ind);  
-
-            varCell = {Nmh, Nme, freq, tampon1, tampon2, ...
-                    tampon3, tampon4, nb_g_total_ligne, a, b, z, ...
-                    T_grill, D_guide_max, erreur_rel, pertes max_nz};
+            %X1 = ne1./nc;
+            %D1 = k0*ne1./dne1;
+            
+            varCell = {Nmh, Nme, freq, ne0(ind), dne0(ind), ...
+                    d_couche(ind), dne1(ind), nb_g_total_ligne, a, b, z, ...
+                    T_grill, D_guide_max, erreur_rel, pertes, max_nz, d_vide(ind)};
 
         elseif (version == 7)
 
