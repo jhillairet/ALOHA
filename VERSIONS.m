@@ -1,4 +1,7 @@
 %  ALOHA (MAJORS) CHANGE-LOG
+% 12/2011 : Added vacuum gap support with two linear density gradients (version=6). 
+%           Corrected bugs for poloidal density mismatch support.
+%  
 % 12/2011 : Corrected bugs about the ITM antenna description (with on-demand compatibility)
 %          and in the EM field evaluation at the antenna mouth.
 %  
