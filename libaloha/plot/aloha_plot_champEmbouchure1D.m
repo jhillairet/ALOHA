@@ -16,14 +16,19 @@ function aloha_plot_champEmbouchure1D(scenario, varargin)
 
 
 % load scenario var into workspace 
-% (for compatibility reasons, it's simpler than to change evvery variables in the code...)
+% (for compatibility reasons, it's simpler than to change every variables in the code...)
 aloha_scenario_loadIntoWorkspace
+
+% If the 'architecture_antenne' directory is not in the Matlab PATH, then add it
+if not(exist('architecture_antenne'))
+    addpath(genpath([aloha_utils_getRootPath, '/architecture_antenne']));
+end
 
 % Load into workspace the geometrical parameter of the scenario architecture 
 % and get the main geometrical parameters.
  if aloha_isAntennaITM(scenario)
       disp(aloha_message('assuming ITM antenna description')); 
-	nb_g_pol = aloha_scenario_get(scenario, 'nwm_theta');
+	  nb_g_pol = aloha_scenario_get(scenario, 'nwm_theta');
 
 else
 	eval(architecture);
