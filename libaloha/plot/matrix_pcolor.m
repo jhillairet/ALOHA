@@ -1,4 +1,5 @@
 function [h]=matrix_pcolor(gp);
+% Author: O.Meneghini
 A=gp;
 A=[A,A(:,end)];
 A=[A;A(end,:)];
