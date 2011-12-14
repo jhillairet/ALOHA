@@ -36,16 +36,19 @@ function h=aloha_plot_densityProfile(scenario)
             X = [X_PLASMA, X_ANTENNA];
             Y = [ne0*(1+abs(X(end)-X(1))/lambda_n0), ne0];
 
-        case 6 % ne0, lambda_n0, d_couche, lambda_n1
+        case 6 % d_vide, ne0, lambda_n0, d_couche, lambda_n1
             lambda_n0 = lambda_n(1);
             lambda_n1 = lambda_n(2);
+            % gradients
+            dne0 = ne0./lambda_n0;
+            dne1 = (1+d_couche./lambda_n0).*ne0./lambda_n1;
 
-            X = [X_PLASMA, X_ANTENNA-d_couche, X_ANTENNA];
-            Y = [ne0*(1+d_couche/lambda_n0) * (1+abs(X_PLASMA-(X_ANTENNA-d_couche))/lambda_n1), ...
-                 ne0*(1+d_couche/lambda_n0), ...
-                 ne0];
-
-        case 5 % d_vide, ne0, lambda_n0, d_couche, lambda_n1
+            ne1 = ne0 + dne0*d_couche;
+            ne2 = ne1 + dne1*abs(X_PLASMA-(X_ANTENNA-d_couche-d_vide));
+            % create the 
+            X = [X_PLASMA, X_ANTENNA-d_couche-d_vide, X_ANTENNA-d_vide,X_ANTENNA-d_vide, X_ANTENNA];
+            Y = [ne2, ne1, ne0,0, 0];
+            
 
         otherwise   
             error('invalid number of arguments. see help.');
@@ -53,7 +56,7 @@ function h=aloha_plot_densityProfile(scenario)
 
     % plot
     h=figure;
-    line(X,Y);
+    line(X,Y, 'Marker', 'O');
     grid on;
     xlabel('\rho/R');
     ylabel('Electr. dens. n_e [m^{-3}]');
