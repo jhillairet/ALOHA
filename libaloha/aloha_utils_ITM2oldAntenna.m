@@ -12,7 +12,7 @@
       pass_module_tor = find(aloha_scenario_get(scenario, 'mask') == 0);
       nb_g_passifs_inter_modules = aloha_scenario_get(scenario, 'npwbm_phi');
       antenne_standard = 0;
-      lcc = aloha_scenario_get(scenario, 'scl');
+      lcc = squeeze(aloha_scenario_get(scenario, 'scl'))';
       chemin_retour = pwd;
       chemin_aller = scenario.antenna_lh.setup.modules.Sparameters.pathTo;
       nom_fichiers = scenario.antenna_lh.setup.modules.Sparameters.SFileNames;

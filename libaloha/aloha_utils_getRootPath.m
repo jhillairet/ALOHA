@@ -24,6 +24,6 @@ end
 
 % the function aloha_message is already in the path
 % We chop the path in order to recover the ALOHA root path
-[pathstr, dummy, dummy, dummy] = fileparts(aloha_message_path);
-[aloha_path, dummy, dummy, dummy] = fileparts(pathstr);
+[pathstr, dummy, dummy] = fileparts(aloha_message_path);
+[aloha_path, dummy, dummy] = fileparts(pathstr);
     
