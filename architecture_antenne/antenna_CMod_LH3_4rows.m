@@ -1,17 +1,5 @@
-function antenna_lh = antenna_CMod_LH2_4rows
-% ALOHA EXAMPLE description of an LH antenna
-% 
-% 
-% This file describes a Passive Active antenna (not necessary a multijunction)
-% 
-% 
-% 
-% INPUT : none
-%  
-% OUTPUT
-%  - antenna_lh <structure> : ALOHA antenna description (Matlab ITM CPO antenna_lh)
-% 
-% 
+function antenna_lh = antenna_CMod_L3
+% ALOHA Alcator C-Mod LH3 antenna
 
 % This file contains the description of an LH antenna according to the ITM
 % defition, i.e. using the CPO antenna_lh format. 
@@ -26,7 +14,7 @@ function antenna_lh = antenna_CMod_LH2_4rows
 %% General description of the antenna
 %% --------------------------------------
 %  Antenna name
-antenna_lh.name = 'Alcator C-Mod LH2 ALOHA antenna description. Complete antenna with its 4 poloidal rows';
+antenna_lh.name = 'Alcator C-Mod LH3 ALOHA antenna description. Complete antenna with its 4 poloidal rows';
 
 %  Frequency [Hz]
 antenna_lh.frequency = 4.6e9;
@@ -45,7 +33,7 @@ antenna_lh.n_par = [];
 % Number of modules per antenna in the poloidal direction. 
 modules.nma_theta = 1;
 %  Number of modules per antenna in the toroidal direction. 
-modules.nma_phi = 16;
+modules.nma_phi = 8;
 
 %  Position index of the module in the poloidal direction (from low theta to high theta, 
 %  i.e. from bottom to top if the antenna is on LFS). 
@@ -65,17 +53,17 @@ modules.sm_theta = 0;
 waveguides.nwm_theta = 4;
 
 % Number of waveguides per module in the toroidal direction. (passive and active)
-waveguides.nwm_phi = 1;
+waveguides.nwm_phi = 2;
 
 % Mask of passive and active waveguides for an internal module
 % 1 for active -- 0 for passive.
-waveguides.mask = [1];
+waveguides.mask = [1 1];
 
 % Number of passive waveguide between modules in the toroidal direction. 
 waveguides.npwbm_phi = 0;
 
 % Number of passive waveguides on each antenna edge in the toroidal direction. 
-waveguides.npwe_phi = 1;
+waveguides.npwe_phi = 0; % 1 in reality
 
 % Spacing between poloidally neighboring waveguides [m]
 waveguides.sw_theta = 21e-3;
@@ -84,17 +72,17 @@ waveguides.sw_theta = 21e-3;
 waveguides.hw_theta = 60e-3;
 
 % Width of active waveguides [m]
-waveguides.bwa = 7e-3;     
+waveguides.bwa = 5e-3;     
 
 % Width of internal passive waveguides [m]
 waveguides.biwp = 0;
 
 % Width of edge passive waveguides [m]
-waveguides.bewp = 7e-3; % ??
+waveguides.bewp = 5e-3; % ??
 
 % Thickness between waveguides in the toroidal direction [m]
 % Reminder : length(e_phi) = nma_phi*nwm_phi + (nma_phi - 1)*npwbm_phi + 2*npwe_phi - 1
-ep = 1.5e-3;
+ep = 2e-3;
 ne_phi = waveguides.npwbm_phi*(modules.nma_phi-1) + ...
 	 waveguides.npwe_phi*2 + ...
 	 modules.nma_phi*waveguides.nwm_phi - 1;
@@ -112,24 +100,10 @@ waveguides.scl = repmat(1/4, 1, nscl);
 %% --------------------------------
 % matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
 modules.Sparameters.pathFrom = pwd;
-modules.Sparameters.pathTo = [aloha_utils_getRootPath,'/S_HFSS/CMOD/LH2'];  % path the S-matrix files (.m files) 
+modules.Sparameters.pathTo = [aloha_utils_getRootPath,'/S_HFSS/CMOD/LH3'];  % path the S-matrix files (.m files) 
 
-filenames = strvcat('S_splitter16.mat', ...
-          'S_splitter15.mat', ...
-          'S_splitter14.mat', ...   
-          'S_splitter13.mat', ... 
-          'S_splitter12.mat', ...
-          'S_splitter11.mat', ...
-          'S_splitter10.mat', ...
-          'S_splitter09.mat', ...
-          'S_splitter08.mat', ...
-          'S_splitter07.mat', ...
-          'S_splitter06.mat', ...
-          'S_splitter05.mat', ...
-          'S_splitter04.mat', ...
-          'S_splitter03.mat', ...
-          'S_splitter02.mat', ...
-          'S_splitter01.mat');
+% Here I assume all the S matrices are the same for all modules
+filenames = repmat(['S_LH3.s9p'], modules.nma_phi, 1);
 
 modules.Sparameters.SFileNames = filenames;
 

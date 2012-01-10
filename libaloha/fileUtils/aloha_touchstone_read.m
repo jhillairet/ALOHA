@@ -18,14 +18,17 @@ function[S,freq1]=aloha_touchstone(file, header_lines)
 % 
 % AUTHOR: ? 
 % Taken from the matlab file exchange
+%
+% Typical header lines number:
+% cst: header lines = 8
+% hfss:header lines = 4 + num_of_ports
+% comsol: header lines = 1
+
 
 %function [S,freq1]=read_snp(header_lines)
+%
 
-%cst: header lines = 8
-%hfss:header lines = 4 + num_of_ports
-%comsol: header lines = 1
-
-[PathName,FileName,EXT,VERSN] = fileparts(file);
+[PathName,FileName,EXT] = fileparts(file);
 %FileName,PathName]=uigetfile('*.s*p','Select valid touchstone file');
 FileName = [FileName, EXT];
 % deduces the number ports from the extension of the file

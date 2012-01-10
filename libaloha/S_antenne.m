@@ -34,8 +34,26 @@ S_ant_22 = diag(S_ant_22);
 for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
     % introduit les variables S [, Z et f] lues dans fichier issu de HFSS
     nom = nom_fichiers(ind,:);
-    eval(nom);
-
+    
+    [dummy,dummy,ext]=fileparts(nom);
+    if strcmp(ext, '') || strcmp(ext, '.m')
+      % if the name has the .m extension, load as a script
+      eval(nom);
+    
+    elseif strcmp(ext, '.mat')
+      % otherwise if it has a .mat extension, load it a matlab matrix 
+      load(nom);
+      
+    elseif regexp(ext, '.s.p')
+      % touchstone file
+      % Problem is : how many header lines does the file have ? Depends on the RF software which creates the file....
+      %[S,f]=aloha_touchstone_read(nom, 1); % sometime doesn't work properly
+      [freq, S, freq_noise, data_noise, Zo] = SXPParse(nom);
+      S=reshape(S, 1, length(S)*length(S));
+    else
+        error('Bad or unknow file name/extension');
+    end
+    
     % J.Hillairet 14/12/07
     % Le format des nouvelles matrices calculees par J.Belo le 13/12/07 est different des anciennes : 
     % (1,7,7) au lieu de (1,49).
