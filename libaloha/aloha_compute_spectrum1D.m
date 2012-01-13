@@ -12,11 +12,19 @@ function scenario=aloha_compute_spectrum1D(scenario)
 %  should be defined into the 'option' sub-field of the input scenario
 %  
 %  LAST UPDATE:
+%   - 11/01:2012: now able to calculate the spectrum of a scenario which input excitation has been changed 
+%                (especially usefull for parametric scan on module excitation)  
 %   - 04/2009 : integration of the code to the scenario formalism (input/output)
+
+% J.Hillairet - 11/01/2012
+% 
+% When one wants to make a parameter study on the module's phase excitation
+% he should not need to recalculate the plasma scattering matrix, which does not depends on the excitation.
+% Thus, the a_plasma, b_plasma are recalculated below (in the aloha_compute_RC function), just in case, if we are in the situation described upper.
+scenario = aloha_compute_RC(scenario);
 
 % for easier matlab manipulation, load all the fields of the input scenario 'scenario'
 % into matlab workspace
-
 aloha_scenario_loadIntoWorkspace;
 
 % test if the main results, such as the plasma scattering matrix, 
@@ -39,7 +47,9 @@ end
 %  aloha_computeSpectrum1D
 %  
 %  
-   
+
+    
+    % now calculates the weight of electric and magnetic field from the power waves
     poids_E = rac_Zhe*(a_plasma + b_plasma);
     poids_H = inv(rac_Zhe)*(a_plasma - b_plasma);
     
