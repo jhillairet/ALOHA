@@ -6,6 +6,7 @@ function vargout=aloha_plot_figure(varargin)
 %   - crop the paper to the figure's size, in order to avoid extra crop operation
 %     after image exporting.
 %   - increasing the line width to 2
+%   - Add a text rectangle with "ALOHA" at the upper left corner.
 %     
 %  INPUT
 %   none
@@ -80,6 +81,16 @@ function vargout=aloha_plot_figure(varargin)
 %      set(gcf, 'PaperUnits', 'centimeters') ;
 %      set(gcf, 'PaperPosition', [0, 0, paperSize(1), paperSize(2)]);
 
+   % add the mention 'ALOHA' to the figure in the upper left corner
+   annotation(h,'textbox',...
+      [0.025 0.92 0.08 0.05],...
+    'String',{'ALOHA'},...
+    'FontSize',15,...
+    ...%'FontWeight','bold',...
+    'FitBoxToText','off',...
+    'Color',[0.0705882352941176 0.211764705882353 0.141176470588235], ...
+    'EdgeColor',[0.0705882352941176 0.211764705882353 0.141176470588235]);
+    
     % ouput argument
     if nargout == 1
         vargout(1)=h;
