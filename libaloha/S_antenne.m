@@ -65,6 +65,18 @@ for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
         S_module = reshape(S,sqrt(length(S)),sqrt(length(S)));
     end
     
+    % Temporary piece of code for the conceptual study of the alcator CMod LH3 
+    %
+    % If the bijLength field exists in the scenario structure, 
+    % then we proceed to a phase desembedding of the scattering matrix of the launcher
+    % in order to change the electric length of the secondary waveguide after the bijunction.
+    if isfield(scenario.antenna_lh.setup.modules.Sparameters, 'bijLength')
+      beta = sqrt(k0^2 - (pi/60e-3)^2);
+      bijLength = scenario.antenna_lh.setup.modules.Sparameters.bijLength;
+      E = diag([1,repmat(exp(-j*beta*bijLength),1,8)]);
+      S_module = E*S_module*E;
+    end
+    
     S_module_11 = S_module(1,1); 
     S_module_12 = S_module(1,:); 
     S_module_12(:,1) = [];
