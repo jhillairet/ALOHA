@@ -157,6 +157,9 @@ if fid > 0
     end;    
     fprintf(fid_log, '\n%s\n', '... done.');
 end
+% J.Hillairet - 11/01/2012
+% BUG corrected: the file was never closed. Thus, one could reach the limit number of files open on a system (given by 'ulimit -n')
+fclose(fid);
 end
 
 function word = opPhrase2Word(phrase, comment_list, separator_list)
