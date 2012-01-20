@@ -75,7 +75,7 @@ for idx_sc = 1:length(scenario)
     % power density in the nz space
     dP_nz = aloha_scenario_get(sc, 'dP_nz');
     % total power launched
-    P = sum(dP_nz)*dnz; 
+    P = sum(real(dP_nz))*dnz; 
     % reflected power coefficient
     RC = aloha_scenario_get(sc, 'CoeffRefPuiss');
     
@@ -84,11 +84,11 @@ for idx_sc = 1:length(scenario)
 
     switch definition_directivite
         case 1
-            D = sum(dP_nz(find(nz>1)))*dnz/P ;    
+            D = sum(real(dP_nz(find(nz>1))))*dnz/P ;    
 
             % compute the cumulated directivity, function of nz
             for idx=1:length(nz)
-                D_cumulated(idx) = 1-dnz*sum(dP_nz([idx:end]))/P;
+                D_cumulated(idx) = 1-dnz*sum(real(dP_nz([idx:end])))/P;
             end
 
 
@@ -97,31 +97,31 @@ for idx_sc = 1:length(scenario)
             % However, if this variable had not been set to the present function,
             % we assume that this value corresponds to the nz for which the spectrum is max.
             if not(exist('n_parallel_0'))
-                [dummy, idx_max] = max(abs(dP_nz));
+                [dummy, idx_max] = max(real(dP_nz));
                 n_parallel_0 = nz(idx_max);
             end 
         
             if n_parallel_0 > 0
                 D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
-                    (dnz*sum(dP_nz(find(nz>1))./nz(find(nz>1)).^2) ...
-                    - dnz*sum(dP_nz(find(nz<1))./nz(find(nz<1)).^2));
+                    (dnz*sum(real(dP_nz(find(nz>1)))./nz(find(nz>1)).^2) ...
+                    - dnz*sum(real(dP_nz(find(nz<1)))./nz(find(nz<1)).^2));
             else
                 D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
-                    (dnz*sum(dP_nz(find(nz<1))./nz(find(nz<1)).^2) ...
-                    - dnz*sum(dP_nz(find(nz>1))./nz(find(nz>1)).^2));
+                    (dnz*sum(real(dP_nz(find(nz<1)))./nz(find(nz<1)).^2) ...
+                    - dnz*sum(real(dP_nz(find(nz>1)))./nz(find(nz>1)).^2));
             end    
 
             % compute the cumulated directivity, function of nz
             for idx=1:length(nz)
-                 D_cumulated(idx) = 1 - (1/P)*dnz*(sum(dP_nz([idx:end])./nz([idx:end]).^2));
+                 D_cumulated(idx) = 1 - (1/P)*dnz*(sum(real(dP_nz([idx:end]))./nz([idx:end]).^2));
             end
 
         case 3
-            D = (1/P)*dnz*(sum(dP_nz(find(nz>0))./nz(find(nz>0)).^2));
+            D = (1/P)*dnz*(sum(real(dP_nz(find(nz>0)))./nz(find(nz>0)).^2));
 
             % compute the cumulated directivity, function of nz
             for idx=1:length(nz)
-                D_cumulated(idx) = 1 - (1/P)*dnz*(sum(dP_nz([idx:end])./nz([idx:end]).^2));
+                D_cumulated(idx) = 1 - (1/P)*dnz*(sum(real(dP_nz([idx:end]))./nz([idx:end]).^2));
             end
 
     
