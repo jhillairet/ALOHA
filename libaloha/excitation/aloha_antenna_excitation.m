@@ -193,40 +193,51 @@ end
 function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
     % Lecture des puissances incidentes :
     disp(aloha_message('Reading power measurements on Q6A [gpinjc1]'));
-    [p_inc_mes,tps]=tsbase(choc,'gpinjc1');
+    [p_inc_mes,tps_pow]=tsbase(choc,'gpinjc1');
     % MODIF 12/11/2008 JH
     % Le dephasage du aux rallonges (entre fenetres et jonction hybride) a ete
     % prise en compte dans l'architecture de C2. Par consequent, la lecture de la phase
     % incident doit se faire au niveau des fenetres. La phase en bout etant calculee grace
     % aux dephasages des rallonges et a la modelisation HFSS de C2
     % 
-    % Lecture des phases incidentes (entr??? du module):
+    % Lecture des phases incidentes (entree du module):
     disp(aloha_message('Reading phase measurements on Q6A (before RF windows) [gphic1]'));
-    [phase_inc_mes,tps]=tsbase(choc,'gphic1');
+    [phase_inc_mes,tps_pha]=tsbase(choc,'gphic1');
  
-%      disp(aloha_message('Lecture des mesures de phases au bout de l''antenne [gphbc2]'));
-%      [phase_inc_mes,tps]=tsbase(choc,'gphbc1');  % modif du 'gphic1' le 15/05/2007
-    tps=tps(:,1);   % pour garder un seul vecteur pour le temps
-    tps_pos=find(tps>0);
-    p_inc_mes=p_inc_mes(tps_pos,:);
-    phase_inc_mes=phase_inc_mes(tps_pos,:);
+    % keep only one and positive time vector
+    tps_pow=tps_pow(:,1);
+    tps_pow_pos=find(tps_pow>0);
+    tps_pha=tps_pha(:,1);
+    tps_pha_pos=find(tps_pha>0);
+
+    % keep measured data for positive time
+    p_inc_mes=p_inc_mes(tps_pow_pos,:);
+    tps_pow = tps_pow(tps_pow_pos);
+    phase_inc_mes=phase_inc_mes(tps_pha_pos,:);
+    tps_pha = tps_pha(tps_pha_pos);
+
     % Lecture des puissances reflechies :
-    [p_refl_mes,tps]=tsbase(choc,'gcrefc1');
+    [p_refl_mes,tps_pow2]=tsbase(choc,'gcrefc1');
     % Lecture des phases reflechies (entr??? du module):
-    [phase_refl_mes,tps]=tsbase(choc,'gphrc1');
+    [phase_refl_mes,tps_pha2]=tsbase(choc,'gphrc1');
 
     % keep only one and positive time vector
-    tps=tps(:,1);  
-    tps_pos=find(tps>0);
+    tps_pow2=tps_pow2(:,1);  
+    tps_pow2_pos=find(tps_pow2>0);
+    tps_pha2=tps_pha2(:,1);  
+    tps_pha2_pos=find(tps_pha2>0);
+
     % keep measured data for positive time
-    p_refl_mes=p_refl_mes(tps_pos,:);
-    phase_refl_mes=phase_refl_mes(tps_pos,:);
+    p_refl_mes=p_refl_mes(tps_pow2_pos,:);
+    tps_pow2 = tps_pow2(tps_pow2_pos);
+    phase_refl_mes=phase_refl_mes(tps_pha2_pos,:);
+    tps_pha2 = tps_pha2(tps_pha2_pos);
 
     % calculate the average of the data between t1 and t2
-    p_inc_mes = mean(p_inc_mes(tps>tps_1&tps<tps_2,:));
-    phase_inc_mes = mean(phase_inc_mes(tps>tps_1&tps<tps_2,:));
-    p_refl_mes= mean(p_refl_mes(tps>tps_1&tps<tps_2,:));
-    phase_refl_mes= mean(phase_refl_mes(tps>tps_1&tps<tps_2,:));
+    p_inc_mes = mean(p_inc_mes(tps_pow>tps_1 & tps_pow<tps_2,:));
+    phase_inc_mes = mean(phase_inc_mes(tps_pha>tps_1 & tps_pha<tps_2,:));
+    p_refl_mes= mean(p_refl_mes(tps_pow2>tps_1 & tps_pow2<tps_2,:));
+    phase_refl_mes= mean(phase_refl_mes(tps_pha2>tps_1 & tps_pha2<tps_2,:));
 
 %  % OLD CODE
 %      tps=tps(:,1);  
@@ -268,39 +279,48 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
 function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
     % Lecture des puissances incidentes :
     disp(aloha_message('Reading power measurements on Q6B [gpinjc2]'));
-    [p_inc_mes,tps]=tsbase(choc,'gpinjc2');
-
+    [p_inc_mes,tps_pow]=tsbase(choc,'gpinjc2');
+    
     % Lecture des phases incidentes (entree du module):
     disp(aloha_message('Reading phase measurements on Q6B (before RF windows) [gphic2]'));
     % 'gphic2' : phase before the antenna
     % 'gphbc2' : phase calulated at the mouth of the antenna
-    [phase_inc_mes,tps]=tsbase(choc,'gphic2');  
+    [phase_inc_mes,tps_pha]=tsbase(choc,'gphic2');  
 
     % keep only one and positive time vector
-    tps=tps(:,1);
-    tps_pos=find(tps>0);
+    tps_pow=tps_pow(:,1);
+    tps_pow_pos=find(tps_pow>0);
+    tps_pha=tps_pha(:,1);
+    tps_pha_pos=find(tps_pha>0);
 
     % keep measured data for positive time
-    p_inc_mes=p_inc_mes(tps_pos,:);
-    phase_inc_mes=phase_inc_mes(tps_pos,:);
+    p_inc_mes=p_inc_mes(tps_pow_pos,:);
+    tps_pow = tps_pow(tps_pow_pos);
+    phase_inc_mes=phase_inc_mes(tps_pha_pos,:);
+    tps_pha = tps_pha(tps_pha_pos);
 
     % read measured reflected power
-    [p_refl_mes,tps]=tsbase(choc,'gcrefc2');
+    [p_refl_mes,tps_pow2]=tsbase(choc,'gcrefc2');
     % read measured reflected phase
-    [phase_refl_mes,tps]=tsbase(choc,'gphrc2');
+    [phase_refl_mes,tps_pha2]=tsbase(choc,'gphrc2');
 
     % keep only one and positive time vector
-    tps=tps(:,1);  
-    tps_pos=find(tps>0);
+    tps_pow2=tps_pow2(:,1);  
+    tps_pow2_pos=find(tps_pow2>0);
+    tps_pha2=tps_pha2(:,1);  
+    tps_pha2_pos=find(tps_pha2>0);
+
     % keep measured data for positive time
-    p_refl_mes=p_refl_mes(tps_pos,:);
-    phase_refl_mes=phase_refl_mes(tps_pos,:);
+    p_refl_mes=p_refl_mes(tps_pow2_pos,:);
+    tps_pow2 = tps_pow2(tps_pow2_pos);
+    phase_refl_mes=phase_refl_mes(tps_pha2_pos,:);
+    tps_pha2 = tps_pha2(tps_pha2_pos);
 
     % calculate the average of the data between t1 and t2
-    p_inc_mes = mean(p_inc_mes(tps>tps_1&tps<tps_2,:));
-    phase_inc_mes = mean(phase_inc_mes(tps>tps_1&tps<tps_2,:));
-    p_refl_mes= mean(p_refl_mes(tps>tps_1&tps<tps_2,:));
-    phase_refl_mes= mean(phase_refl_mes(tps>tps_1&tps<tps_2,:));
+    p_inc_mes = mean(p_inc_mes(tps_pow>tps_1 & tps_pow<tps_2,:));
+    phase_inc_mes = mean(phase_inc_mes(tps_pha>tps_1 & tps_pha<tps_2,:));
+    p_refl_mes= mean(p_refl_mes(tps_pow2>tps_1 & tps_pow2<tps_2,:));
+    phase_refl_mes= mean(phase_refl_mes(tps_pha2>tps_1 & tps_pha2<tps_2,:));
 
 %  % OLD CODE
 %      p_inc_complex=p_inc_mes.*exp(i*phase_inc_mes*pi./180);
@@ -324,7 +344,6 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
     p_refl_mes=p_refl_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
     phase_inc_mes=phase_inc_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
     phase_refl_mes=phase_refl_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
-    
 
     % coupleur haut
     a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
