@@ -70,12 +70,14 @@ for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
     % If the bijLength field exists in the scenario structure, 
     % then we proceed to a phase desembedding of the scattering matrix of the launcher
     % in order to change the electric length of the secondary waveguide after the bijunction.
-    if isfield(scenario.antenna_lh.setup.modules.Sparameters, 'bijLength')
-      beta = sqrt(k0^2 - (pi/scenario.antenna_lh.setup.modules.waveguides.hw_theta)^2);
-      bijLength = scenario.antenna_lh.setup.modules.Sparameters.bijLength;
-      nb_waveguides=scenario.antenna_lh.setup.modules.waveguides.nwm_theta*sum(scenario.antenna_lh.setup.modules.waveguides.mask);
-      E = diag([1,repmat(exp(-j*beta*bijLength),1,nb_waveguides)]);
-      S_module = E*S_module*E;
+    if isfield(scenario.antenna_lh.setup, 'modules') % compatibility with old antenna description
+        if isfield(scenario.antenna_lh.setup.modules.Sparameters, 'bijLength')
+        beta = sqrt(k0^2 - (pi/scenario.antenna_lh.setup.modules.waveguides.hw_theta)^2);
+        bijLength = scenario.antenna_lh.setup.modules.Sparameters.bijLength;
+        nb_waveguides=scenario.antenna_lh.setup.modules.waveguides.nwm_theta*sum(scenario.antenna_lh.setup.modules.waveguides.mask);
+        E = diag([1,repmat(exp(-j*beta*bijLength),1,nb_waveguides)]);
+        S_module = E*S_module*E;
+        end
     end
     
     S_module_11 = S_module(1,1); 
