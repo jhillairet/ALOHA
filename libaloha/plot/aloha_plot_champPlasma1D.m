@@ -21,8 +21,9 @@ Hy_x_z=squeeze(Hy_x_z);
 
 if (aloha_scenario_get(scenario, 'fig_Ez_ou_EzHy') == 1)
        % Rajout le 16/05/2007 par Izacard Olivier pour les titres :
-       letitre0 = 'Chp electrique dans le plasma (V/m) a l'' embouchure';
+       letitre0 = '';
        pcolor(x_coord, z_coord,log10(1+abs(Ez_x_z)'));
+%          pcolor(x_coord, z_coord,abs(Ez_x_z)');
 else
        % Rajout le 16/05/2007 par Izacard Olivier pour les titres :
        letitre0 = 'Vecteur de poynthing dans le plasma (V/m) a l'' embouchure';
@@ -32,16 +33,16 @@ end
    shading flat
    shading interp
    colorbar
-   xlabel('coordonne x')
-   ylabel('coordonne z')
+   xlabel('x [m]')
+   ylabel('z [m]')
     
     letitre1 = ['Electric field in plasma for ', aloha_utils_str4fig(aloha_scenario_get(scenario, 'architecture'))];
 
     if(aloha_scenario_get(scenario, 'bool_mesure'))
-       letitre1 = strcat(letitre1, ...
-        ' du choc ',num2str(aloha_scenario_get(scenario, 'choc')), ...
-        ' de ',num2str(aloha_scenario_get(scenario, 'tps_1')), ...
-        ' a ',num2str(aloha_scenario_get(scenario, 'tps_2')),'s');
+       letitre1 = [letitre1, ...
+        ' from pulse ',num2str(aloha_scenario_get(scenario, 'choc')), ...
+        ' from ',num2str(aloha_scenario_get(scenario, 'tps_1')), ...
+        ' to ',num2str(aloha_scenario_get(scenario, 'tps_2')),'s'];
     else
        letitre1 = strcat(letitre1,' sans mesure (cas ideal)');;
     end

@@ -3,6 +3,8 @@ function aloha_plot_Efield_withAntenna(scenario)
 % plot the absolute value of the Ez electric field in a row of waveguide
 % with the waveguide surimposed on the figure
 % 
+% Also plot the average phase
+% 
 % [Efield_mean=]aloha_plot_Efield_withAntenna(scenario)
 % 
 % INPUT
@@ -16,7 +18,7 @@ end
 
 % if the averaged field does not exist
 % we compute it
-if not(isfield(scenario.results, 'Ez_average'))
+if not(isfield(scenario.results, 'Ez_average')) | not(isfield(scenario.results, 'Phase_average'))
     scenario = aloha_compute_averageEz_waveguides(scenario);
 end
 
@@ -49,3 +51,13 @@ for idx_wg=1:nb_g_total_ligne
     line([z(idx_wg) z(idx_wg)+b(idx_wg)], scenario.results.Ez_average(idx_wg)*[1 1], 'Color', 'r');
 end
 
+%% plot the average phase of at the mouth
+aloha_plot_figure(figure)
+    plot(scenario.results.abs_z(1,:), 180/pi*angle(scenario.results.Efield(1,:)))
+    
+    % surimpose the average field in a waveguide
+    for idx_wg=1:nb_g_total_ligne
+        line([z(idx_wg) z(idx_wg)+b(idx_wg)], scenario.results.Phase_average(idx_wg)*[1 1], 'Color', 'r');
+    end
+    title('Average phase at waveguide mouth')
+    xlabel('z [m]')

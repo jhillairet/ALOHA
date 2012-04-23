@@ -52,7 +52,7 @@ for id_scen=1:length(scenarios) % for many scenarios
     ylabel('Power density [W]');
     title('Power density spectrum');
     grid on;
-%      set(gca, 'XLim', [-10, 10]);
+    set(gca, 'XLim', [-8, 8]);
 
 end % id_scen
 
