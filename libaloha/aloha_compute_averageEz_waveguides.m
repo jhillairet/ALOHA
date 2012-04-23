@@ -1,5 +1,6 @@
 function scenario=aloha_compute_averageEz_waveguides(scenario)
-% Compute the average value of the Ez electric field in each waveguides of the antenna.
+% Compute the average value of the absolute value |Ez| and phase 
+% of the electric field in each waveguides of the antenna.
 % 
 % scenario = aloha_compute_averageEz_waveguides(scenario)
 % 
@@ -9,6 +10,7 @@ function scenario=aloha_compute_averageEz_waveguides(scenario)
 % OUTPUT 
 %  - scenario : ALOHA scenario witch contains the following new 'results' fields :
 %       * Ez_average (NbrowsxNwg) : average absolute Ez field in each waveguide of a row.
+%       * Phase_average(NbrowsxNwg) : average phase of the Ez field in each waveguide of a row. 
 %       * PassWG_idx(NbrowsxNwg) : index of passive waveguides : 1 for passive, 0 for actives WG
 %
 % AUTHOR: JH
@@ -29,16 +31,17 @@ for idx_sc = 1:length(scenario)
     % get the dimensions and coordinates of the waveguides of the antenna
     if aloha_isAntennaITM(sc)
       disp(aloha_message('ITM antenna description'));
-      [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinatesFromCPO(aloha_getAntenna(scenario));
+      [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinatesFromCPO(aloha_getAntenna(sc));
     else
       disp(aloha_message('Old-fashioned antenna description'));
-      [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor,scenario]=aloha_utils_getAntennaCoordinates(architecture,scenario);
+      [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor,scenario]=aloha_utils_getAntennaCoordinates(sc.antenna.architecture,sc);
     end
 
     % calculate the average field in a waveguide
     for idx_wg=1:nb_g_total_ligne
         idx_z_wg = find(sc.results.abs_z(1,:)>=z(idx_wg) & sc.results.abs_z(1,:)<=(z(idx_wg)+b(idx_wg)));
         Ez_average(idx_wg) = mean(abs(Efield(1,idx_z_wg)));
+        Phase_average(idx_wg) = 180/pi*mean(angle(Efield(1,idx_z_wg)));
     end
 
     % calculate the passive waveguide position of some known antenna
@@ -53,6 +56,7 @@ for idx_sc = 1:length(scenario)
 
     % save results in the scenario
     sc.results.Ez_average = Ez_average;
+    sc.results.Phase_average = Phase_average;
     sc.results.PassWG_idx = PassWG_idx; 
     scenario(idx_sc) = sc;
 end % for all scenarios
