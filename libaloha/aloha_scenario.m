@@ -130,7 +130,7 @@ for idx_sc = 1:length(scenarios)
     %%%%%%%%%%%%%%%%%%%%%%%%
     % antenna's module loading
     disp(aloha_message('Module''s excitation:'))
-    disp(a_ampl.*exp(-j*a_phase));
+    disp(a_ampl.*exp(j*a_phase));
 
 	
     %%%%%%%%%%%%%%%%%%%%%%%%
