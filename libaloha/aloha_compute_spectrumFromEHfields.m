@@ -15,6 +15,7 @@ function scenario = aloha_compute_spectrumFromEHfield(scenario)
 % 
 % integral( 1/2|ExH*|^2, s) = integral(dP_nz, n_parallel)
 %
+% WORK ONLY WITH ITM ANTENNA DESCRIPTION !!!
 %
 % AUTHOR: JH,MP
 % LAST UPDATE: 16/03/2011
@@ -74,13 +75,14 @@ for id_row = 1:nbPolWg
   dP_nz_row(id_row,:) = a/sqrt(2)* (ds)^2/lambda0 * (1/2*Efft.*conj(-1*Hfft)); % -1 before H because of the cross product sign
 
   if scenario.options.type_swan_aloha == 0 % SWAN option renormalization
-      dP_nz_row(id_row,:) = dP_nz*sqrt(2);
+      dP_nz_row(id_row,:) = dP_nz_row*sqrt(2);
   end
   
   % Power conservation checking
   dnz=nz(2)-nz(1);
   disp(['Power conservation checking : transmited power for row#',num2str(id_row), '[W] :', num2str(dnz*sum(real(dP_nz_row(id_row,:))))]);
-
+  % % equivalent to :
+  % disp(['Power conservation checking : transmited power for row#',num2str(id_row), '[W] :', num2str(trapz(nz,real(dP_nz_row(id_row,:))))]);
 end % poloidal rows
 
 % The total spectrum is the sum of the spectra of all rows
