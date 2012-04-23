@@ -45,6 +45,10 @@ chemin_retour = pwd;
 %  chemin_aller = 'S_HFSS/matrices_HFSS_C2';
 
 % modules C2
+%  names of the modules (as viewed from the plasma)
+%  
+%  upper : 1B 2B 1B 2B 1B 2B 1B 2B
+%  lower : 1H 2H 1H 2H 1H 2H 1H 2H
 
 % Matrice S theorique (D.Voyer)
 %  nom_fichiers = ['S_C2';'S_C2';'S_C2';'S_C2';'S_C2';'S_C2';'S_C2';'S_C2'];	
@@ -57,8 +61,10 @@ chemin_retour = pwd;
 %  nom_fichiers = ['S_C2_0_exp';'S_C2_0_exp';'S_C2_0_exp';'S_C2_0_exp';'S_C2_0_exp';'S_C2_0_exp';'S_C2_0_exp';'S_C2_0_exp'];	
 
 %  %  Matrices S provenant du document TS9789 du 11/4/89 de Ph.Bibet et J.Achard
-%  %  nom_fichiers = ['S_C2_2H';'S_C2_1H';'S_C2_2H';'S_C2_1H';'S_C2_2H';'S_C2_1H';'S_C2_2H';'S_C2_1H'];	
-%  nom_fichiers = ['S_C2_2B';'S_C2_1B';'S_C2_2B';'S_C2_1B';'S_C2_2B';'S_C2_1B';'S_C2_2B';'S_C2_1B'];	
+%  Lower modules (after antenna rotation)
+%  nom_fichiers = ['S_C2_1B';'S_C2_2B';'S_C2_1B';'S_C2_2B';'S_C2_1B';'S_C2_2B';'S_C2_1B';'S_C2_2B'];   
+%  %  Upper modules (after antenna rotation)
+%  nom_fichiers = ['S_C2_1H';'S_C2_2H';'S_C2_1H';'S_C2_2H';'S_C2_1H';'S_C2_2H';'S_C2_1H';'S_C2_2H'];	
 
 %  % Simulation des matrices S par J.Belo en Janvier 2008 
 %  nom_fichiers = [repmat('JBelo_01_2008_',8,1), ...
@@ -66,19 +72,25 @@ chemin_retour = pwd;
 
 
 %% Simulation des matrices S par J.Belo en Juillet 2008
-chemin_aller = 'S_HFSS/matrices_HFSS_C2/JBelo_07_2008';
+%  chemin_aller = 'S_HFSS/matrices_HFSS_C2/JBelo_07_2008';
 %                   
 %  module #1, le plus a droite vu du plasma : C2_Module_2B_R_8_H
 %  ...
 %  module #8, le plus a gauche vu du plasma : C2_Module_1B_R_1_H
 %  
-%  modules HAUT de C2 (apres retournement)
+% modules HAUT de C2 (apres retournement)
 %  nom_fichiers = [repmat('JBelo_07_2008_C2_Module_',8,1), ...
 %                  ['2B_R_8_H';'1B_R_7_H';'2B_R_6_H';'1B_R_5_H';'2B_R_4_H';'1B_R_3_H';'2B_R_2_H';'1B_R_1_H']]; 
+%  
+%  nom_fichiers = [repmat('JBelo_07_2008_C2_Module_',8,1), ...
+%                  ['1B_R_1_H';'2B_R_2_H';'1B_R_3_H';'2B_R_4_H';'1B_R_5_H';'2B_R_6_H';'1B_R_7_H';'2B_R_8_H']]; 
 
-% modules BAS de C2 (apres retournement) 
-nom_fichiers = [repmat('JBelo_07_2008_C2_Module_',8,1), ...
-                ['2H_R_8_B';'1H_R_7_B';'2H_R_6_B';'1H_R_5_B';'2H_R_4_B';'1H_R_3_B';'2H_R_2_B';'1H_R_1_B']]; 
+%  % modules BAS de C2 (apres retournement) 
+%  nom_fichiers = [repmat('JBelo_07_2008_C2_Module_',8,1), ...
+%                  ['2H_R_8_B';'1H_R_7_B';'2H_R_6_B';'1H_R_5_B';'2H_R_4_B';'1H_R_3_B';'2H_R_2_B';'1H_R_1_B']]; 
+%  
+%  nom_fichiers = [repmat('JBelo_07_2008_C2_Module_',8,1), ...
+%                  ['1H_R_1_B';'2H_R_2_B';'1H_R_3_B';'2H_R_4_B';'1H_R_5_B';'2H_R_6_B';'1H_R_7_B';'2H_R_8_B']]; 
 
 %%  dephasage mesure entre les fenetres HF et l'entree de la jonction hybride
 %  
@@ -141,12 +153,19 @@ nom_fichiers = [repmat('JBelo_07_2008_C2_Module_',8,1), ...
 %  phase_rallonge = pi/180*[5-139.8274; -49-99.0504; 17-145.4388; -64-104.7924; 6-145.4938; -49-100.9410; 7-141.6767; -63-89.7361];
 
 % modules BAS : ['2H_R_8_B';'1H_R_7_B';'2H_R_6_B';'1H_R_5_B';'2H_R_4_B';'1H_R_3_B';'2H_R_2_B';'1H_R_1_B']
-phase_rallonge = pi/180*[-57-111.3714; 14-153.3568; -56-117.0598; 0-160.7192; -61-117.0220; -3-153.2958; -65-111.3019; 0-147.6672];
+%phase_rallonge = pi/180*[-57-111.3714; 14-153.3568; -56-117.0598; 0-160.7192; -61-117.0220; -3-153.2958; -65-111.3019; 0-147.6672];
 
 
+%% Simulation des matrices S par J.Hillairet en Mars 2012
+chemin_aller = 'S_HFSS/matrices_HFSS_C2/JHillairet_03_2012';
+% upper modules
+nom_fichiers = [repmat('C2_Module_',8,1), ...
+                ['1B';'2B';'1B';'2B';'1B';'2B';'1B';'2B']]; 
+%  % lower modules
+%  nom_fichiers = [repmat('C2_Module_',8,1), ...
+%                  ['1H';'2H';'1H';'2H';'1H';'2H';'1H';'2H']]; 
 
-
-%  phase_rallonge = [0,0,0,0,0,0,0,0];
+phase_rallonge = [0,0,0,0,0,0,0,0];
 
 % parametres 1D
 
