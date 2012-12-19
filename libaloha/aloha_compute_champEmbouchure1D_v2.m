@@ -61,7 +61,7 @@ end
 % ATTENTION : doit etre absolument inferieur a la plus petite decimale des dimensions b ou e 
 % pour resoudre correctement spatialement en z.
 % Ex for the C4 launcher: dz=1e-6 since e=4.325mm
-dz = 1e-6; 
+dz = 1e-5; 
 
 % The previous comment means that the total number of point should be an integer. 
 % ie: dz should be sufficiently small !
