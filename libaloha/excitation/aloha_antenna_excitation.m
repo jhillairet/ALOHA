@@ -48,7 +48,7 @@ if (nargin == 1)
     switch architecture
         case 'antenne_C2'
             a_ampl = sqrt(2.0672e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
-            a_phase = 1*(0*pi/180)*(0:7)';
+            a_phase = 0*(pi/180)*(0:7)';
 
         case 'antenne_COMPASS_old2'
             a_ampl = sqrt(1)*ones(8,1);   
@@ -76,11 +76,11 @@ if (nargin == 1)
           
         case {'antenne_C3', 'antenne_C3_referenceModule', 'antenna_C3_ITM'}
             a_ampl = sqrt(4.0320e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
-            a_phase = -90*(pi/180)*(0:7)';
+            a_phase = 270*(pi/180)*(0:7)';
 
         case {'antenna_C3_WEST_ITM'}
             a_ampl = sqrt(4.0320e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
-            a_phase = +90*(pi/180)*(0:7)';
+            a_phase = -90*(pi/180)*(0:7)';
 
         case 'antenne_C3_COMSOL'
             a_ampl = 1*ones(16,1);   % En champ elect pour 25 MW/m^2 !!!
@@ -268,12 +268,12 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6A(choc, tps_1, tps_2)
     phase_inc_mes=phase_inc_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
     phase_refl_mes=phase_refl_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
 
-%      % coupleur haut 
-%      a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
-%      a_phase = pi/180*phase_inc_mes(1:8)';
-    % coupleur bas 
-    a_ampl = sqrt(p_inc_mes(9:16)*1e3)';
-    a_phase = pi/180*phase_inc_mes(9:16)';
+    % coupleur haut 
+    a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
+    a_phase = pi/180*phase_inc_mes(1:8)';
+%      % coupleur bas 
+%      a_ampl = sqrt(p_inc_mes(9:16)*1e3)';
+%      a_phase = pi/180*phase_inc_mes(9:16)';
 
 
 function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
@@ -345,9 +345,9 @@ function [a_ampl, a_phase] = retrieve_tsbase_Q6B(choc, tps_1, tps_2)
     phase_inc_mes=phase_inc_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
     phase_refl_mes=phase_refl_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
 
-    % coupleur haut
-    a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
-    a_phase = pi/180*phase_inc_mes(1:8)';
+%      % coupleur haut
+%      a_ampl = sqrt(p_inc_mes(1:8)*1e3)';
+%      a_phase = pi/180*phase_inc_mes(1:8)';
 %      % coupleur bas
-%      a_ampl = sqrt(p_inc_mes(9:16)*1e3)';
-%      a_phase = pi/180*phase_inc_mes(9:16)';
+    a_ampl = sqrt(p_inc_mes(9:16)*1e3)';
+    a_phase = pi/180*phase_inc_mes(9:16)';
