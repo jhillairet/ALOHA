@@ -158,7 +158,6 @@ elseif (version == 6)
    Ys = num./denom;
    
    for k = 1:nb_g_total_ligne
-  
       % coeff. de normalisation en mode TE des fct. de forme sin et cos
        
       coeff_h = - sqrt(2/(a*b(k)));
@@ -207,7 +206,7 @@ elseif (version == 6)
    
    
    for ind_x = 1:length(x_coord)
-      
+      disp([num2str(ind_x), '/', num2str(length(x_coord))])
       neta = ((nz.*nz - 1).^(1/3))*((X0(ind)/D0(ind))^(1/3))*(k0*x_coord(ind_x) + (D0(ind)/X0(ind))*(X0(ind) - 1))*exp(-i*pi/3);
    
       tampon = (Va.*airy(0,neta)./airy(0,neta_0)+Vb.*airy(2,neta)./airy(2,neta_0)).'*ones(1,length(z_coord));   
@@ -228,7 +227,7 @@ elseif (version == 6)
    x_tot= [x_tot,x_coord+d_couche(2)];    % Modif de 16/05/2007 'd_couche(2)' au lieu de 'd_couche'
    
    for ind_x = 1:length(x_coord)
-      
+      disp([num2str(ind_x), '/', num2str(length(x_coord))])
       neta = ((nz.*nz - 1).^(1/3))*((X1(ind)/D1(ind))^(1/3))*(k0*x_coord(ind_x) + (D1(ind)/X1(ind))*(X1(ind) - 1))*exp(-i*pi/3);
    
       tampon = (Vc.*airy(0,neta)./airy(0,neta_1)).'*ones(1,length(z_coord));   
