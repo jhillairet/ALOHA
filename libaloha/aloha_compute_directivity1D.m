@@ -82,10 +82,23 @@ for idx_sc = 1:length(scenario)
     D = 0;
     D_cumulated = zeros(1,length(nz));
 
+    % In the following calculations, it is assumed that the main peak of the spectrum is 'n_parallel_0'
+    % However, if this variable had not been provided by the user in the input arguments to the present function,
+    % we assume that this value corresponds to the nz for which the spectrum is maximum.
+    if not(exist('n_parallel_0'))
+        [dummy, idx_max] = max(real(dP_nz));
+        n_parallel_0 = nz(idx_max);
+    end 
+    disp(aloha_message(['The maximum peak in the spectrum is located at n//= ',num2str(n_parallel_0)]))
+
     switch definition_directivite
         case 1
-            D = sum(real(dP_nz(find(nz>1))))*dnz/P ;    
-
+            % Positive n//0
+            if n_parallel_0 > 0
+                D = sum(real(dP_nz(find(nz>1))))*dnz/P ;    
+            else
+                D = sum(real(dP_nz(find(nz<1))))*dnz/P;
+            end
             % compute the cumulated directivity, function of nz
             for idx=1:length(nz)
                 D_cumulated(idx) = 1-dnz*sum(real(dP_nz([idx:end])))/P;
@@ -93,23 +106,16 @@ for idx_sc = 1:length(scenario)
 
 
         case 2   
-            % In this calculation, it is assumed that the spectrum is centred on n_parallel_0.
-            % However, if this variable had not been set to the present function,
-            % we assume that this value corresponds to the nz for which the spectrum is max.
-            if not(exist('n_parallel_0'))
-                [dummy, idx_max] = max(real(dP_nz));
-                n_parallel_0 = nz(idx_max);
-            end 
-        
+            % Positive n//0
             if n_parallel_0 > 0
                 D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
                     (dnz*sum(real(dP_nz(find(nz>1)))./nz(find(nz>1)).^2) ...
                     - dnz*sum(real(dP_nz(find(nz<1)))./nz(find(nz<1)).^2));
-            else
+            else % negative n//0
                 D = (1-mean(RC,2)/100).*n_parallel_0.^2 * (1/P) .*  ...
                     (dnz*sum(real(dP_nz(find(nz<1)))./nz(find(nz<1)).^2) ...
                     - dnz*sum(real(dP_nz(find(nz>1)))./nz(find(nz>1)).^2));
-            end    
+            end
 
             % compute the cumulated directivity, function of nz
             for idx=1:length(nz)
@@ -130,9 +136,30 @@ for idx_sc = 1:length(scenario)
     end
     
     disp(aloha_message(...
-    ['Directivity (definition #', num2str(definition_directivite),'): D=', num2str(D)]));
+    ['Directivity (definition #', num2str(definition_directivite),'): D= ', num2str(D)]));
     
-    % save results into the output scenario
+    %% calculate the relative height in % of the secondary lobe
+    % 
+    [dummy, idx_0] = min(abs(nz - n_parallel_0));
+    if n_parallel_0 > 0
+        % Find the location of the maximum peak in the negative region : this is the opposite lobe
+        [dummy, idx_opp] = max(real(dP_nz.*(nz<1)));
+        n_parallel_opposite = nz(idx_opp);
+    else
+        % Find the location of the maximum peak in the positive region : this is the opposite lobe
+        [dummy, idx_opp] = max(real(dP_nz.*(nz>1)));
+        n_parallel_opposite = nz(idx_opp);
+    end
+    % Opposite peak relative height  to the main peak 
+    opposite_peak_relative_height = real(dP_nz(idx_opp))/real(dP_nz(idx_0))*100;
+
+    disp(aloha_message(['Opposite peak located at n//= ',num2str(n_parallel_opposite)]));
+    disp(aloha_message(['Opposite peak relative height to the main peak: ', num2str(opposite_peak_relative_height), '%']));
+
+    %% save results into the output scenario
+    sc.results.opposite_peak_location = n_parallel_opposite;
+    sc.results.opposite_peak_relative_height = opposite_peak_relative_height;
+    sc.results.main_peak_location = nz(idx_0);
     sc.results.directivite = D; 
     sc.results.directivite_cumulee = D_cumulated;
     
