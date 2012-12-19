@@ -2,7 +2,6 @@ include Makefile.inc
 
 all: $(addprefix $(OBJDIR)/,$(LIBS))
 	$(FC) $(FCFLAGS) -o coupl_plasma_version3 coupl_plasma_version3.f90 $(LDFLAGS)
-	$(FC) $(FCFLAGS) -o coupl_plasma_version5 coupl_plasma_version5.f90 $(LDFLAGS)
 	$(FC) $(FCFLAGS) -o coupl_plasma_version6 coupl_plasma_version6.f90 $(LDFLAGS)
 
 $(OBJDIR)/$(LIBBLAS):
