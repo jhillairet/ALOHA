@@ -130,7 +130,7 @@ for idx_sc = 1:length(scenarios)
     %%%%%%%%%%%%%%%%%%%%%%%%
     % antenna's module loading
     disp(aloha_message('Module''s excitation:'))
-    disp(a_ampl.*exp(j*a_phase));
+    disp(a_ampl.*exp(i*a_phase));
 
 	
     %%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,7 +187,7 @@ for idx_sc = 1:length(scenarios)
     % save global antenna S parameters into the scenario
     scenario.results = aloha_setfield(scenario.results, S_ant_11, S_ant_12, S_ant_21, S_ant_22);
     % save coupling results into scenario
-    scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, RC, RC_mouth, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe); 
+    scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, RC, RC_mouth, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe, K_cpl); 
     % save some constants into the scenario (for check purpose essentially)
     scenario.results = aloha_setfield(scenario.results, k0);
 
