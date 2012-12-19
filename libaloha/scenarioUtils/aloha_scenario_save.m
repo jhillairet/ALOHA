@@ -24,9 +24,9 @@ function status = aloha_scenario_save(scenario, fileName)
 %    if getversion > 5 
 %        save(fileName, 'scenario', '-v6');
 %    elseif getversion >= 7.3
-%        save(fileName, 'scenario', '-v7.3');
+        save(fileName, 'scenario', '-v7.3');
 %    else
-      save(fileName, 'scenario');
+%      save(fileName, 'scenario');
 %    end
 
   status = 0;
