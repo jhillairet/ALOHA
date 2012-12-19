@@ -51,7 +51,10 @@ lcc = 1/4*ones(1,nb_g_passifs_inter_modules*(nb_modules_tor-1) + 2*nb_g_passifs_
 
 chemin_retour = pwd;
 chemin_aller = 'S_HFSS/matrices_HFSS_C3';
-%  chemin_retour =  'cd ../../matlab';
+
+%  C3 module names
+%  upper modules : 24H 23H 22H 21H 14H 13H 12H 11H
+%  lower modules : 24B 23B 22B 21B 14B 13B 12B 11B
 
 % modules C3
 % La modelisation HFSS de l'antenne débute au voisinage du CM.
