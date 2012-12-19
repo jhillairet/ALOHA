@@ -174,7 +174,7 @@ for ind = 1:nb_g_pol
         [S_plasma, rac_Zhe] = aloha_getDatasFromBinaryFile(fortranOutputBinaryFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq);
     else
         disp(aloha_message([textInd, 'Reading ascii result file']));
-        [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(fortranOutputAsciiFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq, scenario);
+        [S_plasma, rac_Zhe, K_cpl] = aloha_getDatasFromAsciiFile(fortranOutputAsciiFileName, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max,ind,type_swan_aloha, architecture, freq, scenario);
     end
 
     if isempty(S_plasma)
