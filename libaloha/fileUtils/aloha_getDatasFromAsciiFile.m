@@ -1,4 +1,4 @@
-function [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(filename, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max, ind,type_swan_aloha, architecture, freq, scenario)
+function [S_plasma, rac_Zhe, K_cpl] = aloha_getDatasFromAsciiFile(filename, S_plasma, rac_Zhe, Nme, Nmh, nb_g_pol, nb_g_total_ligne, D_guide_max, ind,type_swan_aloha, architecture, freq, scenario)
 %  data extraction from ASCII file S_plasma.dat (fortran90 output)
 %  
 %  EXAMPLE:
@@ -39,7 +39,7 @@ function [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(filename, S_plasma, r
 
     S_plasma_inline = complex(S_r,S_i);
     S_plasma_ligne2 = reshape(S_plasma_inline, sqrt(length(S_plasma_inline)), sqrt(length(S_plasma_inline)));    
-
+    K_cpl = S_plasma_ligne2;
 
     rac_Zhe_inline= complex(RZ_r,RZ_i); 
     rac_Zhe_ligne2 = reshape(rac_Zhe_inline, sqrt(length(rac_Zhe_inline)), sqrt(length(rac_Zhe_inline)));
@@ -68,6 +68,7 @@ function [S_plasma, rac_Zhe] = aloha_getDatasFromAsciiFile(filename, S_plasma, r
             % waveguide impedance for parallel plate waveguide is Z0 for TEM and value below for TM
             Zc_swan = [Zc_swan,120*pi,-i*120*pi.*sqrt((1:Nme)*((celerite/(2*b(i_ind)*freq))^2-1))];
         end
+        
         Z_ligne = rac_Zhe_ligne2*(eye((Nme+Nmh)*nb_g_total_ligne)+S_plasma_ligne2)*inv(eye((Nme+Nmh)*nb_g_total_ligne)-S_plasma_ligne2)*rac_Zhe_ligne2;
         S_plasma_ligne2 = diag(sqrt(1./Zc_swan))*(Z_ligne-diag(Zc_swan))*inv(Z_ligne+diag(Zc_swan))*diag(sqrt(Zc_swan));
     
