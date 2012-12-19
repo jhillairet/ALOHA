@@ -53,11 +53,34 @@ end
 
 %% plot the average phase of at the mouth
 aloha_plot_figure(figure)
-    plot(scenario.results.abs_z(1,:), 180/pi*angle(scenario.results.Efield(1,:)))
-    
-    % surimpose the average field in a waveguide
+    % draw rectangles for waveguides
     for idx_wg=1:nb_g_total_ligne
-        line([z(idx_wg) z(idx_wg)+b(idx_wg)], scenario.results.Phase_average(idx_wg)*[1 1], 'Color', 'r');
+        if ismember(idx_wg,PassWG_idx)
+            % passive waveguide
+            rectangle('Position', [z(idx_wg) 0 b(idx_wg) 360], 'FaceColor', [.8 .8 .8]);
+        else
+            % active waveguide
+            rectangle('Position', [z(idx_wg) 0 b(idx_wg) 360]);
+        end
+    end    
+
+    phase = 180/pi*angle(scenario.results.Efield(1,:));
+    % if phase if negative -> add +360 deg - easier reading convention
+    phase(phase<0) = phase(phase<0)+360;
+
+    hold on
+    plot(scenario.results.abs_z(1,:), phase)
+    hold off
+
+    % surimpose the average field in a waveguide
+
+
+    for idx_wg=1:nb_g_total_ligne
+        phase_avg(idx_wg) = scenario.results.Phase_average(idx_wg);
+        if phase_avg(idx_wg)<0
+            phase_avg(idx_wg) = phase_avg(idx_wg)+360; % convention
+        end
+        line([z(idx_wg) z(idx_wg)+b(idx_wg)], phase_avg(idx_wg)*[1 1], 'Color', 'r');
     end
     title('Average phase at waveguide mouth')
     xlabel('z [m]')
