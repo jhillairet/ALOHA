@@ -25,5 +25,5 @@ if isfield(scenario.results, 'Ez_x_z')
     save(filename, 'dP_z', 'nz', 'z', 'Ez', ...
         'Ez_x_z', 'Hy_x_z', 'x_coord', 'z_coord', 'nbre_x_coord', 'nbre_z_coord');
 else
-    save(filename, 'dP_z', 'nz', 'z', 'Ez');
+    save(filename, 'dP_z', 'nz', 'z', 'Ez','-v7.3');
 end
