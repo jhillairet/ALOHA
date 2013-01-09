@@ -102,6 +102,7 @@ contains
             resultr0112=(0.,0.)
             resulti0112=(0.,0.)
             absr(1:4)=0.
+        
 
             ! Integration quadpack
             ! FINITE INTEGRATION
@@ -113,7 +114,7 @@ contains
             call qag(if0133, d, f, eps_abs, eps_rel, key, resulti0133, absr(10), neval(10), ier(10))
             call qag(rf0134, d, f, eps_abs, eps_rel, key, resultr0134, absr(11), neval(11), ier(11))
             call qag(if0134, d, f, eps_abs, eps_rel, key, resulti0134, absr(12), neval(12), ier(12))
-
+            
 !             ! Integration NAG d01alf_9d
 !             call nag_quad_1d_gen(rf0131, d, f, resultr0131, abs_err=absr(5), error=error)
 !             call nag_quad_1d_gen(if0131, d, f, resulti0131, abs_err=absr(6), error=error)
@@ -131,19 +132,11 @@ contains
         EndIf
     
         
-
-!         write(*,*) 'resultr0112=',resultr0112, 'resulti0112=', resulti0112
-!         write(*,*) 'resultr013=', resultr013, 'resulti013=',resulti013
-
         If ((m == n).AND.(i == j)) Then
             Call Calresidu(residu)
         Else
             residu=(0.,0.)
         EndIf
-    
-!         write(*,*) 'residu=',residu
-!         write(*,*) 'resultr0112=',resultr0112, 'resulti0112=',resulti0112
-!         write(*,*) 'resultr013=',resultr013, 'resulti013=',resulti013
 
         If (i == j) Then
             resultr=real(residu)-resultr0112
@@ -153,7 +146,6 @@ contains
             resulti=aimag(residu)-resulti013
         EndIf
     
-!         write(*,*) 'resultr=',resultr,'resulti=',resulti
 
         absrm=minval(absr)
 !         do ct=2,12

@@ -101,8 +101,8 @@ contains
     write(*,*) 'epsabs=', epsabs
     write(*,*) 'nlimit=', nlimit
     write(*,*) 'Nmax=', Nmax ! maximum |N_parallel|
-    write(*,*) 'b=', b(1:5)
-    write(*,*) 'z=', z(1:5)
+    write(*,*) 'b(1:5)=', b(1:5)
+    write(*,*) 'z(1:5)=', z(1:5)
     write(*,*) 'bcte=', bcte
     write(*,*) 'k0=', k0
     write(*,*) 'X0=', X0
@@ -147,7 +147,6 @@ contains
 
         write(*,*) 'Calcul de la matrice admittance'
         Call CalcouPgi(version, intg,i,a,epsrel,T_grill,D_guide_max,Nmh,Nme,Pg,Y)         
-        write(*,*) 'Matrice Admittance : OK'
         
 ! ! Calcul de RYhe^-1*(Y*RZheg)=RZhe*(Y*RZheg)=RZYRZg en fortran 77
 !          Call F06ZAF(TransA,TransB,Nmh+Nme,(Nmh+Nme)*Pg,(Nmh+Nme)*Pg,
@@ -685,11 +684,14 @@ contains
                         m=mhj(2,k)
                         n=mhi(2,l)
                         
-!                         write(*,*) 'k=',k,' l=',l,'i=',i,' j=',j
+                        !if (i.EQ.63) then
+                        ! write(*,*) 'k=',k,' l=',l,'i=',i,' j=',j
+                        !end if
 
                         if (cofm /= 0.0) then
                             if (version == 3) then
                                 Call Int01AHF(epsrel,i,j,resultrhh,resultihh,absrm)
+
                             elseif (version == 6) then
                                 Call Int01AJF(epsrel,i,j,resultrhh,resultihh,absrm)
                             endif
@@ -702,7 +704,9 @@ contains
                     end do
                 end do
 
-!                 write(*,*) 'premier quadrant: sum(Y)=', sum(Y)
+                !if (i.EQ.63) then
+                ! write(*,*) 'premier quadrant: sum(Y)=', sum(Y)
+                !end if
 
                 Do k=1,Nmh
                     Do l=1,Nme
@@ -733,7 +737,9 @@ contains
                             ct=ct+1
                     end do
                 end do
-!                 write(*,*) 'deuxieme quadrant : sum(Y)=',sum(Y)
+                !if (i.EQ.63) then
+                ! write(*,*) 'deuxieme quadrant : sum(Y)=',sum(Y)
+                !end if
                 Do l=1,Nme
                     Do k=1,Nmh
                         Call CM(j,a,b,mej(1,l),mej(2,l),Dj,sgp)
@@ -755,13 +761,15 @@ contains
                                 Call Int01AJF(epsrel,i,j,resultreh,resultieh,absrm)
                             endif
                         endif
-                        write(*,*) 'M-E :', resultreh, resultieh
+                        !write(*,*) 'M-E :', resultreh, resultieh
                         Y(Nmh+l,k+(Nmh+Nme)*(i-1))=Dj*Ei*cofm*cte*(resultreh+(0.,1.)*resultieh)
                         absrr(ct)=absrm
                         ct=ct+1
                     end do
                 end do
-!                 write(*,*) 'troisieme quadrant : sum(Y)=',sum(Y)
+                !if (i.EQ.63) then
+                ! write(*,*) 'troisieme quadrant : sum(Y)=',sum(Y)
+                !end if
                 Do l=1,Nme
                     Do k=1,Nme
                         Call CM(j,a,b,mej(1,l),mej(2,l),Dj,sgp)

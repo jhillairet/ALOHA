@@ -63,7 +63,10 @@ program coupl_plasma_version3
       Read(10,*) Pg_r ! Nombre total de guides sur une ligne poloidale
       Pg = int(Pg_r)! cast readed real variables into integer
       Read(10,*) a
-      Read(10,*) (b(i),i=1,Pg)
+      Read(10,*) (b(i),i=1,Pg) ! Attention : la taille max de b,z est définie dans aloha_config (bouahhhh!!! c'est pas beau !)
+        write(*,*) 'size(b)=',size(b)
+
+
       Read(10,*) (z(i),i=1,Pg)
       Read(10,*) T_grill_r
       Read(10,*) D_guide_max_r

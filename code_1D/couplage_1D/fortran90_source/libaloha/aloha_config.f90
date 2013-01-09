@@ -8,7 +8,7 @@ module aloha_config
     ! waveguide parameters
     character, dimension(1) :: bcte
     real(kind=wp)       :: a
-    real(kind=wp)       :: b(60), z(60)
+    real(kind=wp)       :: b(100), z(100)
 
     ! ? 
     real(kind=wp)       :: epsabs
