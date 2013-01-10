@@ -9,7 +9,7 @@
       nb_g_module_tor = aloha_scenario_get(scenario, 'nwm_phi');
       a = aloha_scenario_get(scenario, 'hw_theta');
       nb_g_passifs_bord = aloha_scenario_get(scenario, 'npwe_phi');
-      pass_module_tor = find(aloha_scenario_get(scenario, 'mask') == 0);
+      pass_module_tor = reshape(find(aloha_scenario_get(scenario, 'mask') == 0),1,[]); % the reshape force the array to be horizontal
       nb_g_passifs_inter_modules = aloha_scenario_get(scenario, 'npwbm_phi');
       antenne_standard = 0;
       lcc = squeeze(aloha_scenario_get(scenario, 'scl'))';
