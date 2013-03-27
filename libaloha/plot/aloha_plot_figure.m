@@ -44,7 +44,7 @@ function vargout=aloha_plot_figure(varargin)
       case 1
         if ishandle(varargin{1})
             h = varargin{1};
-        elseif isnumeric(varargin{1}) & isint(varargin{1});
+        elseif isnumeric(varargin{1}) & isinteger(varargin{1});
             h = figure(varargin{1});
         elseif isstr(varargin{1}) 
             h = figure;
