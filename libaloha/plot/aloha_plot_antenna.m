@@ -63,16 +63,37 @@ for idx_pol = 1:nb_g_pol%nb_g_module_pol
         
         % new way
         if aloha_isAntennaITM(scenario)
-            % if the current wg is a passive wg
-            if b(idx_tor) == aloha_scenario_get(scenario, 'bewp');
-             rectangle('Position', rect_pos, 'FaceColor', [.8,.8,.8]);
-            elseif b(idx_tor) == aloha_scenario_get(scenario, 'biwp');
-             rectangle('Position', rect_pos, 'FaceColor', [.8,.8,.8]);
-            % for all other cases (ie active wg), just plot the contour
-            % of the wg
-            else 
+            % we create an array of passive/active mask to determine 
+            % if a waveguide is either active of passive
+            ar_modules = ones(1, scenario.antenna_lh.setup.modules.nma_phi); % [1 1 ... 1] (1xnmodules)
+            ar_pa_mask = scenario.antenna_lh.setup.modules.waveguides.mask;
+            % adding passive waveguide between modules in the P/A mask
+            ar_pa_mask = [ar_pa_mask, zeros(1, scenario.antenna_lh.setup.modules.waveguides.npwbm_phi)];
+            
+            pa_mask = kron(ar_modules, ar_pa_mask);
+            % removing the last one, which came from the passive waveguide
+            % between modules ) if there's any)
+            if scenario.antenna_lh.setup.modules.waveguides.npwbm_phi > 0
+                pa_mask(end)=[];
+            end
+            % adding passive waveguides at the edges in the P/A mask
+            pa_mask = [zeros(1, scenario.antenna_lh.setup.modules.waveguides.npwe_phi), pa_mask, zeros(1, scenario.antenna_lh.setup.modules.waveguides.npwe_phi)];
+            
+            if pa_mask(idx_tor) == 0
+                rectangle('Position', rect_pos, 'FaceColor', [.8,.8,.8]);
+            elseif pa_mask(idx_tor) == 1
                 rectangle('Position', rect_pos);
             end
+%              % if the current wg is a passive wg
+%              if b(idx_tor) == aloha_scenario_get(scenario, 'bewp');
+%               rectangle('Position', rect_pos, 'FaceColor', [.8,.8,.8]);
+%              elseif b(idx_tor) == aloha_scenario_get(scenario, 'biwp');
+%               rectangle('Position', rect_pos, 'FaceColor', [.8,.8,.8]);
+%              % for all other cases (ie active wg), just plot the contour
+%              % of the wg
+%              else 
+%                  rectangle('Position', rect_pos);
+%              end
         else % old way
             % if the wg is a passive wg, 
             % then fill the rectangle in gray
