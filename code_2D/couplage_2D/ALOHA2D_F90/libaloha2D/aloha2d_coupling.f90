@@ -405,6 +405,7 @@ end module aloha2d_coupling
             b_ny=real(-SQRT(ABS(S-nz**2.))-demi_intervalle)
             Call qags(f_real,a_ny,b_ny,epsabs,epsrel,tamp,abserr, &
                      neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_r=tamp
             !write(*,*) '    2nd ny domain'
             a_ny=real(-SQRT(ABS(S-nz**2.))-demi_intervalle)
@@ -412,12 +413,14 @@ end module aloha2d_coupling
             points(1)=-SQRT(ABS(S-nz**2.))
             Call qagp(f_real,a_ny,b_ny,npts2,points,epsabs, &
               epsrel,tamp,abserr,neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_r=f_nz_r+tamp
             !write(*,*) '    3rd ny domain'
             a_ny=real(-SQRT(ABS(S-nz**2.))+demi_intervalle)
             b_ny=real(SQRT(ABS(S-nz**2.))-demi_intervalle)
             Call qags(f_real,a_ny,b_ny,epsabs,epsrel,tamp,abserr, &
                      neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_r=f_nz_r+tamp
             !write(*,*) '    4th ny domain'
             a_ny=real(+SQRT(ABS(S-nz**2.))-demi_intervalle)
@@ -425,12 +428,14 @@ end module aloha2d_coupling
             points(1)=SQRT(ABS(S-nz**2.))
             Call qagp(f_real,a_ny,b_ny,npts2,points,epsabs, &
               epsrel,tamp,abserr,neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_r=f_nz_r+tamp
             !write(*,*) '    5th and last ny domain'
             a_ny=real(SQRT(ABS(S-nz**2.))+demi_intervalle)
             b_ny=real(ny_max)
             Call qags(f_real,a_ny,b_ny,epsabs,epsrel,tamp,abserr, &
                      neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_r=f_nz_r+tamp
 
          Endif
@@ -479,12 +484,14 @@ end module aloha2d_coupling
             points(1)=-SQRT(ABS(S-nz**2.))
             Call qagp(f_imag,a_ny,b_ny,npts2,points,epsabs,&
               epsrel,tamp,abserr,neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_i=tamp
 
             a_ny=-SQRT(ABS(S-nz**2.))+demi_intervalle
             b_ny=SQRT(ABS(S-nz**2.))-demi_intervalle
             Call qags(f_imag,a_ny,b_ny,epsabs,epsrel,tamp,abserr,&
                      neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_i=f_nz_i+tamp
 
             a_ny=+SQRT(ABS(S-nz**2.))-demi_intervalle
@@ -492,14 +499,20 @@ end module aloha2d_coupling
             points(1)=SQRT(ABS(S-nz**2.))
             Call qagp(f_imag,a_ny,b_ny,npts2,points,epsabs,&
               epsrel,tamp,abserr,neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_i=f_nz_i+tamp
 
-         Else
-
+          Else
             a_ny=real(ny_min)
             b_ny=real(-SQRT(ABS(S-nz**2.))-demi_intervalle)
             Call qags(f_imag,a_ny,b_ny,epsabs,epsrel,tamp,abserr,&
                      neval,ier)
+            ! JH 24/03/2013
+            ! The follwing isNaN test below intend to avoid
+            ! a NaN value in tamp for some high order mode (TE0n?)
+            if (isNaN(tamp)) tamp = 0.0;
+
+
             f_nz_i=tamp
 
             a_ny=real(-SQRT(ABS(S-nz**2.))-demi_intervalle)
@@ -507,12 +520,15 @@ end module aloha2d_coupling
             points(1)=-SQRT(ABS(S-nz**2.))
             Call qagp(f_imag,a_ny,b_ny,npts2,points,epsabs,&
               epsrel,tamp,abserr,neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_i=f_nz_i+tamp
 
             a_ny=-SQRT(ABS(S-nz**2.))+demi_intervalle
             b_ny=SQRT(ABS(S-nz**2.))-demi_intervalle
             Call qags(f_imag,a_ny,b_ny,epsabs,epsrel,tamp,abserr,&
                      neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
+
             f_nz_i=f_nz_i+tamp
 
             a_ny=+SQRT(ABS(S-nz**2.))-demi_intervalle
@@ -520,12 +536,14 @@ end module aloha2d_coupling
             points(1)=SQRT(ABS(S-nz**2.))
             Call qagp(f_imag,a_ny,b_ny,npts2,points,epsabs,&
               epsrel,tamp,abserr,neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_i=f_nz_i+tamp
 
             a_ny=SQRT(ABS(S-nz**2.))+demi_intervalle
             b_ny=ny_max
             Call qags(f_imag,a_ny,b_ny,epsabs,epsrel,tamp,abserr,&
                      neval,ier)
+            if (isNaN(tamp)) tamp = 0.0;
             f_nz_i=f_nz_i+tamp
 
          Endif
