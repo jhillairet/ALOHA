@@ -21,8 +21,8 @@ PROGRAM ALOHA_2D
 
 
   ! namelists
-  namelist /general/ wg_nb, wg_modes_nb, f, nz_min,nz_max, ny_min, ny_max
-  namelist /plasma/ ne, dne, B0
+  !namelist /general/ wg_nb, wg_modes_nb, f, nz_min,nz_max, ny_min, ny_max
+  !namelist /plasma/ ne, dne, B0
   !namelist /output_param/ K, Zc_he
 
 
@@ -67,18 +67,19 @@ PROGRAM ALOHA_2D
   ! Main part
   call eval_coupling()
 
-  ! Test array
+  ! ! Quick test to verify the way arrays are stored in Namelist
   !K(1,1) = one
   !K(2,1) = 2*one
   !K(1,2) = j
   !K(2,2) = 2*j
+  !
+  ! ! NB: The array in fortran is written inline with the following way!
+  ! ! Array content
+  ! ! K = 1,2
+  ! !   3,4
+  ! ! Array in the namelist ==>
+  ! ! K = 1,3,2,4
 
-  ! NB: The array in fortran is written inline with the following way!
-  ! Array content
-  !K = 1,2
-  !    3,4
-  ! Array in the namelist ==>
-  !K = 1,3,2,4
 
 
       ! Spectrum calculation
@@ -91,6 +92,8 @@ PROGRAM ALOHA_2D
   !
   call set_output_parameters()
   write(*,*) size(K)
+
+
   !
   !
   !
@@ -261,7 +264,25 @@ PROGRAM ALOHA_2D
       integer :: id_mode, fu
       integer, dimension(wg_nb*wg_modes_nb)  :: m, n ! port modal indexes
       real, dimension(wg_nb*wg_modes_nb) :: a_port, b_port, y_port, z_port ! port waveguide dimensions
-       character(len=1), dimension(wg_nb*wg_modes_nb) :: mode_port
+      character(len=1), dimension(wg_nb*wg_modes_nb) :: mode_port ! mode type index ('E' (TM) or 'H' (TE) modes)
+
+!
+!          ! Julien
+!          ! 24/03/2013
+!          !
+!          ! Temporary piece of code for AOLGA comparizon
+!          ! For the 2013 RF Conference
+!          !
+!          ! Assuming the number of mode is 7:
+!          character(len=1), dimension(7) :: AOLGA_mode_port
+!          integer, dimension(7) :: AOLGA_m, AOLGA_n
+!          ! We want here to compare the following modes
+!          !        ( TE10,TE01,TE11,TE02,TE12,TM11,TM12)
+!
+!          AOLGA_mode_port = (/ 'H', 'H', 'H', 'H', 'H', 'E', 'E' /)
+!                  AOLGA_m = (/  1 ,  0 ,  1 ,  0 ,  1 ,  1 ,  1  /)
+!                  AOLGA_n = (/  0 ,  1 ,  1 ,  2 ,  2 ,  1 ,  2  /)
+
 
       print*,'Preparing the calculation...'
       ! For all waveguides
@@ -292,19 +313,31 @@ PROGRAM ALOHA_2D
           ! TODO : here we may select the modes to use depending of
           ! their cut-off wavelengths
 
+!          ! 24/03/2013
+!          ! Temporary piece of code for the comparizon to AOLGA
+!          mode_port(id_port) = AOLGA_mode_port(id_mode)
+!          m(id_port) = AOLGA_m(id_mode)
+!          n(id_port) = AOLGA_n(id_mode)
+
+          ! Here the first mode is the TE10 mode, while other modes are TM_1n
           if (id_mode .EQ. 1) then
             ! TE_10 (H_10) characteristic impedance
             mode_port(id_port) = 'H'
             m(id_port)=1
             n(id_port)=0
-            Zc_he(id_port) = rectwg_Zc(real(f),a_port(id_port),b_port(id_port),m(id_port),n(id_port),'H')
           else
             ! TM_1n (E_1n) characteristic impedance
             mode_port(id_port) = 'E'
             m(id_port)=1
             n(id_port)=id_mode-1
-            Zc_he(id_port) = rectwg_Zc(real(f),a_port(id_port),b_port(id_port),m(id_port),n(id_port),'E')
           end if
+
+          ! define the port characteristic impedance depending the kind of mode is used
+          if (mode_port(id_port) .EQ. 'H') then ! H (TE) modes
+            Zc_he(id_port) = rectwg_Zc(real(f),a_port(id_port),b_port(id_port),m(id_port),n(id_port),'H')
+          else ! E (TM) modes
+            Zc_he(id_port) = rectwg_Zc(real(f),a_port(id_port),b_port(id_port),m(id_port),n(id_port),'E')
+          endif
 
           print*, 'Zc_he(id_port)=', Zc_he(id_port)
 
@@ -322,8 +355,10 @@ PROGRAM ALOHA_2D
       isAdmittanceCalculated = .TRUE.
       print*,'Plasma admittance grid evaluation : Done.'
 
+      ! write the results in a text file
+      ! which contains also the kind of mode
       open(newunit=fu, file='ALOHA2D.out.K_details.dat', form='formatted', status='replace')
-      write(fu,*) 'port1 m1 n1 mode1 port2 m2 n2 mode2 K(port1,port2)'
+      write(fu,*) 'port1  mode1  m1 n1  port2  mode2 m2  n2   K(port1,port2)'
 
       print*,'Launching coupling calculation...'
       ! For all ports, double loop
@@ -344,8 +379,8 @@ PROGRAM ALOHA_2D
                 mode_port(id_port2), m(id_port2),n(id_port2))
           write(*,'(A,I3,A,I3,A,2g15.5)') 'K(',id_port1,',',id_port2,')=',K(id_port1,id_port2)
 
-          write(fu,*) id_port1, m(id_port1), n(id_port1), mode_port(id_port1), &
-                      id_port2, m(id_port2), n(id_port2), mode_port(id_port2), &
+          write(fu,*) id_port1, mode_port(id_port1), m(id_port1), n(id_port1), &
+                      id_port2, mode_port(id_port2), m(id_port2), n(id_port2), &
                       K(id_port1,id_port2)
         end do ! id_port2
       end do ! id_port1
