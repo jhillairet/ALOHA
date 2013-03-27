@@ -26,13 +26,15 @@ a = wg.hw_theta;
 %% b
 % Make the array b which contains all the waveguide width 
 % of a row of waveguides
+if not(isfield(wg, 'b'))
+    b_module = wg.mask.*wg.bwa + not(wg.mask).*wg.biwp; % waveguide width inside a module
+    b_edge = repmat(wg.bewp, 1, wg.npwe_phi);  % passive wg width on each side
+    b_inter= repmat(wg.biwp, 1, wg.npwbm_phi); % passive wg width between modules
 
-b_module = wg.mask.*wg.bwa + not(wg.mask).*wg.biwp; % waveguide width inside a module
-b_edge = repmat(wg.bewp, 1, wg.npwe_phi);  % passive wg width on each side
-b_inter= repmat(wg.biwp, 1, wg.npwbm_phi); % passive wg width between modules
-
-b = [b_edge, kron(ones(1,mod.nma_phi-1),[b_module, b_inter]),b_module, b_edge];
-
+    b = [b_edge, kron(ones(1,mod.nma_phi-1),[b_module, b_inter]),b_module, b_edge];
+else
+    b = wg.b;
+end
 %% e
 % Make the array e which contains all the waveguide septum width
 % of a row of waveguides 
