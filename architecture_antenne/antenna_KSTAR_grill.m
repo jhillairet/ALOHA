@@ -105,7 +105,11 @@ waveguides.e_phi = repmat(ep, 1, ne_phi);
 nscl = waveguides.npwbm_phi*(modules.nma_phi-1) + ...
        waveguides.npwe_phi*2 + ...
        sum(not(waveguides.mask))*modules.nma_phi;
-waveguides.scl = repmat(1/4, 1, nscl);     
+ 
+% Actually, the passivewaveguide depth is not 1/4 lambdag, but 1/8lambdag 
+% at the left and 3/8lambdag at the right : 
+% waveguides.scl = repmat(1/4, 1, nscl);   
+waveguides.scl = [1/8 3/8];
 
 %% --------------------------------
 %% Modules Scattering parameters
