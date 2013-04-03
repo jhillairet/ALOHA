@@ -41,7 +41,6 @@ options.comment = [''];
 %  Ces valeurs correspondent aux noms des fichiers disponibles dans
 %  le dossier 'achitecture_antenne'.
 % 
-antenna.architecture = 'antenne_C4'; % Old fashioned antenna description. [OBSOLETE]
 antenna.architecture = 'antenna_C4_ITM';      
 
 %% #####################
@@ -109,39 +108,33 @@ Nmh = 1;    % nbre de modes TE
 Nme = 2;    % nbre de modes TM
 
 %% #####################
-% Choix de la version de modelisation du profil 
-% de densite electronique devant l'antenne.
-%  --------- pour la version 1D ------------
-%  
-% version 3: profil lineaire, methode des residus 
-%            + domaine d'integration limite e t = 1/(max_nz+1)
-% 
-% version 5: profil lineaire, couche de vide 
-%            + couche de plasma [Deneb only]
-%  
-% version 6: profil lineaire, deux couches de plasma.
-%            ne0 et dne0 decrivent la couche ne1
-%            
-% version 7: plasma step [Deneb only]
-version_plasma_1D = 3;
+% Plasma model
+%
+%  --------- 1D (TEM/TM modes, slow wave only) ------------
+% version_plasma_1D = 3: 1 linear profile
+% version_plasma_1D = 6: 2 linear profiles + eventually a vacuum gap
+version_plasma_1D = 6;
 
-% --------- pour la version 2D ------------
-% version_plasma_2D 1 : 1 couche. Integration numerique (libquadpack)
-% version_plasma_2D 2 : 1 couche, Integration numerique et FEM
-% version_plasma_2D 3 : 
-% ...TODO...
-% version_plasma_2D 6 : 2 couches, Integration numerique et FEM
-version_plasma_2D = 2;
+% --------- 2D (TE/TM modes, slow and fast waves) ------------
+% FORTRAN 90 version
+% version_plasma_2D = 1 : 1 gradient, FEM admittance
+%
+%
+% FORTRAN 77 versions [obsolete]
+% version_plasma_2D = 10 : 1 gradient. analytical admittance 
+% version_plasma_2D = 20 : 1 gradient, FEM admittance
+% version_plasma_2D = 60 : 2 gradients, FEM admittance
+version_plasma_2D = 1;
 
 %% #####################
-% Utiliser des lignes poloidales identiques ?
-% 
-% true  : densite Haut et Bas identiques 
-%       => ne0 et dne0 scalaires. ex : ne0 = 0.2
-% false : densite Haut et Bas differentes 
-%       => ne0 et dne0 tableaux. ex : ne0 = [0.2,0.4,0.2]
-% NB : les tableaux sont de la taille du nombre 
-% de lignes poloidale d'un module (pour une demi-antenne)
+% Should we use the same density profile for each rows of waveguides ?
+% [1D Plasma model ONLY]
+%
+% true  : each row has same density profile
+%       => ne0 and lambdas are scalar values. e.g. : ne0 = 0.2e18
+% false : each row has a distinct density profile
+%       => ne0 and lambdas are array. e.g. : ne0 = [0.2,0.4,0.2]*1e18
+% NB : the array length should be equal to the number of waveguide rows
 % 
 options.bool_lignes_identiques = true;     
  
@@ -158,6 +151,8 @@ plasma.ne0 = 5e17; % if bool_lignes_identiques = true
 %% #####################
 % Scrape-off length (lambda_n) of the first plasma layer [m]
 % 
+% reminder: lambda_n = ne/grad_ne
+% 
 % longueur de decroissance 
 % pour la premiere couche de plasma en partant de l'antenne. [m]
 % 
@@ -167,7 +162,7 @@ plasma.lambda_n(1) = 2e-3; % 2mm if bool_lignes_identiques = true
 
 
 %% #####################
-% Width of the first plasma layer [version=6 only]. [m]
+% Width of the first plasma layer [version_plasma_1D=6 only]. [m]
 % 
 % Epaisseur de la premiere couche de plasma [version=6 only]. [m]
 % 
@@ -179,7 +174,7 @@ plasma.d_couche = 2e-3;
 % Scrape-off length of the second plasma layer [m]
 % 
 % longueur de decroissance 
-% pour la deuxieme couche de plasma (version=6). [m]
+% pour la deuxieme couche de plasma (version_plasma_1D=6). [m]
 % 
 % Exemple :
 plasma.lambda_n(2) = 2e-2; % 2cm if bool_lignes_identiques = true
@@ -188,7 +183,7 @@ plasma.lambda_n(2) = 2e-2; % 2cm if bool_lignes_identiques = true
 
 
 %% #####################
-% Vacuum gap width between the antenna [m]
+% Vacuum gap width between the antenna [m] (version_plasma_1D=6)
 % and the first layer of the plasma [m]
 % 
 % Epaisseur de vide entre l'antenne et le plasma [m]
@@ -197,7 +192,7 @@ plasma.d_vide = 0;
 
 %% ####################
 %  Intensite du champ magnetique devant l'antenne. [T]
-% [OBSOLETE pour le moment]  
+% [version_plasma_2D only]  
 options.B0 = 2.95;        
 
 %% #####################
