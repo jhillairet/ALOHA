@@ -194,19 +194,19 @@ PROGRAM ALOHA_2D
 
           case('b')
             read(param_value, *) b
-            write(*,'((A),*(f7.2))') '+ Waveguides width in [mm], b=', b*1e3
+            write(*,'((A),(f7.2))') '+ Waveguides width in [mm], b=', b*1e3
 
           case('a')
             read(param_value, *) a
-            write(*,'((A),*(f7.2))') '+ Waveguides height in [mm], a=', a*1e3
+            write(*,'((A),(f7.2))') '+ Waveguides height in [mm], a=', a*1e3
 
           case('y')
             read(param_value, *) y
-            write(*,'((A),*(f7.2))') '+ Waveguides polidal location in [mm], y=', y*1e3
+            write(*,'((A),(f7.2))') '+ Waveguides polidal location in [mm], y=', y*1e3
 
           case('z')
             read(param_value, *) z
-            write(*,'((A),*(f7.2))') '+ Waveguides toroidal location in [mm], z=', z*1e3
+            write(*,'((A),(f7.2))') '+ Waveguides toroidal location in [mm], z=', z*1e3
 
           case('ne')
             read(param_value, *) ne
@@ -235,15 +235,19 @@ PROGRAM ALOHA_2D
     !
     subroutine set_output_parameters()
         integer :: p,q, fu
-
-        open(newunit=fu, file='ALOHA2D.out.K.dat', form='formatted', status='replace')
+        ! newunit is a fortran 2008 Feature
+        !open(newunit=fu, file='ALOHA2D.out.K.dat', form='formatted', status='replace')
+        fu=1
+        open(fu, file='ALOHA2D.out.K.dat', form='formatted', status='replace')
         !write(fu,*) ((real(K(p,q)),p=1,wg_nb*wg_modes_nb),q=1,wg_nb*wg_modes_nb)
         !write(fu,*) ((imag(K(p,q)),p=1,wg_nb*wg_modes_nb),q=1,wg_nb*wg_modes_nb)
         write(fu,*) 'K(real)   K(imag)'
         write(fu,'(2g20.10)') ((K(p,q),p=1,wg_nb*wg_modes_nb),q=1,wg_nb*wg_modes_nb)
         close(fu)
 
-        open(newunit=fu, file='ALOHA2D.out.Zc.dat', form='formatted', status='replace')
+        fu=1
+        !open(newunit=fu, file='ALOHA2D.out.Zc.dat', form='formatted', status='replace')
+        open(fu, file='ALOHA2D.out.Zc.dat', form='formatted', status='replace')
         !write(fu,*) (real(Zc_he(p)),p=1,wg_nb*wg_modes_nb)
         !write(fu,*) (imag(Zc_he(p)),p=1,wg_nb*wg_modes_nb)
         write(*,*) 'Zc(real)  Zc(imag)'
@@ -357,7 +361,10 @@ PROGRAM ALOHA_2D
 
       ! write the results in a text file
       ! which contains also the kind of mode
-      open(newunit=fu, file='ALOHA2D.out.K_details.dat', form='formatted', status='replace')
+      fu=1
+      open(fu, file='ALOHA2D.out.K_details.dat', form='formatted', status='replace')
+      ! newunit is a fortran 2008 feature
+      !open(newunit=fu, file='ALOHA2D.out.K_details.dat', form='formatted', status='replace')
       write(fu,*) 'port1  mode1  m1 n1  port2  mode2 m2  n2   K(port1,port2)'
 
       print*,'Launching coupling calculation...'
