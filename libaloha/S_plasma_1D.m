@@ -51,7 +51,7 @@ chemin_retour = pwd;
 chemin_binaire_fortran = '/code_1D/couplage_1D';
 
 % change dir to the fortran binary directory
-cd([aloha_utils_getRootPath, chemin_binaire_fortran]);
+% cd([aloha_utils_getRootPath, chemin_binaire_fortran]);
 
 if (bool_lignes_identiques)
     ne0 = ones(1,nb_g_pol)*ne0;
@@ -83,7 +83,7 @@ for ind = 1:nb_g_pol
     % execute binary only if:
     %  - this is the first row and bool_lignes_identiques == true
     %  - bool_lignes_identiques == false (then do for all rows)
-    if ((bool_lignes_identiques == true) & (ind > 1))
+    if ((bool_lignes_identiques == true) && (ind > 1))
         disp(aloha_message([textInd, '[bool_lignes_identiques=true]']));
         disp(aloha_message([textInd, '--> No need to calculate this row! taking previous result ']));
     else
@@ -148,8 +148,9 @@ for ind = 1:nb_g_pol
         % Fortran Binary execution
         % 
         try
-            disp(aloha_message([textInd, 'Run binary ', binary_name]));
-            [status,result] = system(['./',binary_name]);
+            binary_full_path = [aloha_utils_getRootPath, chemin_binaire_fortran, '/', binary_name];
+            disp(aloha_message([textInd, 'Run binary ', binary_full_path]));
+            [status,result] = system(binary_full_path);
 
             if bool_debug
                 disp(result);
@@ -160,7 +161,7 @@ for ind = 1:nb_g_pol
                 error(aloha_message(result));
             end
         catch
-            cd(chemin_retour);
+            % cd(chemin_retour);
             error(aloha_message('?! Binary execution problem ?!'));
         end
     end
@@ -191,5 +192,5 @@ for ind = 1:nb_g_pol
 end % for ind = 1:nb_g_pol
 
 % back to working dir
-cd(chemin_retour);
+% cd(chemin_retour);
 

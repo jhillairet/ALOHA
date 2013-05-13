@@ -43,7 +43,7 @@ z_tot=kron(ones(1,nb_g_pol),z);
 % En cas d'erreur lors de l'execution du binaire, le programme affiche une alerte et continu.
 chemin_retour = pwd;
 % on se place dans le repertoire des binaires fortran 
-cd([aloha_utils_getRootPath, chemin_binaire_fortran]);
+% cd([aloha_utils_getRootPath, chemin_binaire_fortran]);
    
 %  ecriture du fichier par_grill_2D.dat
 %  
@@ -54,7 +54,7 @@ if (version == 1)
         'b', b_tot, 'a', a_tot, 'y', y_tot, 'z', z_tot, ...
         'ne', ne0, 'dne', dne0, 'B0', B0);
     
-elseif (version == 10|20 ) % modeles plasma 1 couche
+elseif (version == 10 || version == 20 ) % modeles plasma 1 couche
     varCell = {nbre_guides nbre_modes B0 freq ne0 dne0 a_tot b_tot y_tot z_tot ny_min nz_min ny_max nz_max nbre_ny nbre_nz};
     
     aloha_saveFortranInputFile('par_grill_2D.dat', varCell);
@@ -72,14 +72,15 @@ end
 % execution du binaire fortran
 % 
 try
-    disp(aloha_message(['Lancement du binaire ', binary_name]));
-    [status,result] = system(['./',binary_name]);
+    binary_full_path = [aloha_utils_getRootPath,chemin_binaire_fortran,'/',binary_name];
+    disp(aloha_message(['Lancement du binaire ', binary_full_path]));
+    [status,result] = system(binary_full_path);
 
     if bool_debug
         disp(result);
     end
 catch
-    cd(chemin_retour);
+    % cd(chemin_retour);
     error(aloha_message('?! Binary execution problem ?!'));
 end
 
@@ -95,7 +96,7 @@ if (version == 1)
     Zhe = complex(data(:,1), data(:,2));
     rac_Zhe = diag(sqrt(Zhe));
     
-elseif (version == 10|20|60)
+elseif (version == 10 || version == 20 || version == 60)
 
     %  % extraction des donn???es du fichier binaire K_cpl.dat
     %  fichier_data = fopen('K_cpl.dat','r');
@@ -132,6 +133,6 @@ H = rac_Zhe*K_cpl*rac_Zhe;
 S_plasma = inv(eye(length(Zhe))+H)*(eye(length(Zhe))-H); 
   
     
-cd(chemin_retour);
+% cd(chemin_retour);
 
     
