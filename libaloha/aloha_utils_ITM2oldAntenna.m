@@ -3,7 +3,7 @@
       % we have to translate the parameters into the old-fashioned way
       scenario.antenna.freq = scenario.antenna_lh.frequency;% TODO : correct this bug
       freq = scenario.antenna_lh.frequency; % TODO : correct this bug 
-      nb_g_pol = aloha_scenario_get(scenario, 'nma_theta');
+      nb_g_pol = aloha_scenario_get(scenario, 'nwm_theta');% JH 06/09/2013, was nma_theta, don't know why...?! Seems there is a confusion between nmw_theta and nma_theta in the code
       nb_modules_tor = aloha_scenario_get(scenario, 'nma_phi');
       nb_g_module_pol = aloha_scenario_get(scenario, 'nwm_theta');
       nb_g_module_tor = aloha_scenario_get(scenario, 'nwm_phi');
