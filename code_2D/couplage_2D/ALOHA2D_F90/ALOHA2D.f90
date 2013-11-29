@@ -112,7 +112,12 @@ PROGRAM ALOHA_2D
       logical :: exist_file
 
       integer :: fu, ios = 0, line = 0
-      character(len=300) :: buffer, param_value, param_label
+      ! ATTENTION : the following char size is the maximum char to be read on a line
+      ! Thus it determines the maximum number of guides the code can support !!
+      ! At that part of the programm, the number of waveguides has not yet be read. So we must infer the maximum number of char we could read !
+      ! Assuming that we need 9 char for one  value (8 char + 1 space, eg. " 5.88E-03"), and assuming than 300 waveguides
+      ! is the maximum number of waveguides we could encouter, then 9*300=2700 should be sufficient...
+      character(len=2700) :: buffer, param_value, param_label
 
       ! Display the current path
       call getcwd(path)
