@@ -17,11 +17,15 @@ nwr = mod.nma_phi * wg.nwm_phi  + 2*wg.npwe_phi + (mod.nma_phi-1)*wg.npwbm_phi;
 nwc = mod.nma_theta*wg.nwm_theta;
 
 % total number of waveguides
-nwa = nwr*mod.nma_theta;
+% JH 04/12/2013
+% BUG discovered when mutli poloidal rows... to be cleaned... one day...
+% maybe
+nwa = nwr*nwc;% was nwa = nwr*mod.nma_theta;
 
 % waveguide height - supposed constant for all the waveguides of the antenna
 a = wg.hw_theta;
 
+ 
 
 %% b
 % Make the array b which contains all the waveguide width 
