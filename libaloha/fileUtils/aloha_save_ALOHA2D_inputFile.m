@@ -27,7 +27,24 @@ for idx=1:length(varargin)/2
     arg_name{idx} = varargin{2*(idx-1)+1};
     arg_value{idx}= varargin{2*(idx-1)+2};
     
-    arg_string{idx} = [arg_name{idx}, ' = ', num2str(reshape(arg_value{idx}, 1, []))];
+    % JH 23/05/2013
+    % Integer are written the classic way, and real number in engeenering
+    % style, in order to gain some character space in the file. Indeed,
+    % I've discovered that up to a certain number of columns, the fortran
+    % read function crashed... I didn't dig very much and the following is
+    % in fact a workaround...
+    % JH 04/12/2013
+    % The bug came from the fortran 90 code part dedicated to read the
+    % input file. The inferred max number of char in a row was 300. If the
+    % number of waveguides was to much, then we had more than 300 char per row...
+    % The fortran has been fixed, but I kept the following part in order to
+    % keep nicer input file (with shorter numbers).
+    if isint(arg_value{idx})
+        arg_string{idx} = [arg_name{idx}, ' = ', num2str(reshape(arg_value{idx}, 1, []))];
+    else
+        arg_string{idx} = [arg_name{idx}, ' = ', num2str(reshape(arg_value{idx}, 1, []),'%1.2E ')];
+    end
+    
     disp(arg_string{idx})
     fprintf(fid, '%s\n', arg_string{idx});
 end
