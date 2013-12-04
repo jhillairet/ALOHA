@@ -39,7 +39,7 @@ for idx=1:length(varargin)/2
     % number of waveguides was to much, then we had more than 300 char per row...
     % The fortran has been fixed, but I kept the following part in order to
     % keep nicer input file (with shorter numbers).
-    if isint(arg_value{idx})
+    if not(mod(arg_value{idx},1)) % equiv to is_integer() 
         arg_string{idx} = [arg_name{idx}, ' = ', num2str(reshape(arg_value{idx}, 1, []))];
     else
         arg_string{idx} = [arg_name{idx}, ' = ', num2str(reshape(arg_value{idx}, 1, []),'%1.2E ')];
