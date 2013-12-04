@@ -104,7 +104,7 @@ if (nargin == 1)
 
         case {'antenne_C4', 'antenna_C4_ITM'}
             a_ampl = sqrt(2.6725e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
-            a_phase = 1*(180*pi/180)*(0:7)';
+            a_phase = 180*(pi/180)*(0:7)';
         
         case {'antenne_C4_dphi_D'}
             a_ampl = sqrt(2.6725e6/16)*ones(8,1);   % En champ elect pour 25 MW/m^2 !!!
