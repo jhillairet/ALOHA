@@ -25,7 +25,7 @@ function aloha_plot_reflectionCoeff(scenario, varargin)
 %  
 
 % on recupere tous les coefficients de reflexion calcules
-RC = aloha_scenario_get(scenario, 'CoeffRefPuiss');
+RC = aloha_scenario_get(scenario, 'RC');
 
 % verification de la validite du scenario
 if isempty(RC)

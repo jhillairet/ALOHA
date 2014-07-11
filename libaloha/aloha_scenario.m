@@ -162,6 +162,9 @@ for idx_sc = 1:length(scenarios)
             error('Version_code not (correctly) defined !');
     end
     scenario.options = aloha_setfield(scenario.options, chemin_binaire_fortran); 
+    
+    % Save plasma scattering parameters into the scenario
+    scenario.results = aloha_setfield(scenario.results, S_plasma, rac_Zhe, K_cpl); 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % voies passives et voies actives
@@ -174,20 +177,21 @@ for idx_sc = 1:length(scenarios)
     % calcul de la matrice S antenne
     disp(aloha_message('Take into account Antenna Scattering matrices'));
     S_antenne;
+     % save global antenna S parameters into the scenario
+    scenario.results = aloha_setfield(scenario.results, S_ant_11, S_ant_12, S_ant_21, S_ant_22);
+
+    
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculte the coupling response of the antenna 
     disp(aloha_message('Compute antenna/plasma interactions'));
-    reponse_antenne;
-    
+    %reponse_antenne;
+    scenario = aloha_compute_RC(scenario)
+          
     % show the reflexion coefficient 
     disp(aloha_message('Reflexion Coefficients (RC) per module :'));
-    disp(CoeffRefPuiss);
+    disp(scenario.results.RC);    
     
-    % save global antenna S parameters into the scenario
-    scenario.results = aloha_setfield(scenario.results, S_ant_11, S_ant_12, S_ant_21, S_ant_22);
-    % save coupling results into scenario
-    scenario.results = aloha_setfield(scenario.results, CoeffRefPuiss, RC, RC_mouth, S_acces, a_acces, b_acces, S_plasma, a_plasma, b_plasma, rac_Zhe, K_cpl); 
     % save some constants into the scenario (for check purpose essentially)
     scenario.results = aloha_setfield(scenario.results, k0);
 
@@ -196,7 +200,7 @@ for idx_sc = 1:length(scenarios)
     scenario.results.computationTime = toc;
 
     % moyenne du coefficient de reflexion en puissance
-    R = mean( abs(b_acces./a_acces).^2 ) ;
+    R = mean( scenario.results.RC ) ;
     disp(aloha_message(['Average reflexion coefficient |Gamma^2| : R = ', num2str(R*100), ' %']));  
     
     %%%%%%%%%%%%%%%%%%%%%%%%%    
