@@ -6,7 +6,7 @@
 
 
 % incident wave vector on antenna
-a_acces = a_ampl.*exp(-i*a_phase);
+a_acces = a_ampl.*exp(i*a_phase);
 
 % incident and reflected wave vector on/from plasma 
 % 
