@@ -113,7 +113,7 @@ waveguides.scl = repmat(1/4, 1, nscl);
 modules.Sparameters.pathFrom = pwd;
 modules.Sparameters.pathTo = 'S_HFSS/matrices_HFSS_C3';  % path the S-matrix files (.m files) 
 % modules C3
-% La modelisation HFSS de l'antenne dÃ©bute au voisinage du CM.
+% La modelisation HFSS de l'antenne debute au voisinage du CM.
 % Pour prendre en compte le dephasage entre la mesure de phase et le debut de la modelisation HFSS
 % il faut calculer le dephasage necessaire : 
 %  phase incident + phase rallonge + phase s12 HFSS = phase en bout
@@ -121,8 +121,23 @@ modules.Sparameters.pathTo = 'S_HFSS/matrices_HFSS_C3';  % path the S-matrix fil
 %  phase rallonge = dphi - phase s12 HFSS
 % ou dphi est la correction (connue, cf. doc Annika) utilisee pour calculer la phase en bout
 % a partir de la phase incidente.
+%
+% mesures relative au module 8B
 
-
+% modules BAS
+% -----------
+% module    correction dphi     phase S12 HFSS    
+% 24b (= 8B)  0                   166.4453
+% 23b        -5.5                -160.9112
+% 22b         8                  -135.2895
+% 21b        14                  -122.0280
+% 14b         8.5                -116.1493
+% 13b        20                  -131.2212
+% 12b        10                  -139.8052
+% 11b (= 1B) 20                  -166.9180
+%  nom_fichiers = ['S_C3_24b';'S_C3_23b';'S_C3_22b';'S_C3_21b';'S_C3_14b';'S_C3_13b';'S_C3_12b';'S_C3_11b'];   
+%  phase_rallonge = (pi/180)*[0-166.44; -5.5+160.9; 8+135.3; 14+122; 8.5+116.1; 20+131.2; 10+139.8; 20+166.9];
+%
 % modules HAUT
 % -----------
 % module    correction dphi     phase S12 HFSS    
