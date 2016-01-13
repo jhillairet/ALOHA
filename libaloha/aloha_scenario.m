@@ -201,7 +201,7 @@ for idx_sc = 1:length(scenarios)
 
     % moyenne du coefficient de reflexion en puissance
     R = mean( scenario.results.RC ) ;
-    disp(aloha_message(['Average reflexion coefficient |Gamma^2| : R = ', num2str(R*100), ' %']));  
+    disp(aloha_message(['Average reflexion coefficient |Gamma^2| : R = ', num2str(R), ' %']));  
     
     %%%%%%%%%%%%%%%%%%%%%%%%%    
     % Antenna spectrum 
