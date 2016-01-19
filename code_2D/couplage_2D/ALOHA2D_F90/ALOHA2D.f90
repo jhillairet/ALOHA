@@ -193,9 +193,17 @@ PROGRAM ALOHA_2D
             read(param_value,*) ny_min
             write(*,*) '+ ny_min = ', ny_min
 
-          case('ny_max')
+           case('ny_max')
             read(param_value,*) ny_max
             write(*,*) '+ ny_max = ', ny_max
+
+          case('ny_nb')
+            read(param_value,*) ny_nb
+            write(*,*) '+ ny_nb = ', ny_nb
+
+          case('nz_nb')
+            read(param_value,*) nz_nb
+            write(*,*) '+ nz_nb = ', nz_nb
 
           case('b')
             read(param_value, *) b

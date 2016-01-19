@@ -6,6 +6,7 @@
 !
 module aloha2d_plasma_admittance
   use aloha2d_plasma
+  use aloha2d_globalParameters
 
   implicit none
 
@@ -16,14 +17,20 @@ module aloha2d_plasma_admittance
   ! ny = [-3,+3]
   ! nz = [0 ,24]
   ! 361501 ??= 6/0.02 * 24/0.02 + 1 + 1500??
-  real, parameter :: GRID_NZ_MIN=0.0,  GRID_NY_MIN=-3.0  ! was : 0 and -3
-  real, parameter :: GRID_NZ_MAX=24,   GRID_NY_MAX=+3.0  ! was : 24 and 3
-  real, parameter :: GRID_DNZ=0.02,    GRID_DNY=0.02     ! was : 0.02
+  !real, parameter :: GRID_NZ_MIN=0.0,  GRID_NY_MIN=-3.0  ! was : 0 and -3
+  !real, parameter :: GRID_NZ_MAX=24,   GRID_NY_MAX=+3.0  ! was : 24 and 3
+  !real, parameter :: GRID_DNZ=0.02,    GRID_DNY=0.02     ! was : 0.02
   ! calculate the number of point for the grid for the array allocations
-  integer :: GRID_NY_NB=ceiling( (GRID_NY_MAX-GRID_NY_MIN)/GRID_DNY) + 1
-  integer :: GRID_NZ_NB=ceiling( (GRID_NZ_MAX-GRID_NZ_MIN)/GRID_DNZ) + 1
+
+  real :: GRID_NZ_MAX=30, GRID_NY_MAX
+  real :: GRID_NZ_MIN, GRID_NY_MIN
+  real :: GRID_DNZ, GRID_DNY
+
+  integer :: GRID_NY_NB!=ceiling( (GRID_NY_MAX-GRID_NY_MIN)/GRID_DNY) + 1
+  integer :: GRID_NZ_NB!=ceiling( (GRID_NZ_MAX-GRID_NZ_MIN)/GRID_DNZ) + 1
 
 contains
+
 
   !
   ! Forms the plasma admittance tensor from the g_S and g_F functions
@@ -83,6 +90,23 @@ contains
     integer  :: n1, n2, incr=1
     real     :: ny, nz
     complex  :: Ys_yy_temp, Ys_yz_temp, Ys_zy_temp, Ys_zz_temp, temp
+
+    ! JH 19/01/2016
+    ! Initiallising the nz,ny-space using ALOHA input file parameters (instead of constants previously)
+    GRID_NZ_MIN = 0
+    GRID_NZ_MAX = nz_max
+    GRID_NY_MIN = ny_min
+    GRID_NY_MAX = ny_max
+    GRID_NZ_NB = nz_nb
+    GRID_NY_NB = ny_nb
+    GRID_DNZ = (GRID_NZ_MAX - GRID_NZ_MIN)/GRID_NZ_NB
+    GRID_DNY = (GRID_NY_MAX - GRID_NY_MIN)/GRID_NY_NB
+
+    write(*,*) GRID_NZ_MIN, GRID_NY_MIN
+    write(*,*) GRID_NZ_MAX, GRID_NY_MAX
+    write(*,*) GRID_NZ_NB, GRID_NY_NB
+    write(*,*) GRID_DNZ, GRID_DNY
+
     allocate(g_S(GRID_NY_NB*GRID_NZ_NB), g_F(GRID_NY_NB*GRID_NZ_NB))
     allocate(Ys_yy(GRID_NY_NB*GRID_NZ_NB), Ys_yz(GRID_NY_NB*GRID_NZ_NB), &
       Ys_zy(GRID_NY_NB*GRID_NZ_NB), Ys_zz(GRID_NY_NB*GRID_NZ_NB))
