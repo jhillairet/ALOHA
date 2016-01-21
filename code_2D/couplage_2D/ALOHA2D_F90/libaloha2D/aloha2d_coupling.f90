@@ -251,54 +251,56 @@ Subroutine integral_imag_f(Ki)
 End subroutine integral_imag_f
 
 
-!
-!
-!      Subroutine spect_discr(eyt_ny_nz,ezt_ny_nz,hyt_ny_nz,hzt_ny_nz)
-!
-!      implicit none
-!
-!      Common/integral/min_ny,min_nz,max_ny,max_nz,nbre_ny,nbre_nz
-!
-!      Integer *4 nbre,n_1,n_2,incr,int_sp
-!      Real *8 min_ny,min_nz,max_ny,max_nz,nbre_ny,nbre_nz
-!      Real *8 pas_ny,pas_nz,ny,nz
-!      Complex *16 f_ny_nz
-!      Complex *16 ey_ny_nz,ez_ny_nz,hy_ny_nz,hz_ny_nz
-!      Complex *16 eyt_ny_nz(30000),ezt_ny_nz(30000)
-!      Complex *16 hyt_ny_nz(30000),hzt_ny_nz(30000)
-!
-!      int_sp=2
-!
-!      pas_ny=(max_ny-min_ny)/nbre_ny
-!      pas_nz=(max_nz-min_nz)/nbre_nz
-!
-!      incr=1
-!
-!      Do 40 n_1=0,nbre_nz
-!
-!         nz=min_nz+n_1*pas_nz
-!
-!	 Do 50 n_2=0,nbre_ny
-!
-!            ny=min_ny+n_2*pas_ny
-!            Call chps_spect(ny,nz,f_ny_nz,ey_ny_nz,ez_ny_nz,
-!     &                      hy_ny_nz,hz_ny_nz,int_sp,incr)
-!
-!            eyt_ny_nz(incr)=ey_ny_nz
-!            ezt_ny_nz(incr)=ez_ny_nz
-!            hyt_ny_nz(incr)=hy_ny_nz
-!            hzt_ny_nz(incr)=hz_ny_nz
-!
-!            incr=incr+1
-!
-! 50      Continue
-!
-! 40   Continue
-!
-!      Return
-!      End
-!
-!
+! Calculates arrays of spectral electric and magnetic field components
+! Returned array of size nb_ny x nb_nz
+subroutine spect_discr(aa, bb, yy, zz, mode, mm, nn, &
+                       eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz)
+    use aloha2d_plasma_admittance
+    use aloha2d_rectangularwaveguides
+
+    implicit none
+
+    real, intent(in) :: aa, bb, yy, zz
+    character(len=1), intent(in) :: mode
+    integer, intent(in) :: mm, nn
+    complex, dimension(:), allocatable, intent(out) :: eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz
+
+    integer :: n_1, n_2
+    integer :: incr ! arrays index
+    integer :: int_sp = 2
+    complex :: f_ny_nz
+    real :: ny, nz
+    complex :: ey_ny_nz, ez_ny_nz, hy_ny_nz, hz_ny_nz ! spectral components of the field
+
+    allocate(eyt_ny_nz(GRID_NY_NB*GRID_NZ_NB), ezt_ny_nz(GRID_NY_NB*GRID_NZ_NB))
+    allocate(hyt_ny_nz(GRID_NY_NB*GRID_NZ_NB), hzt_ny_nz(GRID_NY_NB*GRID_NZ_NB))
+
+    incr=1
+    do n_1=0,GRID_NY_NB-1
+        !nz = min_nz + n_1*pas_nz
+        nz = GRID_NZ_MIN + n_1*GRID_DNZ
+
+        do n_2=0,GRID_NZ_NB-1
+
+            !ny = min_ny + n_2*pas_ny
+            ny = GRID_NY_MIN + n_2*GRID_DNY
+
+            call spectralEigenVector(ny, nz, aa, bb, mm, nn, yy, zz, mode, &
+                                    ey_ny_nz, ez_ny_nz, hy_ny_nz, hz_ny_nz)
+
+            ! save into the arrays
+            eyt_ny_nz(incr)=ey_ny_nz
+            ezt_ny_nz(incr)=ez_ny_nz
+            hyt_ny_nz(incr)=hy_ny_nz
+            hzt_ny_nz(incr)=hz_ny_nz
+
+            incr=incr+1
+        end do
+    end do
+end subroutine spect_discr
+
+
+
 end module aloha2d_coupling
 
 

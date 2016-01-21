@@ -80,19 +80,11 @@ PROGRAM ALOHA_2D
   ! ! Array in the namelist ==>
   ! ! K = 1,3,2,4
 
-
-
-      ! Spectrum calculation
-      !Call spect_discr(eyt_ny_nz,ezt_ny_nz,hyt_ny_nz,hzt_ny_nz)
-
-
-
   !
   ! saving output parameters
   !
   call set_output_parameters()
   write(*,*) size(K)
-
 
   !
   !
@@ -266,7 +258,6 @@ PROGRAM ALOHA_2D
         write(*,*) 'Zc(real)  Zc(imag)'
         write(fu,'(2g20.10)') (Zc_he(p),p=1,wg_nb*wg_modes_nb)
         close(fu)
-
     end subroutine set_output_parameters
 
     !
@@ -277,11 +268,16 @@ PROGRAM ALOHA_2D
 
       implicit none
 
-      integer :: id_wg, id_port, id_port1, id_port2
-      integer :: id_mode, fu
+      integer :: id_wg, id_port, id_port1, id_port2, id_mode
+      integer :: fu, fu2 ! file descriptors
+      integer :: q ! array index
       integer, dimension(wg_nb*wg_modes_nb)  :: m, n ! port modal indexes
       real, dimension(wg_nb*wg_modes_nb) :: a_port, b_port, y_port, z_port ! port waveguide dimensions
       character(len=1), dimension(wg_nb*wg_modes_nb) :: mode_port ! mode type index ('E' (TM) or 'H' (TE) modes)
+
+      complex, dimension(:), allocatable :: eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz
+      allocate(eyt_ny_nz(GRID_NY_NB*GRID_NZ_NB), ezt_ny_nz(GRID_NY_NB*GRID_NZ_NB))
+      allocate(hyt_ny_nz(GRID_NY_NB*GRID_NZ_NB), hzt_ny_nz(GRID_NY_NB*GRID_NZ_NB))
 
 !
 !          ! Julien
@@ -402,15 +398,40 @@ PROGRAM ALOHA_2D
           write(fu,*) id_port1, mode_port(id_port1), m(id_port1), n(id_port1), &
                       id_port2, mode_port(id_port2), m(id_port2), n(id_port2), &
                       K(id_port1,id_port2)
+
         end do ! id_port2
       end do ! id_port1
       !$OMP end parallel do
       print*,'Coupling calculation : Done.'
+      close(fu)
 
       print*,'size(K)=',size(K)
       print*,'size(Zc_he)=',size(Zc_he)
 
-      close(fu)
+      print*,'Starting Spectrum calculation...'
+      ! Spectral field for all ny,nz
+      fu2=1
+      open(fu2, file='ALOHA2D.out.spectralFields.dat', form='formatted', status='replace')
+      write(fu2,*) '==================== ALOHA 2D result file - 2D Spectral Ey,Ez,Hy,Hz components ========'
+      write(fu2,*) '    nbre_modes, nbre_guides'
+      write(fu2,'(2g20.10)') wg_modes_nb, wg_nb
+      write(fu2,*) '    nbre_ny, nbre_nz'
+      write(fu2,'(2g20.10)') GRID_NY_NB, GRID_NZ_NB
+      write(fu2,*) '   Ey, Ez, Hy, Hz (in spectral domain)'
+      do id_port1=1,wg_nb*wg_modes_nb
+            ! calculates the spectral components of the E-H field and write them into the output file
+            call spect_discr(a_port(id_port1),b_port(id_port1), &
+                             y_port(id_port1), z_port(id_port1), &
+                             mode_port(id_port1), m(id_port1),n(id_port1), &
+                             eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz)
+            write(fu2,*) (eyt_ny_nz(q), ezt_ny_nz(q), hyt_ny_nz(q), hzt_ny_nz(q), &
+                                   q=1,GRID_NY_NB*GRID_NZ_NB)
+
+      end do !id_port
+
+
+      print*,'Spectrum calculation : Done.'
+      close(fu2)
     end subroutine eval_coupling
 
 END PROGRAM ALOHA_2D

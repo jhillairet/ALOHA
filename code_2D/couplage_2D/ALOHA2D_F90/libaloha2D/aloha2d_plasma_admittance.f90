@@ -22,7 +22,7 @@ module aloha2d_plasma_admittance
   !real, parameter :: GRID_DNZ=0.02,    GRID_DNY=0.02     ! was : 0.02
   ! calculate the number of point for the grid for the array allocations
 
-  real :: GRID_NZ_MAX=30, GRID_NY_MAX
+  real :: GRID_NZ_MAX, GRID_NY_MAX
   real :: GRID_NZ_MIN, GRID_NY_MIN
   real :: GRID_DNZ, GRID_DNY
 
@@ -89,11 +89,11 @@ contains
 
     integer  :: n1, n2, incr=1
     real     :: ny, nz
-    complex  :: Ys_yy_temp, Ys_yz_temp, Ys_zy_temp, Ys_zz_temp, temp
+    complex  :: Ys_yy_temp, Ys_yz_temp, Ys_zy_temp, Ys_zz_temp
 
     ! JH 19/01/2016
     ! Initiallising the nz,ny-space using ALOHA input file parameters (instead of constants previously)
-    GRID_NZ_MIN = 0
+    GRID_NZ_MIN = 0.001 ! not purely 0 in order to avoid NaNs
     GRID_NZ_MAX = nz_max
     GRID_NY_MIN = ny_min
     GRID_NY_MAX = ny_max
