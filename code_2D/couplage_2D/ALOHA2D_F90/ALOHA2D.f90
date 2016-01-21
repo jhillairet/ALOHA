@@ -381,27 +381,27 @@ PROGRAM ALOHA_2D
       ! Array storage in Fortran is column-major ; in order to optimize the loop,
       ! we access element column-wise ("the first index vary fastest").
       ! In this particular case, this play little importance, since each loop takes time to compute.
-      !$OMP parallel do
-      do id_port2=1,wg_nb*wg_modes_nb
-        !print*,' Port#1 : ',id_port1,'/',wg_nb*wg_modes_nb
-        do id_port1=1,wg_nb*wg_modes_nb
-          !print*,'++++++++ Port#2 : ',id_port2,'/',wg_nb*wg_modes_nb
-          K(id_port1,id_port2) = eval_K( &
-                a_port(id_port1),b_port(id_port1), &
-                y_port(id_port1), z_port(id_port1), &
-                mode_port(id_port1), m(id_port1),n(id_port1), &
-                a_port(id_port2),b_port(id_port2), &
-                y_port(id_port2), z_port(id_port2), &
-                mode_port(id_port2), m(id_port2),n(id_port2))
-          write(*,'(A,I3,A,I3,A,2g15.5)') 'K(',id_port1,',',id_port2,')=',K(id_port1,id_port2)
-
-          write(fu,*) id_port1, mode_port(id_port1), m(id_port1), n(id_port1), &
-                      id_port2, mode_port(id_port2), m(id_port2), n(id_port2), &
-                      K(id_port1,id_port2)
-
-        end do ! id_port2
-      end do ! id_port1
-      !$OMP end parallel do
+!      !$OMP parallel do
+!      do id_port2=1,wg_nb*wg_modes_nb
+!        !print*,' Port#1 : ',id_port1,'/',wg_nb*wg_modes_nb
+!        do id_port1=1,wg_nb*wg_modes_nb
+!          !print*,'++++++++ Port#2 : ',id_port2,'/',wg_nb*wg_modes_nb
+!          K(id_port1,id_port2) = eval_K( &
+!                a_port(id_port1),b_port(id_port1), &
+!                y_port(id_port1), z_port(id_port1), &
+!                mode_port(id_port1), m(id_port1),n(id_port1), &
+!                a_port(id_port2),b_port(id_port2), &
+!                y_port(id_port2), z_port(id_port2), &
+!                mode_port(id_port2), m(id_port2),n(id_port2))
+!          write(*,'(A,I3,A,I3,A,2g15.5)') 'K(',id_port1,',',id_port2,')=',K(id_port1,id_port2)
+!
+!          write(fu,*) id_port1, mode_port(id_port1), m(id_port1), n(id_port1), &
+!                      id_port2, mode_port(id_port2), m(id_port2), n(id_port2), &
+!                      K(id_port1,id_port2)
+!
+!        end do ! id_port2
+!      end do ! id_port1
+!      !$OMP end parallel do
       print*,'Coupling calculation : Done.'
       close(fu)
 
@@ -424,8 +424,9 @@ PROGRAM ALOHA_2D
                              y_port(id_port1), z_port(id_port1), &
                              mode_port(id_port1), m(id_port1),n(id_port1), &
                              eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz)
-            write(fu2,*) (eyt_ny_nz(q), ezt_ny_nz(q), hyt_ny_nz(q), hzt_ny_nz(q), &
-                                   q=1,GRID_NY_NB*GRID_NZ_NB)
+            do q=1,GRID_NY_NB*GRID_NZ_NB
+                write(fu2,*) eyt_ny_nz(q), ezt_ny_nz(q), hyt_ny_nz(q), hzt_ny_nz(q)
+            end do ! q
 
       end do !id_port
 

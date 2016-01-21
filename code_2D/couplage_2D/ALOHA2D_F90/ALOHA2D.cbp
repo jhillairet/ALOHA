@@ -53,11 +53,6 @@
 		<Unit filename="libaloha2D/aloha2d_rectangularwaveguides.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="libaloha2D/calcul_K.f">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option weight="3" />
-		</Unit>
 		<Unit filename="libaloha2D/pivot_gauss/dcabs1.f">
 			<Option weight="0" />
 		</Unit>
