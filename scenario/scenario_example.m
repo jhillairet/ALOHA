@@ -371,8 +371,8 @@ options.ny_max = 2;     % arrivee en ny
 options.dny = 0.1;        % pas en ny
 
 % NB JH 01/2009 : compatibilite avec code 2D       
-options.nbre_ny=(options.ny_max-options.ny_min)/options.dny;
-options.nbre_nz=(options.nz_max-options.nz_min)/options.dnz;  
+options.ny_nb=(options.ny_max-options.ny_min)/options.dny;
+options.nz_nb=(options.nz_max-options.nz_min)/options.dnz;  
 
 % ##################### TODO
 % trace du chp dans le plasma 

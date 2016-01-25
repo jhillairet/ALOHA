@@ -1,4 +1,7 @@
 %  ALOHA (MAJORS) CHANGE-LOG
+% 01/2016 : Some work on ALOHA-2D in order to allow any (nz, ny) spectral domain range.  
+%           Add calculation of the spectrum.
+%
 % 12/2011 : Added vacuum gap support with two linear density gradients (version=6). 
 %           Corrected bugs for poloidal density mismatch support.
 %  

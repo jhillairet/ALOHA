@@ -180,7 +180,7 @@ contains
     n1=INT(abs_nz/GRID_DNZ)+1
     n2=INT((ny-GRID_NY_MIN)/GRID_DNY)+1
 
-    nb_ny = INT(abs(GRID_NY_MAX - GRID_NY_MIN)/GRID_DNY)+1
+    nb_ny = GRID_NY_NB!INT(abs(GRID_NY_MAX - GRID_NY_MIN)/GRID_DNY)+1
 
     f1=g_S(n2+(n1-1)*nb_ny)
     f2=g_S(n2+1+(n1-1)*nb_ny)

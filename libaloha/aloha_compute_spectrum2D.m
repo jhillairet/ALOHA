@@ -22,10 +22,10 @@ fid = fopen(ascii_file_path,'r');
     nbre_guides= C{2};
     % read nb of ny & nz
     C = textscan(fid, '%f %f', 1, 'headerLines', 2);
-    nbre_ny = C{1};
-    nbre_nz = C{2};
+    ny_nb = C{1};
+    nz_nb = C{2};
     % read spectral electric and magnetic field components
-    C = textscan(fid, '(%f,%f) (%f,%f) (%f,%f) (%f,%f)', 'headerLines', 2);
+    C = textscan(fid, '%f %f %f %f %f %f %f %f', 'headerLines', 2);
     Ey_r = C{1};Ey_i = C{2};
     Ez_r = C{3};Ez_i = C{4};
     Hy_r = C{5};Hy_i = C{6};
@@ -58,7 +58,9 @@ fclose(fid);
 % 
 % Si la taille des vecteurs n'est pas celle que l'on attend,
 % on bourre par des zeros :
-array_size = round((nbre_ny+1)*(nbre_nz+1)*nbre_modes*nbre_guides);
+%array_size = round((nbre_ny+1)*(nbre_nz+1)*nbre_modes*nbre_guides);
+array_size = ny_nb*nz_nb*nbre_modes*nbre_guides;
+
 
 %  if length(Ey_r) ~= array_size 
 %      Ey_r = [Ey_r; zeros(array_size-length(Ey_r),1)];
@@ -72,10 +74,11 @@ array_size = round((nbre_ny+1)*(nbre_nz+1)*nbre_modes*nbre_guides);
 %  end
 
 
-Ey_ny_nz=reshape(complex(Ey_r, Ey_i), (nbre_ny+1)*(nbre_nz+1), nbre_modes*nbre_guides).';
-Ez_ny_nz=reshape(complex(Ez_r, Ez_i), (nbre_ny+1)*(nbre_nz+1), nbre_modes*nbre_guides).';
-Hy_ny_nz=reshape(complex(Hy_r, Hy_i), (nbre_ny+1)*(nbre_nz+1), nbre_modes*nbre_guides).';
-Hz_ny_nz=reshape(complex(Hz_r, Hz_i), (nbre_ny+1)*(nbre_nz+1), nbre_modes*nbre_guides).';
+Ey_ny_nz=reshape(complex(Ey_r, Ey_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
+Ez_ny_nz=reshape(complex(Ez_r, Ez_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
+
+Hy_ny_nz=reshape(complex(Hy_r, Hy_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
+Hz_ny_nz=reshape(complex(Hz_r, Hz_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
 
 %  %   BINARY FILE
 %  ascii_file_path = [scenario.options.aloha_path,scenario.options.chemin_binaire_fortran, '/Spect_plasma.dat'];
@@ -120,22 +123,22 @@ Hz_ny_nz=reshape(complex(Hz_r, Hz_i), (nbre_ny+1)*(nbre_nz+1), nbre_modes*nbre_g
 poids_E = scenario.results.rac_Zhe*(scenario.results.a_plasma + scenario.results.b_plasma);
 poids_H = inv(scenario.results.rac_Zhe)*(scenario.results.a_plasma - scenario.results.b_plasma);
     
-dny=(scenario.options.ny_max-scenario.options.ny_min)/scenario.options.nbre_ny;
-dnz=(scenario.options.nz_max-scenario.options.nz_min)/scenario.options.nbre_nz;
-ny = scenario.options.ny_min:dny:scenario.options.ny_max;
-nz = scenario.options.nz_min:dnz:scenario.options.nz_max;
+dny = scenario.options.dny;%(scenario.options.ny_max-scenario.options.ny_min)/scenario.options.ny_nb;
+dnz = scenario.options.dnz;%(scenario.options.nz_max-scenario.options.nz_min)/scenario.options.nz_nb;
+ny = [scenario.options.ny_min:dny:scenario.options.ny_max-dny]; % -dny to get the correct number of points
+nz = [scenario.options.nz_min:dnz:scenario.options.nz_max-dnz];
 
-Eyt_ny_nz = Ey_ny_nz.*(poids_E*ones(1,(scenario.options.nbre_ny+1)*(scenario.options.nbre_nz+1)));
-Ezt_ny_nz = Ez_ny_nz.*(poids_E*ones(1,(scenario.options.nbre_ny+1)*(scenario.options.nbre_nz+1)));
-Hyt_ny_nz = Hy_ny_nz.*(poids_E*ones(1,(scenario.options.nbre_ny+1)*(scenario.options.nbre_nz+1)));
-Hzt_ny_nz = Hz_ny_nz.*(poids_E*ones(1,(scenario.options.nbre_ny+1)*(scenario.options.nbre_nz+1)));
+Eyt_ny_nz = Ey_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
+Ezt_ny_nz = Ez_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
+Hyt_ny_nz = Hy_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
+Hzt_ny_nz = Hz_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
    
 aloha_constants; % celerite
 k0 = 2*pi*scenario.antenna.freq/celerite;
 
 dP_ligne = ((k0/(2*pi))^2)*(sum(Eyt_ny_nz).*sum(((Hzt_ny_nz.')'))-sum(Ezt_ny_nz).*sum(((Hyt_ny_nz.')')));
 
-dP = reshape(dP_ligne,scenario.options.nbre_ny+1, scenario.options.nbre_nz+1);
+dP = reshape(dP_ligne, scenario.options.ny_nb, scenario.options.nz_nb);
 
 dP_nz = dny*sum(real(dP));
 
