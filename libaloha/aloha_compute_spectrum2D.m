@@ -9,12 +9,12 @@ function scenario=aloha_compute_spectrum2D(scenario, varargin)
 %     corresponding to the spectrum parameters (dP, dP_nz, nz, ny)
 %  
 if nargin == 1
-    ascii_file_path = [scenario.options.aloha_path,scenario.options.chemin_binaire_fortran, '/Spect_plasma2.dat'];
+    ascii_file_path = [scenario.options.aloha_path,scenario.options.chemin_binaire_fortran, '/ALOHA2D.out.spectralFields.dat'];
 elseif nargin == 2
     ascii_file_path = varargin{1};
 end
 
-aloha_message(['Reading result file:', 'Spect_plasma2.dat...'])
+aloha_message(['Reading result file:', 'ALOHA2D.out.spectralFields.dat...'])
 fid = fopen(ascii_file_path,'r');
     % read nb of mode and nb of guides
     C = textscan(fid, '%f %f', 1, 'headerLines', 2);
