@@ -216,7 +216,8 @@ for idx_sc = 1:length(scenarios)
 
                 case '2D'
                     % retrieve the spectrum from the fortran output file
-                    scenario=aloha_compute_spectrum2D(scenario); 
+                    spectrum_file = [pwd,'/ALOHA2D.out.spectralFields.dat'];
+                    scenario=aloha_compute_spectrum2D(scenario, spectrum_file); 
             end
             toc        
             if (bool_display_spectrum)
