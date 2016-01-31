@@ -59,9 +59,6 @@ fclose(fid);
 % Si la taille des vecteurs n'est pas celle que l'on attend,
 % on bourre par des zeros :
 %array_size = round((nbre_ny+1)*(nbre_nz+1)*nbre_modes*nbre_guides);
-array_size = ny_nb*nz_nb*nbre_modes*nbre_guides;
-
-
 %  if length(Ey_r) ~= array_size 
 %      Ey_r = [Ey_r; zeros(array_size-length(Ey_r),1)];
 %      Ey_i = [Ey_i; zeros(array_size-length(Ey_i),1)];
@@ -73,12 +70,13 @@ array_size = ny_nb*nz_nb*nbre_modes*nbre_guides;
 %      Hz_i = [Hz_i; zeros(array_size-length(Hz_i),1)];
 %  end
 
+array_size = ny_nb*nz_nb*nbre_modes*nbre_guides;
 
-Ey_ny_nz=reshape(complex(Ey_r, Ey_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
-Ez_ny_nz=reshape(complex(Ez_r, Ez_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
+Ey_ny_nz=reshape(complex(Ey_r, Ey_i), ny_nb*nz_nb, nbre_modes*nbre_guides).';
+Ez_ny_nz=reshape(complex(Ez_r, Ez_i), ny_nb*nz_nb, nbre_modes*nbre_guides).';
 
-Hy_ny_nz=reshape(complex(Hy_r, Hy_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
-Hz_ny_nz=reshape(complex(Hz_r, Hz_i), nbre_modes*nbre_guides, ny_nb*nz_nb);
+Hy_ny_nz=reshape(complex(Hy_r, Hy_i), ny_nb*nz_nb, nbre_modes*nbre_guides).';
+Hz_ny_nz=reshape(complex(Hz_r, Hz_i), ny_nb*nz_nb, nbre_modes*nbre_guides).';
 
 %  %   BINARY FILE
 %  ascii_file_path = [scenario.options.aloha_path,scenario.options.chemin_binaire_fortran, '/Spect_plasma.dat'];
@@ -128,24 +126,26 @@ dnz = scenario.options.dnz;%(scenario.options.nz_max-scenario.options.nz_min)/sc
 ny = [scenario.options.ny_min:dny:scenario.options.ny_max-dny]; % -dny to get the correct number of points
 nz = [scenario.options.nz_min:dnz:scenario.options.nz_max-dnz];
 
-Eyt_ny_nz = Ey_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
-Ezt_ny_nz = Ez_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
-Hyt_ny_nz = Hy_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
-Hzt_ny_nz = Hz_ny_nz.*(poids_E*ones(1,scenario.options.ny_nb*scenario.options.nz_nb));
+Eyt_ny_nz = Ey_ny_nz.*(poids_E*ones(1, ny_nb*nz_nb));
+Ezt_ny_nz = Ez_ny_nz.*(poids_E*ones(1, ny_nb*nz_nb));
+Hyt_ny_nz = Hy_ny_nz.*(poids_E*ones(1, ny_nb*nz_nb));
+Hzt_ny_nz = Hz_ny_nz.*(poids_E*ones(1, ny_nb*nz_nb));
    
 aloha_constants; % celerite
 k0 = 2*pi*scenario.antenna.freq/celerite;
 
-dP_ligne = ((k0/(2*pi))^2)*(sum(Eyt_ny_nz).*sum(((Hzt_ny_nz.')'))-sum(Ezt_ny_nz).*sum(((Hyt_ny_nz.')')));
+dP_ligne = ((k0/(2*pi))^2)*( ...
+     sum(Eyt_ny_nz).*sum(conj(Hzt_ny_nz)) ...
+    -sum(Ezt_ny_nz).*sum(conj(Hyt_ny_nz)) );
 
-dP = reshape(dP_ligne, scenario.options.ny_nb, scenario.options.nz_nb);
+dP = reshape(dP_ligne, ny_nb, nz_nb);
 
 dP_nz = dny*sum(real(dP));
 
-    % display the main peak value 
-    [max_nz, id_max_nz] = max(abs(dP_nz));
-    nz0 = nz(id_max_nz);
-    disp(aloha_message(['Main n_z peak ("n_z0") : ', num2str(nz0)]));  
+% display the main peak value 
+[max_nz, id_max_nz] = max(abs(dP_nz));
+nz0 = nz(id_max_nz);
+disp(aloha_message(['Main n_z peak ("n_z0") : ', num2str(nz0)]));  
 
 % save results into the scenario
 scenario.results = aloha_setfield(scenario.results, ny, nz, nz0, dny, dnz, dP, dP_nz); 

@@ -425,10 +425,10 @@ PROGRAM ALOHA_2D
                              mode_port(id_port1), m(id_port1),n(id_port1), &
                              eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz)
             do q=1,GRID_NY_NB*GRID_NZ_NB
-                write(fu2,*) real(eyt_ny_nz(q)), imag(eyt_ny_nz(q)), &
-                             real(ezt_ny_nz(q)), imag(ezt_ny_nz(q)), &
-                             real(hyt_ny_nz(q)), imag(hyt_ny_nz(q)), &
-                             real(hzt_ny_nz(q)), imag(hzt_ny_nz(q))
+                write(fu2,*) real(eyt_ny_nz(q)), aimag(eyt_ny_nz(q)), &
+                             real(ezt_ny_nz(q)), aimag(ezt_ny_nz(q)), &
+                             real(hyt_ny_nz(q)), aimag(hyt_ny_nz(q)), &
+                             real(hzt_ny_nz(q)), aimag(hzt_ny_nz(q))
             end do ! q
 
       end do !id_port
