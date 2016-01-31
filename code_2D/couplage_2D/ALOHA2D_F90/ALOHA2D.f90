@@ -239,6 +239,10 @@ PROGRAM ALOHA_2D
     ! Set the output parameters into the output ascii file
     !
     subroutine set_output_parameters()
+        use aloha2d_globalParameters
+
+        implicit none
+
         integer :: p,q, fu
         ! newunit is a fortran 2008 Feature
         !open(newunit=fu, file='ALOHA2D.out.K.dat', form='formatted', status='replace')
@@ -270,7 +274,7 @@ PROGRAM ALOHA_2D
 
       integer :: id_wg, id_port, id_port1, id_port2, id_mode
       integer :: fu, fu2 ! file descriptors
-      integer :: q ! array index
+      integer :: q,i ! array index
       integer, dimension(wg_nb*wg_modes_nb)  :: m, n ! port modal indexes
       real, dimension(wg_nb*wg_modes_nb) :: a_port, b_port, y_port, z_port ! port waveguide dimensions
       character(len=1), dimension(wg_nb*wg_modes_nb) :: mode_port ! mode type index ('E' (TM) or 'H' (TE) modes)
@@ -405,9 +409,6 @@ PROGRAM ALOHA_2D
       print*,'Coupling calculation : Done.'
       close(fu)
 
-      print*,'size(K)=',size(K)
-      print*,'size(Zc_he)=',size(Zc_he)
-
       print*,'Starting Spectrum calculation...'
       ! Spectral field for all ny,nz
       fu2=1
@@ -418,13 +419,15 @@ PROGRAM ALOHA_2D
       write(fu2,*) '    nbre_ny, nbre_nz'
       write(fu2,'(2g20.10)') GRID_NY_NB, GRID_NZ_NB
       write(fu2,*) '   Ey, Ez, Hy, Hz (in spectral domain)'
+
       do id_port1=1,wg_nb*wg_modes_nb
             ! calculates the spectral components of the E-H field and write them into the output file
-            call spect_discr(a_port(id_port1),b_port(id_port1), &
+            call spect_discr(a_port(id_port1), b_port(id_port1), &
                              y_port(id_port1), z_port(id_port1), &
-                             mode_port(id_port1), m(id_port1),n(id_port1), &
+                             mode_port(id_port1), m(id_port1), n(id_port1), &
                              eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz)
-            do q=1,GRID_NY_NB*GRID_NZ_NB
+
+            do q=1,GRID_NZ_NB*GRID_NY_NB
                 write(fu2,*) real(eyt_ny_nz(q)), aimag(eyt_ny_nz(q)), &
                              real(ezt_ny_nz(q)), aimag(ezt_ny_nz(q)), &
                              real(hyt_ny_nz(q)), aimag(hyt_ny_nz(q)), &
@@ -436,6 +439,19 @@ PROGRAM ALOHA_2D
 
       print*,'Spectrum calculation : Done.'
       close(fu2)
+
+      fu2=1
+      open(fu2, file='ALOHA2D.out.modes.dat', form='formatted', status='replace')
+      write(fu2,*) wg_nb, wg_modes_nb
+      write(fu2,*) (a(i),i=1,wg_nb)
+      write(fu2,*) (b(i),i=1,wg_nb)
+      write(fu2,*) (y(i),i=1,wg_nb)
+      write(fu2,*) (z(i),i=1,wg_nb)
+      write(fu2,*) (m(i),i=1,wg_nb*wg_modes_nb)
+      write(fu2,*) (n(i),i=1,wg_nb*wg_modes_nb)
+      write(fu2,*) (mode_port(i),i=1,wg_nb*wg_modes_nb)
+      close(fu2)
+
     end subroutine eval_coupling
 
 END PROGRAM ALOHA_2D

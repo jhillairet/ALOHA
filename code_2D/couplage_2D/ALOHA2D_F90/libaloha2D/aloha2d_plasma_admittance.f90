@@ -112,13 +112,13 @@ contains
       Ys_zy(GRID_NY_NB*GRID_NZ_NB), Ys_zz(GRID_NY_NB*GRID_NZ_NB))
 
     ! OLGA comparizon
-    !open(70, file='ALOHA2D.out.admittance', form='formatted', status='replace')
-    !write(70,*) 'nz, ny, Y_yy, Y_yz, Y_zy, Ys_zz'
+    open(70, file='ALOHA2D.out.admittance.dat', form='formatted', status='replace')
+    write(70,*) 'nz, ny, Y_yy, Y_yz, Y_zy, Ys_zz'
 
     !!$OMP do
     ! For all elements of the ny,nz grid
     Do n1=0,GRID_NZ_NB-1
-      write(*,*) n1,'/',GRID_NZ_NB-1
+      write(*,*) n1+1,'/',GRID_NZ_NB
       nz = GRID_NZ_MIN + n1*GRID_DNZ
 
       Do n2=0,GRID_NY_NB-1
@@ -137,13 +137,17 @@ contains
         Ys_zy(incr) = Ys_zy_temp
         Ys_zz(incr) = Ys_zz_temp
 
-        !write(70,*) nz, ny, Ys_yy(incr), Ys_yz(incr), Ys_zy(incr), Ys_zz(incr)
-        !print*,'incr=',incr,'/',GRID_NY_NB*GRID_NZ_NB, '(ny,nz)=',ny,nz,'g_S=',g_S(incr)
-        !print*,'incr=',incr,'/',GRID_NY_NB*GRID_NZ_NB, '(ny,nz)=',ny,nz,'g_F=',g_F(incr)
-        !print*,'Ys_yy(incr)=',Ys_yy(incr)
-        !print*,'Ys_yz(incr)=',Ys_yz(incr)
-        !print*,'Ys_zy(incr)=',Ys_zy(incr)
-        !print*,'Ys_zz(incr)=',Ys_zz(incr)
+        write(70,*) nz, ny, &
+            real(Ys_yy(incr)), aimag(Ys_yy(incr)), &
+            real(Ys_yz(incr)), aimag(Ys_yz(incr)), &
+            real(Ys_zy(incr)), aimag(Ys_zy(incr)), &
+            real(Ys_zz(incr)), aimag(Ys_zz(incr))
+!        print*,'incr=',incr,'/',GRID_NY_NB*GRID_NZ_NB, '(ny,nz)=',ny,nz,'g_S=',g_S(incr)
+!        print*,'incr=',incr,'/',GRID_NY_NB*GRID_NZ_NB, '(ny,nz)=',ny,nz,'g_F=',g_F(incr)
+!        print*,'Ys_yy(incr)=',Ys_yy(incr)
+!        print*,'Ys_yz(incr)=',Ys_yz(incr)
+!        print*,'Ys_zy(incr)=',Ys_zy(incr)
+!        print*,'Ys_zz(incr)=',Ys_zz(incr)
 
         incr=incr+1
 

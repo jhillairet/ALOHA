@@ -265,10 +265,7 @@ subroutine spect_discr(aa, bb, yy, zz, mode, mm, nn, &
     integer, intent(in) :: mm, nn
     complex, dimension(:), allocatable, intent(out) :: eyt_ny_nz, ezt_ny_nz, hyt_ny_nz, hzt_ny_nz
 
-    integer :: n_1, n_2
     integer :: incr ! arrays index
-    integer :: int_sp = 2
-    complex :: f_ny_nz
     real :: ny, nz
     complex :: ey_ny_nz, ez_ny_nz, hy_ny_nz, hz_ny_nz ! spectral components of the field
 
@@ -276,14 +273,14 @@ subroutine spect_discr(aa, bb, yy, zz, mode, mm, nn, &
     allocate(hyt_ny_nz(GRID_NY_NB*GRID_NZ_NB), hzt_ny_nz(GRID_NY_NB*GRID_NZ_NB))
 
     incr=1
-    do n_1=0,GRID_NY_NB-1
-        !nz = min_nz + n_1*pas_nz
-        nz = GRID_NZ_MIN + n_1*GRID_DNZ
 
-        do n_2=0,GRID_NZ_NB-1
+    ! nz first then ny
+    Do n1=0,GRID_NZ_NB-1
+      !write(*,*) n1+1,'/',GRID_NZ_NB
+      nz = GRID_NZ_MIN + n1*GRID_DNZ
 
-            !ny = min_ny + n_2*pas_ny
-            ny = GRID_NY_MIN + n_2*GRID_DNY
+      Do n2=0,GRID_NY_NB-1
+            ny = GRID_NY_MIN + n2*GRID_DNY
 
             call spectralEigenVector(ny, nz, aa, bb, mm, nn, yy, zz, mode, &
                                     ey_ny_nz, ez_ny_nz, hy_ny_nz, hz_ny_nz)

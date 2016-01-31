@@ -267,7 +267,8 @@ for idx_sc = 1:length(scenarios)
                     % Changed aloha_compute_champEmbouchure1D to aloha_compute_champEmbouchure1D_v2
                     scenario=aloha_compute_champEmbouchure1D_v2(scenario);
                 case '2D'
-                    scenario=aloha_compute_champEmbouchure2D(scenario);
+                    modes_file = [pwd, '/ALOHA2D.out.modes.dat'];
+                    scenario=aloha_compute_champEmbouchure2D(scenario, modes_file);
             end
         
             if (bool_display_total_field)

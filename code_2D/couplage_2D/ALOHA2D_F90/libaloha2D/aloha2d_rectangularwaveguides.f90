@@ -109,18 +109,22 @@ module aloha2d_rectangularwaveguides
   !
   ! Spectral eigenvector function
   !
-  subroutine spectralEigenVector(ny,nz,aa,bb,m,n,yy,zz,mode,Ey,Ez,Hy,Hz)
+  subroutine spectralEigenVector(ny, nz, aa, bb, m, n, yy, zz, mode, &
+                                 Ey, Ez, Hy, Hz)
     use aloha2d_globalParameters, only : k0
+    use aloha2d_plasma_admittance
 
     implicit none
 
-    real, intent(in) :: nz,ny,aa,bb,yy,zz
-    integer, intent(in) :: m,n
-    character(len=1), intent(in)  :: mode
-    complex,intent(out) :: Ey,Ez,Hy,Hz
+    real, intent(in) :: nz, ny, aa, bb, yy, zz
+    integer, intent(in) :: m, n
+    character(len=1), intent(in) :: mode
+    complex,intent(out) :: Ey, Ez, Hy, Hz
 
     real :: coeff_mode_y, coeff_mode_z
     complex :: TF_cos_m, TF_cos_n, TF_sin_m, TF_sin_n
+
+    complex :: YYs_yy, YYs_yz, YYs_zy, YYs_zz, g_S_interp, g_F_interp
 
     ! Normalization factor
     select case (mode)
@@ -171,6 +175,17 @@ module aloha2d_rectangularwaveguides
 
     Ez = coeff_mode_z*TF_sin_m*TF_cos_n
     Ey = coeff_mode_y*TF_cos_m*TF_sin_n
+
+
+!    call interpolate_gS_gF(ny, nz, g_S_interp,g_F_interp)
+!
+!    ! Plasma admittance tensor elements
+!    call eval_admittanceTensor(ny, nz, g_S_interp, g_F_interp, &
+!                               YYs_yy, YYs_yz, YYs_zy, YYs_zz)
+!
+!    Hy = Y0*(YYs_yy*Ey + YYs_yz*Ez)
+!    Hz = Y0*(YYs_zy*Ey + YYs_zz*Ez)
+
   end subroutine spectralEigenVector
 
 

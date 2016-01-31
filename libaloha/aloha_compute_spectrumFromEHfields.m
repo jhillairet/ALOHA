@@ -30,9 +30,13 @@ nbPolWg = aloha_scenario_get(scenario, 'nwm_theta');
 for id_row = 1:nbPolWg
   % retrieve EM field and spatial toroidal coordinate
   s = scenario.results.abs_z(id_row,:);
-  E = scenario.results.E_mouth(3,:,id_row); % Ez
-  H = scenario.results.H_mouth(2,:,id_row); % Hy
-  
+  if isfield(scenario.results, 'H_mouth') % from ALOHA 1D
+      E = scenario.results.E_mouth(3,:,id_row); % Ez
+      H = scenario.results.H_mouth(2,:,id_row); % Hy
+  elseif isfield(scenario.results, 'EE') % from ALOHA 2D
+      E = scenario.results.EE;
+      H = E;
+  end
   % waveguide height
   a = scenario.antenna_lh.setup.modules.waveguides.hw_theta;
 

@@ -1,9 +1,15 @@
-function scenario=aloha_compute_champEmbouchure2D(scenario)
+function scenario=aloha_compute_champEmbouchure2D(scenario, varargin)
 % Compute the parallel component of electric field (Ez) in the  mouth of the antenna.
 % Calcule le champ electrique parallele (Ez) dans l'embouchure de l'antenne
 % 
 % 2D case : the electric field correspond to the modes of a parallel-plate waveguide, ie 1 TEM and n TM modes.
 %  
+
+if nargin == 1
+    modes_file = [pwd, '/ALOHA2D.out.modes.dat'];
+elseif nargin == 2
+    modes_file = varargin{1};
+end
 
 % for easier matlab manipulation, load all the fields of the input scenario 'scenario'
 % into matlab workspace
@@ -26,12 +32,8 @@ else
     [b,h,z,y,nb_g_total_ligne,nbre_guides,act_module_tor]=aloha_utils_getAntennaCoordinates(architecture);
 end
 
-ascii_file_path = [scenario.options.aloha_path,scenario.options.chemin_binaire_fortran, '/Modes2.dat'];
-
-
-
 % open the modes ascii file given by the fortran binary for aloha-2D
-fid = fopen(ascii_file_path,'r');
+fid = fopen(modes_file,'r');
     % read nb of mode and nb of guides
     C = textscan(fid, '%f %f', 1);
     nbre_guides= C{1};
@@ -48,7 +50,7 @@ fid = fopen(ascii_file_path,'r');
     tab_ind_m = C{:};
     C = textscan(fid, '%f', nbre_guides*nbre_modes);
     tab_ind_n = C{:};
-    C = textscan(fid, '%f', nbre_guides*nbre_modes);
+    C = textscan(fid, '%c', nbre_guides*nbre_modes);
     tab_TE_TM = C{:};
 fclose(fid);
 
@@ -91,7 +93,7 @@ for ind_guide=1:nbre_guides
 
     
         % coefficients de normalisation
-        if (TE_TM_1==1) 
+        if (TE_TM_1=='H') 
       
             coeff_mode_1y=(n1/b1)/sqrt((m1^2)*b1/a1+(n1^2)*a1/b1);
             coeff_mode_1z=-(m1/a1)/sqrt((m1^2)*b1/a1+(n1^2)*a1/b1);
@@ -130,5 +132,29 @@ for ind_guide=1:nbre_guides
 
 end
 
-scenario.results = aloha_setfield(scenario.results, y, z, Ey, Ez, nbre_guides); 
+zz = [];
+EE = [];
+% calculate the norm of the E field in the middle of the waveguide
+for idx_wg = 1:nbre_guides
+    Ey_g = squeeze(Ey(idx_wg,:,:));
+    Ez_g = squeeze(Ez(idx_wg,:,:));
+    z_g = z(idx_wg,:);
+    y_g = y(idx_wg,:);
+
+    % look for the middle of the waveguide (in y direction)
+    % i.e. where the E field should be maximum
+    y_middle = (max(y_g)-min(y_g))/2;
+    % take the closest vector index from geometric middle
+    [dummy, idx_y_middle] = min(abs(y_g-y_middle)); 
+    % take fields for this value
+    Ey_g = Ey_g(idx_y_middle,:);
+    Ez_g = Ez_g(idx_y_middle,:);
+    norm_E = sqrt(abs(Ey_g).^2+abs(Ez_g).^2);
+    
+    zz = [zz, z_g];
+    EE = [EE, norm_E];
+end
+
+abs_z = zz;
+scenario.results = aloha_setfield(scenario.results, y, z, abs_z, EE, Ez_g, Ey, Ez, nbre_guides); 
 
