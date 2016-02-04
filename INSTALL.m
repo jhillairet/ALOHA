@@ -1,11 +1,13 @@
 %  INSTALLATION :
 %  
-%  Normally, the code should be able to run after the SVN checkout. 
+%  Normally, the code should be able to run after the git cloning. 
 %  Since the fortran code part used by matlab depends of the
 %  computer architecture, some all-ready made
 %  binaries exist for i686 32 and 64 bits (Linux). 
 %  It is however possible that you need to compile the code on your
-%  platform.
+%  platform.  
+% I suggest to use the open source IDE Code::Blocks. (http://www.codeblocks.org/)
+% A Code::Blocks project file exists for the fortran 90 versions.   
 % 
 %  Before using ALOHA, the directory which contain all the librairies
 %  needed by the code has to be included into the Matlab PATH. In order 
