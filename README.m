@@ -6,7 +6,32 @@
 % #                                                                   #
 % #####################################################################
 %  
-%  
+% ALOHA is a coupling code for Lower Hybrid Current Drive antennas facing 
+% tokamak magnetized fusion plasma. 
+%
+% This coupling code is based on the linear coupling theory. It allows 
+% one to model the coupling of a 'grill'-like antenna to a cold plasma of the 
+% kind one can find in Tokamak. It allows to take into account advanced antennas
+% such as multijunctions or passive-active multijunction antennas. 
+%
+% The plasma model assumes a slab cold magnetized plasma, which density 
+% can be modelled as a linear or a bi-linear electron density gradient,
+% with or without vacuum layer facing the antenna. The plasma wave model 
+% is either '1D' (slow wave only, infinite waveguides in the poloidal direction)
+% or '2D' (slow and fast waves described in an uncoupled way, rectangular waveguides).
+% The electromagnetic behaviour of the antenna can be described using scattering
+% parameters, and the coupling between the plasma and the front face waveguide is 
+% then calculated in the code. 
+%
+% ALOHA is a free software distributed under the CeCILL-B FREE LICENSE AGREEMENT. 
+% This licence is fully compatible with BSD-like licenses (BSD, X11, MIT) 
+% which have a strong attribution requirement (which goes much further than a simple copyright notice).
+% Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
+%
+%
+% And now the French version
+% --------------------------
+%
 %  Code de calcul du couplage des antennes à la fréquence hybride basse 
 %  avec un plasma de tokamak ALOHA (Advanced LOwer Hybrid Antenna).
 %  
@@ -62,8 +87,12 @@
 %  matlab pour effectuer cette operation a chaque demarrage de matlab
 %  (cf help matlab)
 %  
+% ------------------------------------------------------------------------
+%
 %  AUTHORS: Ph.Bibet, S.Berio, O.Izacard, D.Voyer, J.Hillairet
 %  
+% ------------------------------------------------------------------------
+%
 %  REFERENCES:
 %  Coupling theory 2D/3D:
 %   - M.Brambilla, Lower Hybrid waves propagation in cold plasma, 1978
