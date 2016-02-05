@@ -23,6 +23,14 @@ This licence is fully compatible with BSD-like licenses (BSD, X11, MIT)
 which have a strong attribution requirement (which goes much further than a simple copyright notice).
 Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
 
+
+## How to Contributing to the Code ?
+
+**ALOHA* uses the Fork + Pull collaborative development model. If this new to you, see github’s articles on  [forking](https://help.github.com/articles/fork-a-repo) and [pull requests](http://help.github.com/send-pull-requests/). 
+
+In short: you will fork the ALOHA repo, make change on your git repository and commit them, and then send a pull request for your additions to be merged into the main ALOHA repository.
+
+
 -----------------------
 
 
