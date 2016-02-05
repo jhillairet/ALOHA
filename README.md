@@ -24,9 +24,9 @@ which have a strong attribution requirement (which goes much further than a simp
 Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
 
 
-## How to Contributing to the Code ?
+## How to Contribute to the Code ?
 
-**ALOHA* uses the Fork + Pull collaborative development model. If this new to you, see github’s articles on  [forking](https://help.github.com/articles/fork-a-repo) and [pull requests](http://help.github.com/send-pull-requests/). 
+**ALOHA** uses the Fork + Pull collaborative development model. If this new to you, see github’s articles on  [forking](https://help.github.com/articles/fork-a-repo) and [pull requests](http://help.github.com/send-pull-requests/). 
 
 In short: you will fork the ALOHA repo, make change on your git repository and commit them, and then send a pull request for your additions to be merged into the main ALOHA repository.
 
