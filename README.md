@@ -1,11 +1,6 @@
-#####################################################################
-#                                                                   # 
-#                         ALOHA                                     #
-#                                                                   #
-#              (Advanced LOwer Hybrid Antenna)                      #
-#                                                                   #
-#####################################################################
-  
+# ALOHA
+## Advanced LOwer Hybrid Antenna
+
 ALOHA is a coupling code for Lower Hybrid Current Drive antennas facing 
 tokamak magnetized fusion plasma. 
 
@@ -29,6 +24,7 @@ which have a strong attribution requirement (which goes much further than a simp
 Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
 
 -----------------------
+
 
 Code de calcul du couplage des antennes à la fréquence hybride basse 
 avec un plasma de tokamak ALOHA (Advanced LOwer Hybrid Antenna).
@@ -86,22 +82,24 @@ matlab pour effectuer cette operation a chaque demarrage de matlab
 (cf help matlab)
   
 ------------------------------------------------------------------------
-#AUTHORS
+## AUTHORS
 
-  - Ph.Bibet
-  - S.Berio
-  - O.Izacard
-   - D.Voyer
-   - J.Hillairet
+ - Ph.Bibet
+ - S.Berio
+ - O.Izacard
+ - D.Voyer
+ - J.Hillairet
 
 ------------------------------------------------------------------------
-# REFERENCES:
+## REFERENCES:
 Coupling theory 2D/3D:
    - M.Brambilla, Lower Hybrid waves propagation in cold plasma, 1978
    - A.Bers, K.S.Theilaber, Three dimensional theory of waveguide plasma coupling, 1983
+
 SWAN:
    - D.Moreau, T.K.Bguyen, Couplage de l'onde lente au voisinage de la fréquence 
      hybride basse dans les grands tokamaks, 1984
+
 ALOHA:
    - S.Berio, Developpement de coupleurs a la frequence hybride pour la generation
      non inductive de courant dans un tokamak, 1996
