@@ -201,7 +201,7 @@ elseif (version == 6)
    Va = (Hy_0 + Y0*Yb.*Ez_0)./(Y0*(Yb-Ya));
    Vb = (Hy_0 + Y0*Ya.*Ez_0)./(Y0*(Ya-Yb));
    
-   x_coord = (0:d_couche(1)/6:d_couche(1)-d_couche(1)/6); % Modif de 16/05/2007 'd_couche(1)' au lieu de 'd_couche'
+   x_coord = (0:d_couche/6:d_couche-d_couche/6); 
    x_tot = x_coord;
    
    
@@ -224,7 +224,7 @@ elseif (version == 6)
    Vc = Va.*airy(0,neta_d)./airy(0,neta_0)+Vb.*airy(2,neta_d)./airy(2,neta_0);
    
    x_coord = x_coord_2nd_couche;
-   x_tot= [x_tot,x_coord+d_couche(2)];    % Modif de 16/05/2007 'd_couche(2)' au lieu de 'd_couche'
+   x_tot= [x_tot,x_coord+d_couche];
    
    for ind_x = 1:length(x_coord)
       disp([num2str(ind_x), '/', num2str(length(x_coord))])
