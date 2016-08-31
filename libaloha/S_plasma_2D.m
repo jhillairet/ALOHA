@@ -75,11 +75,13 @@ end
 try
     binary_full_path = [aloha_utils_getRootPath,chemin_binaire_fortran,'/',binary_name];
     disp(aloha_message(['Lancement du binaire ', binary_full_path]));
-    [status,result] = system(binary_full_path,'-echo');
-    disp([status,result])
+
     if bool_debug
-        disp(result);
+        [status,result] = system(binary_full_path,'-echo')
+    else
+        [status,result] = system(binary_full_path)
     end
+    disp([status,result]);
 catch
     % cd(chemin_retour);
     error(aloha_message('?! Binary execution problem ?!'));
