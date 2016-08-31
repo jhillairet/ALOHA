@@ -22,19 +22,20 @@ Hy_x_z=squeeze(Hy_x_z);
 if (aloha_scenario_get(scenario, 'fig_Ez_ou_EzHy') == 1)
        % Rajout le 16/05/2007 par Izacard Olivier pour les titres :
        letitre0 = '';
-       pcolor(x_coord, z_coord,log10(1+abs(Ez_x_z)'));
-%          pcolor(x_coord, z_coord,abs(Ez_x_z)');
+       %pcolor(z_coord, x_coord, log10(1+abs(Ez_x_z)));
+       pcolor(z_coord, x_coord, abs(Ez_x_z));
 else
        % Rajout le 16/05/2007 par Izacard Olivier pour les titres :
        letitre0 = 'Vecteur de poynthing dans le plasma (V/m) a l'' embouchure';
-       pcolor(x_coord, z_coord,20*log10(abs(Ez_x_z.*(Hy_x_z.')')'));
+       pcolor(z_coord, x_coord, 20*log10(abs(Ez_x_z.*(Hy_x_z.')')));
 end
      
    shading flat
    shading interp
    colorbar
-   xlabel('x [m]')
-   ylabel('z [m]')
+   ylabel('x [m]')
+   xlabel('z [m]')
+   axis equal;
     
     letitre1 = ['Electric field in plasma for ', aloha_utils_str4fig(aloha_scenario_get(scenario, 'architecture'))];
 
