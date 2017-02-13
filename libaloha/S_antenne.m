@@ -33,7 +33,7 @@ S_ant_22 = diag(S_ant_22);
 % Pour tous les modules situes sur une ligne poloidale de modules
 for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
     % introduit les variables S [, Z et f] lues dans fichier issu de HFSS
-    nom = nom_fichiers(ind,:);
+    nom = strtrim(nom_fichiers(ind,:)); % trim remaining space in the filename
     
     [dummy,dummy,ext]=fileparts(nom);
     if strcmp(ext, '') || strcmp(ext, '.m')
