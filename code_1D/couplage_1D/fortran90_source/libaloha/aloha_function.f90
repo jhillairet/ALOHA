@@ -755,13 +755,13 @@ CONTAINS
             ! Expression 1 (definition) --> produces NaN
             !tanh_d_vide(p) = (exp(2*gamma(p)*d_vide)-1)/(exp(2*gamma(p)*d_vide)+1)
             ! Expression 2 (built in function)  --> Complex tanh only in Fortran 2008 !
-            !tanh_d_vide(p) = tanh(gamma(p)*d_vide)
+            tanh_d_vide(p) = tanh(gamma(p)*d_vide)
             ! Expression 3 (alternate x+iy form) --> produces NaN
             !z_r = real(gamma(p)*d_vide)
             !z_i = aimag(gamma(p)*d_vide)
             !tanh_d_vide(p) = (sinh(2*z_r) + (0.,1.)*sin(2*z_i))/(cosh(2*z_r) + cos(2*z_i))
             ! Expression 4 : limit --> works !
-            tanh_d_vide(p) = gamma(p)*d_vide
+            !tanh_d_vide(p) = gamma(p)*d_vide
             ! Expression 5 : Taylor expansion of the tanh function (source: wikipedia) --> works also !
             !u = gamma(p)*d_vide
             !tanh_d_vide(p) = u - (u**3.)/3. + 2.*(u**5.)/15. - 17.*(u**7.)/315.
