@@ -16,8 +16,8 @@ $(OBJDIR)/$(LIBBLAS):
 $(OBJDIR)/$(LIBLAPACK):
 	@(cd $(LIBLAPACK_DIR) && $(MAKE))
 
-$(OBJDIR)/$(LIBLAPACK95):
-	@(cd $(LIBLAPACK95_DIR) && $(MAKE) single_double_complex_dcomplex)
+$(OBJDIR)/$(LIBLAPACK95): 
+	@(cd $(LIBLAPACK95_DIR) && $(MAKE) single_double_complex_dcomplex )
 
 $(OBJDIR)/$(LIBQUADPACK):
 	@(cd $(LIBQUADPACK_DIR) && $(MAKE))

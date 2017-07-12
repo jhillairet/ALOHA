@@ -9,12 +9,12 @@
 #
 
 # g95
-FC	 = g95 -ffree-form
-FC1      = g95 -ffixed-form
+#FC	 = g95 -ffree-form
+#FC1      = g95 -ffixed-form
 
 # gfortran
-#FC       = gfortran -ffree-form
-#FC1	 = gfortran -ffixed-form
+FC       = gfortran -ffree-form
+FC1	 = gfortran -ffixed-form
 
 # -dcfuns  Enable recognition of non-standard double
 #          precision  complex intrinsic functions
@@ -23,10 +23,10 @@ FC1      = g95 -ffixed-form
 #          errors  found  in  such software from "Error" to
 # -ieee=full enables all IEEE arithmetic facilities
 #          including non-stop arithmetic.
-OPTS0    = #-ieee=full -march=opteron # -u -V -dcfuns -dusty -ieee=full # g95 options
+#OPTS0    = #-ieee=full -march=opteron # -u -V -dcfuns -dusty -ieee=full # g95 options
 
 # gfortran specific options :
-#OPTS0    = -mtune=generic -pipe -ftree-vectorize
+OPTS0    = -mtune=generic -pipe -ftree-vectorize
 # -pipe : Use pipes rather than temporary files for communication between the various stages of compilation. This fails to work on some systems where the assembler is unable to read from a pipe; but the GNU assembler has no trouble.
 # -ftree-vectorize : Perform loop vectorization on trees.
 # -mtune=generic
