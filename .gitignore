@@ -1,0 +1,6 @@
+*.m~ 
+*.o
+*.mod
+*.a
+*.old
+*.depend
