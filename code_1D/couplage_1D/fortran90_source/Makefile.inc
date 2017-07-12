@@ -1,14 +1,13 @@
 ####################################################################
-#  ALOHA (LUKE Module) make include and initialisation file.       #
+#  ALOHA  make include and initialisation file.       #
 #
 #  Last update :
 #  -------------
-#  22/09/2009
+# 04/03/2017
 #                                              
 ####################################################################
 
 # Path and directories configuration
-ALOHAPATH=/home/sccp/gchf/JH218595/codes/aloha/code_1D/couplage_1D/fortran90_source
 # TOP path 
 # the next line retrieve automaticcaly the relative path to the top directory
 # thus avoiding the need to set an absolute path 
