@@ -3,42 +3,26 @@
 	<FileVersion major="1" minor="6" />
 	<Project>
 		<Option title="ALOHA_1D" />
-		<Option execution_dir="/Home/JH218595/codes/ALOHA/code_1D/couplage_1D/fortran90_source/ALOHA_1D/" />
 		<Option pch_mode="2" />
-		<Option compiler="gfortran" />
+		<Option compiler="g95" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/ALOHA_1D" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
-				<Option compiler="gfortran" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
+				<Option compiler="g95" />
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/ALOHA_1D" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
-				<Option compiler="gfortran" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
+				<Option compiler="g95" />
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../coupl_plasma_version6.f90" />
-		<Unit filename="../libaloha/aloha_config.f90" />
-		<Unit filename="../libaloha/aloha_constants.f90" />
-		<Unit filename="../libaloha/aloha_function.f90" />
-		<Unit filename="../libaloha/aloha_integration.f90" />
-		<Unit filename="../libaloha/aloha_scattering_matrix_utils.f90" />
-		<Unit filename="../libaloha/aloha_sgrill.f90" />
+		<Unit filename="main.f90" />
 		<Extensions>
 			<envvars />
 			<debugger />
