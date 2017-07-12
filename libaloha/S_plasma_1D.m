@@ -27,7 +27,7 @@
 %  Determine le nom du binaire a utiliser
 % TODO : use tempname for generate a temporary file - fortran bin should accept args 
 binary_name = aloha_getBinaryName(aloha_getArchitecture, version);
-% noms des fichiers d'échange avec le code fortran
+% noms des fichiers d'??change avec le code fortran
 fortranInputAsciiFileName = 'par_grill.dat';
 fortranOutputBinaryFileName = 'S_plasma.dat';
 fortranOutputAsciiFileName = 'S_plasma2.dat';
@@ -160,8 +160,9 @@ for ind = 1:nb_g_pol
                 disp(aloha_message([textInd, 'Binary execution problem : ']));
                 error(aloha_message(result));
             end
-        catch
+        catch ME
             % cd(chemin_retour);
+            disp(ME.message);
             error(aloha_message('?! Binary execution problem ?!'));
         end
     end
