@@ -82,8 +82,9 @@ try
         [status,result] = system(binary_full_path)
     end
     disp([status,result]);
-catch
+catch ME
     % cd(chemin_retour);
+    print(ME);
     error(aloha_message('?! Binary execution problem ?!'));
 end
 
