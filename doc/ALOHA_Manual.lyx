@@ -1,0 +1,2282 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{fourier}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding iso8859-15
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_title "ALOHA documentation"
+\pdf_author "Julien Hillairet"
+\pdf_subject "ALOHA"
+\pdf_bookmarks false
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+ALOHA Manual
+\end_layout
+
+\begin_layout Author
+J.Hillairet
+\end_layout
+
+\begin_layout Date
+Last update : 03/10/10
+\end_layout
+
+\begin_layout Abstract
+This document is the documentation of the Advanced LOwer Hybrid Antenna
+ code (
+\noun on
+aloha
+\noun default
+).
+ It describes the main characteristic of the code and how to use it, for
+ both basic or advanced uses.
+\end_layout
+
+\begin_layout Abstract
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+
+\noun on
+aloha
+\noun default
+ (
+\emph on
+Advanced LOwer Hybrid Antenna
+\emph default
+) is a Lower Hybrid (LH) coupling code, i.e.
+ a code which purpose is to calculate the coupling between a LH antenna
+ (often called 
+\begin_inset Quotes eld
+\end_inset
+
+grill
+\begin_inset Quotes erd
+\end_inset
+
+) and a magnetised plasma, for a specified antenna and plasma model.
+ 
+\end_layout
+
+\begin_layout Standard
+The physics underlying the code is based on the linear coupling theory mainly
+ due to M.Brambilla
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Brambilla1976a"
+
+\end_inset
+
+.
+ However, in contrary to previous coupling code such as 
+\noun on
+swan
+\noun default
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Moreau1984"
+
+\end_inset
+
+, 
+\noun on
+aloha
+\noun default
+ provide a 2D description of the LH antennas
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Bers1983"
+
+\end_inset
+
+, which means that both 
+\begin_inset Formula $y$
+\end_inset
+
+ and 
+\begin_inset Formula $z$
+\end_inset
+
+ description of an antenna must be provided.
+ An example of a typical LH antenna geometry as described in 
+\noun on
+aloha
+\noun default
+ is shown on figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Example_geometry"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/antenne_C4.pdf
+	width 60text%
+	rotateOrigin leftTop
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Example_geometry"
+
+\end_inset
+
+Example of a LH antenna geometry as described in ALOHA.
+ This example corresponds to a Passive-Active Antenna (PAM) ; grey rectangles
+ are passive waveguides.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The code core had been developed by between 1994 and 1996 by S.Berio and
+ Ph.Bibet
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Berio1996"
+
+\end_inset
+
+.
+ The project has been resumed in 2006 by D.Voyer and Ph.Bibet, then by D.Voyer
+ and M.Goniche.
+ Since 2008, the code is maintained by J.Hillairet
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Hillairet2009,Hillairet2009a"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Edge plasma is described in 
+\noun on
+aloha
+\noun default
+ as an inhomogeneous cold plasma in the radial direction (for each toroidal
+ line of waveguides).
+ The plasma is described as a linear evolution of the density in the direction
+ of the core plasma (
+\begin_inset Formula $x$
+\end_inset
+
+).
+ One or two electron density gradients 
+\begin_inset Formula $\nabla n_{e}$
+\end_inset
+
+ are taken into account after a step density 
+\begin_inset Formula $n_{e0}$
+\end_inset
+
+ which is supposed to be the density at the mouth of the waveguides.
+ An example of a density profile with 2 density gradients 
+\begin_inset Formula $\nabla n_{e0}$
+\end_inset
+
+, 
+\begin_inset Formula $\nabla n_{e1}$
+\end_inset
+
+ is shown on figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Example_density"
+
+\end_inset
+
+.
+ Since the gradient value depends on the initial density, the slope of the
+ linear density gradient is actually set using the decay length 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ (in meters):
+\begin_inset Formula 
+\begin{equation}
+\lambda_{n}=\frac{n_{e}}{\nabla n_{e}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/aloha_density_profil.pdf
+	width 50text%
+	rotateOrigin leftTop
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Example_density"
+
+\end_inset
+
+Example of density profile as it is defined in 
+\noun on
+aloha
+\noun default
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the antenna part, the electromagnetic waves are modelled by a discrete
+ sum of conventional TE/TM modes.
+ Since the plasma is supposed to have an infinite extend in the radial direction
+ – which imply that all the waves are supposed to be absorbed into core
+ plasma and satisfy to the WKB(J) boundaries conditions – the electromagnetic
+ fields in the plasma are modelled by a continuous sum of planes waves.
+\end_layout
+
+\begin_layout Standard
+In harmonic regime, boundaries conditions at the interface allow one to
+ match antenna fields with plasma fields by expressing the plasma as a equivalen
+t load for the antenna, ie as an equivalent surface admittance, and then
+ to express the coupling between antenna and plasma.
+\end_layout
+
+\begin_layout Standard
+Following the derivation of Bers and Theilhaber
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Bers1983"
+
+\end_inset
+
+, 
+\noun on
+aloha
+\noun default
+ can handle both slow and fast waves (
+\noun on
+aloha-2D
+\noun default
+) or only slow waves (
+\noun on
+aloha-1D
+\noun default
+) and provide different results related on the LH coupling of an antenna
+ with a plasma.
+ Basic results returned are the reflection coefficients as if it were measured
+ behind the antenna or the 
+\begin_inset Formula $n_{\parallel}$
+\end_inset
+
+ antenna spectrum.
+\end_layout
+
+\begin_layout Section
+Preamble
+\end_layout
+
+\begin_layout Standard
+
+\noun on
+aloha
+\noun default
+ is a set of Matlab scripts and FORTRAN binaries.
+ In order to run 
+\noun on
+aloha,
+\noun default
+ the code need to access to is own libraries.
+ In order to do so, the directory containing all the 
+\noun on
+aloha
+\noun default
+ Matlab scripts must be load into the Matlab 
+\family typewriter
+PATH
+\family default
+ system variable, in order that Matlab may be able to find them.
+ Then, the first thing to do is to add the 
+\family typewriter
+libaloha
+\family default
+ directory to the Matlab path
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+where 
+\family typewriter
+\color blue
+>>
+\family default
+\color inherit
+ design the prompt line of Matlab.
+\end_layout
+
+\end_inset
+
+ :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> addpath(genpath(['absolute_path_to_aloha_main_dir/libaloha']));
+\end_layout
+
+\end_inset
+
+This command can be automatically set up when starting Matlab.
+ See the Matlab documentation.
+ There is two way to use ALOHA : a basic and an advanced.
+ In the basic way, user runs a Matlab script which calculates the coupling
+ with one antenna and for one plasma configuration.In the advanced way, users
+ runs a Matlab function which take into input argument a 
+\begin_inset Quotes eld
+\end_inset
+
+scenario
+\begin_inset Quotes erd
+\end_inset
+
+, i.e.
+ a combinaison of antennas and plasma configurations.
+ The advanced usage allows user to easily do multiple calculations and parameter
+ studies, such as edge electron density variation, etc.
+\end_layout
+
+\begin_layout Section
+Basic use
+\end_layout
+
+\begin_layout Standard
+The simplest and the fastest way to use 
+\noun on
+aloha
+\noun default
+ is to modify and then to run the 
+\family typewriter
+aloha.m
+\family default
+ Matlab script file, which is in the main directory.
+ All the parameters and their meaning should be explained in this file.
+ When running the 
+\family typewriter
+aloha.m
+\family default
+ script file, all results are saved into the Matlab workspace into a Matlab
+ structure named 
+\family typewriter
+scenario
+\family default
+.
+ This structure contains all the input parameters such as the antenna descriptio
+n (antenna name, power feeding, etc.), plasma description (density, scrape-off
+ length, etc.) and 
+\noun on
+aloha
+\noun default
+ options (1 or 2 gradients, 1D or 2D, etc.).
+ The structure also contains the results calculated by 
+\noun on
+aloha
+\noun default
+, such reflection coefficients, spectrum (if asked), directivity (if asked),
+ etc.
+\end_layout
+
+\begin_layout Section
+Advanced use
+\end_layout
+
+\begin_layout Subsection
+scenario(s)
+\end_layout
+
+\begin_layout Standard
+In order to run many simulations during the same run (as it could be with
+ a Unix 
+\emph on
+batch
+\emph default
+) or in order to save some reference simulations for future comparisons,
+ one can use the 
+\noun on
+aloha
+\noun default
+ 
+\emph on
+scenarios
+\emph default
+.
+ An 
+\noun on
+aloha
+\noun default
+ 
+\begin_inset Quotes eld
+\end_inset
+
+scenario
+\begin_inset Quotes erd
+\end_inset
+
+ is a Matlab structure which contains all the parameters required by 
+\noun on
+aloha
+\noun default
+ to make a simulation.
+ Using the 
+\family typewriter
+aloha_\SpecialChar softhyphen
+scenario
+\family default
+ function and a 
+\noun on
+aloha
+\noun default
+ scenario as input, one retrieves (as a returned parameter) a new 
+\noun on
+aloha
+\noun default
+ scenario which contains the input scenario plus all the results computed
+ by 
+\noun on
+aloha
+\noun default
+.
+ The general workflow of ALOHA is illustrated on Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALOHA_Workflow"
+
+\end_inset
+
+.
+ More details on Antenna Scattering Matrix, Antenna feeding and Plasma descripti
+on are given in the appendix sections.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/ALOHA_2010.tif
+	width 90text%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALOHA_Workflow"
+
+\end_inset
+
+General description of the ALOHA workflow.
+ All input parameters such as antenna and plasma descriptions are set into
+ a Matlab structure which is called an ALOHA scenario.
+ ALOHA process this input structure and return a new Matlab structure similar
+ to the input one, but including all the calculated results.
+ Many ALOHA function have been written in order to facilitate pre and post-proce
+ssing.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since Matlab structures can also been vectorized, one can construct vectors
+ 
+\begin_inset Formula $\left(1\times N\right)$
+\end_inset
+
+ of 
+\noun on
+aloha
+\noun default
+ scenarios and gives it as an input parameter to the 
+\family typewriter
+aloha_scenario
+\family default
+ function function.
+ In this case, 
+\noun on
+aloha
+\noun default
+ will compute all these scenarios and return a new vector of scenarios,
+ each one containing its own results.
+ See help for 
+\family typewriter
+aloha_scenario
+\family default
+ for more details.
+\end_layout
+
+\begin_layout Standard
+In order to make it easier post-treatments of the 
+\noun on
+aloha
+\noun default
+ scenario variables, a bundle of Matlab scripts exists to retrieve specific
+ variables such as parameters or results from scenarios.
+ Most of these function accept vectorized scenarios.
+ An example is explained below.
+\end_layout
+
+\begin_layout Subsection
+Example
+\end_layout
+
+\begin_layout Standard
+In order to generate an 
+\noun on
+aloha
+\noun default
+ scenario, an example named 
+\family typewriter
+scenario_example.m
+\family default
+ is furnished in the 
+\family typewriter
+scenario
+\family default
+ directory.
+ This Matlab script contains all the parameters needed by 
+\noun on
+aloha
+\noun default
+ for a computation, and returns a scenario structure
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This means that the Matlab call should be as : 
+\family typewriter
+my_scenario = scenario_example()
+\family default
+; .
+\end_layout
+
+\end_inset
+
+.
+ In the following example, this file is modified and saved to an other name
+ : 
+\family typewriter
+scenario_testC2.m
+\family default
+.
+\end_layout
+
+\begin_layout Subsubsection
+Setting the main parameters
+\end_layout
+
+\begin_layout Standard
+In this example, we want to compute the reflection coefficient and the spectrum
+ for different electron densities for the Tore-Supra C2 antenna.
+ First of all, we need to modify the 
+\family typewriter
+scenario_testC2.m
+\family default
+ in order to fit with our requirements.
+ Commonly used parameters are set to the following values
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Other parameters are not modified in this example since they satisfy to
+ our requirements.
+ Of course, users must pay attention to other parameters and change them
+ if necessary.
+\end_layout
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+
+\family typewriter
+antenna.architecture = 'antenne_C2'
+\family default
+; 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+options.version_code = '1D';
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+version_plasma_1D = 
+\family default
+3;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+plasma.ne0 = 5e17
+\family default
+; 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+plasma.lambda_n(1) = 2e-3
+\family default
+; 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+options.bool_compute_spectrum = true
+\family default
+; 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+options.bool_display_spectrum = false
+\family default
+; 
+\end_layout
+
+\begin_layout Standard
+These parameters define a slow-wave only simulation (
+\noun on
+aloha
+\noun default
+-1D, 
+\family typewriter
+options.version_code = '1D'
+\family default
+), 1 gradient plasma (
+\family typewriter
+version_plasma_1D=3
+\family default
+) with a step density of 
+\begin_inset Formula $n_{e0}=5\times10^{17}\,m^{-3}$
+\end_inset
+
+ and a scrape-off length of 
+\begin_inset Formula $\lambda_{n}=2\,mm$
+\end_inset
+
+.
+ The antenna spectrum will be calculated, but not displayed : this choice
+ is motivated by the fact that we will compute many scenarios, so it is
+ unnecessary to show the spectrum for each of these scenarios
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Once the scenarios have been processed by the 
+\family typewriter
+aloha_scenario
+\family default
+ function, the spectrum can be plot by either 
+\family typewriter
+aloha_plot_spectrum
+\family default
+ or 
+\family typewriter
+aloha_plot_spectra
+\family default
+ functions (see the help for these functions).
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Testing for one scenario
+\end_layout
+
+\begin_layout Standard
+First, we generate the ALOHA scenario from the script we had modified in
+ the previous section.
+ Calling this script will give back a Matlab structure corresponding to
+ the desired ALOHA scenario : 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> my_scenario = scenario_testC2.m
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+my_scenario =
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    antenna: [1x1 struct]     
+\end_layout
+
+\begin_layout Plain Layout
+
+    options: [1x1 struct]      
+\end_layout
+
+\begin_layout Plain Layout
+
+     plasma: [1x1 struct]     
+\end_layout
+
+\begin_layout Plain Layout
+
+    results: [1x1 struct] 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+At this step, you can check that the field 
+\family typewriter
+results
+\family default
+ of the structure
+\family typewriter
+ my_scenario
+\family default
+ is empty : this is normal, since we haven't run ALOHA yet.
+ In order to calculate all the desired results, we ask ALOHA to process
+ this scenario :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> my_scenario_with_results = aloha_scenario(my_scenario);
+\end_layout
+
+\end_inset
+
+Then, ALOHA will display many messages lines, which indicate in which step
+ the code is.
+ When the computation is finished, the new variable 
+\family typewriter
+my_scenario_with_results
+\family default
+ will be :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> my_scenario_with_results
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+my_scenario_with_results = 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    antenna: [1x1 struct]
+\end_layout
+
+\begin_layout Plain Layout
+
+    options: [1x1 struct]
+\end_layout
+
+\begin_layout Plain Layout
+
+     plasma: [1x1 struct]
+\end_layout
+
+\begin_layout Plain Layout
+
+    results: [1x1 struct] 
+\end_layout
+
+\end_inset
+
+Now, the structure 
+\family typewriter
+my_scenario_with_results
+\family default
+ contains the same parameters that the structure 
+\family typewriter
+my_scenario
+\family default
+, but also the results computed by 
+\noun on
+ALOHA
+\noun default
+.
+ These results are saved is the field 
+\family typewriter
+results
+\family default
+ of the structure :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> my_scenario_with_results.results
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+ans =
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          CoeffRefPuiss: [8x1 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                    Pin: 2.0672e+06
+\end_layout
+
+\begin_layout Plain Layout
+
+          Ptr_plasma_RC: 2.0228e+06
+\end_layout
+
+\begin_layout Plain Layout
+
+    Ptr_plasma_spectrum: 1.9010e+06
+\end_layout
+
+\begin_layout Plain Layout
+
+                S_acces: [8x8 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+               S_plasma: [204x204 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                a_acces: [8x1 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+               a_plasma: [204x1 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                b_acces: [8x1 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+               b_plasma: [204x1 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                     dP: [41x1001 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                  dP_nz: [1x1001 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+            directivite: 0.7599
+\end_layout
+
+\begin_layout Plain Layout
+
+        directivite_tab: [1x500 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                    dny: 0.1000
+\end_layout
+
+\begin_layout Plain Layout
+
+                    dnz: 0.0200
+\end_layout
+
+\begin_layout Plain Layout
+
+                     ny: [1x41 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                     nz: [1x1001 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+                rac_Zhe: [204x204 double]
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In order to get or to watch for one of these results, one can uses either
+ the Matlab workspace environment
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+See help for 
+\family typewriter
+workspace
+\family default
+ or 
+\family typewriter
+openvar
+\family default
+ Matlab functions.
+\end_layout
+
+\end_inset
+
+ (or Matlab command line) or more conveniently some of the 
+\noun on
+aloha
+\noun default
+ functions.
+ By example, knowing that the reflection coefficients 
+\begin_inset Formula $\Gamma^{2}$
+\end_inset
+
+ (in percents) for 8 modules of the C2 antenna are contained in the field
+ named 
+\family typewriter
+CoeffRefPuiss
+\family default
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In the Matlab structure tree, this is in fact 
+\family typewriter
+my_scenario_with_results.results.CoeffRefPuiss
+\end_layout
+
+\end_inset
+
+, one can get these values using the 
+\family typewriter
+aloha_scenario_get
+\family default
+ function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> RC=aloha_scenario_get(my_scenario_with_results, 'CoeffRefPuiss')
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+RC =
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   2.2070
+\end_layout
+
+\begin_layout Plain Layout
+
+   1.6138
+\end_layout
+
+\begin_layout Plain Layout
+
+   2.4489
+\end_layout
+
+\begin_layout Plain Layout
+
+   2.1221
+\end_layout
+
+\begin_layout Plain Layout
+
+   2.6350
+\end_layout
+
+\begin_layout Plain Layout
+
+   2.2712
+\end_layout
+
+\begin_layout Plain Layout
+
+   1.9757
+\end_layout
+
+\begin_layout Plain Layout
+
+   1.8985
+\end_layout
+
+\end_inset
+
+which are the reflection coefficients.
+ The function 
+\family typewriter
+aloha_scenario_get
+\family default
+ can take multiple arguments, which can be convenient for getting multiple
+ parameters.
+ By example, if one wants to get the plasma parameters for which the simulation
+ had been made:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+> [n_e,lamb_n,vers]= ...
+\end_layout
+
+\begin_layout Plain Layout
+
+      aloha_scenario_get(my_scenario_with_results, ...
+\end_layout
+
+\begin_layout Plain Layout
+
+		'ne0','lambda_n','version');
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Running for multiple scenarios
+\end_layout
+
+\begin_layout Standard
+Working with multiple scenarios is similar to working with only one.
+ The only difference is that the input scenario parameter would be now a
+ 1D-array of scenario structures.
+ Moreover, the resulting variable from 
+\family typewriter
+aloha_scenario
+\family default
+ will be an array of scenario structures containing all the results for
+ each scenarios.
+ Let by example do 2 computation for 2 different electronic densities, still
+ using our preceding example :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> sc(1)=scenario_testC2;
+\end_layout
+
+\begin_layout Plain Layout
+
+>> sc(2)=scenario_testC2; % duplicate scenario_test2
+\end_layout
+
+\begin_layout Plain Layout
+
+>> sc(2).plasma.ne0=10e17; % change only ne into scenario #2
+\end_layout
+
+\begin_layout Plain Layout
+
+>> aloha_scenario_get(sc, 'ne0') % check 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+ans =
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   1.0e+18 *
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    0.5000
+\end_layout
+
+\begin_layout Plain Layout
+
+    1.0000
+\end_layout
+
+\end_inset
+
+Then, running 
+\noun on
+aloha
+\noun default
+ for this array of scenarios:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> sc=aloha_scenario(sc);
+\end_layout
+
+\end_inset
+
+Results can be easily extracted from the resulting array of scenarios 
+\family typewriter
+sc
+\family default
+ still using the 
+\family typewriter
+aloha_scenario_get
+\family default
+ function.
+ For multiple scenarios, results coming from same fields are stacked together
+ : scalar values becomes array (which length is the length of the scenario
+ array), vectors becomes matrices and matrices becomes array of matrices.
+ 
+\end_layout
+
+\begin_layout Standard
+In order to facilitate the computation of many scenarios, the file 
+\family typewriter
+batch_example.m
+\family default
+ provides an example of a way of doing a density scan.
+\end_layout
+
+\begin_layout Subsubsection
+Save and load scenario(s)
+\end_layout
+
+\begin_layout Standard
+In order to easily keep the results obtained, one can save a scenario (or
+ an array of scenarios) using the 
+\family typewriter
+aloha_scenario_save
+\family default
+ function
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Scenario files are saved in the Matlab-V6 
+\family typewriter
+'.mat'
+\family default
+ file format, in order to assure backward compatibility with previous versions.
+\end_layout
+
+\end_inset
+
+ :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> aloha_scenario_save(sc, 'my_scenario.mat');
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Retrieving this scenario can be done using the 
+\family typewriter
+aloha_scenario_load 
+\family default
+function
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+We assume that we are in the same directory that the 
+\family typewriter
+.mat
+\family default
+ file.
+\end_layout
+
+\end_inset
+
+ ;
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>> sc = aloha_scenario_load('my_scenario.mat');
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Plotting results
+\end_layout
+
+\begin_layout Standard
+The 
+\noun on
+aloha
+\noun default
+ library contains some useful functions for plotting results which are contained
+ into a scenario.
+ All of these functions start with 
+\family typewriter
+aloha_plot_
+\family default
+.
+ Most usefull functions are:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_export 
+\family default
+: export a Matlab figure to an image file (.png, .tif, .pdf, etc.) with a correct
+ aspect for publication or slide purposes ;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_figure
+\family default
+ : generate a new figure with correct options for publication or slide purposes
+ ;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_spectrum
+\family default
+ : plot spectrum for each scenario
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_spectra
+\family default
+ : plot superposed spectrum of scenarios for comparison.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_reflectionCoeff
+\family default
+ : plot reflection coefficient(s).
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_antenna
+\family default
+ : plot the antenna used in the scenario, as view from the plasma ;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_champEmbouchure
+\family default
+ : plot the toroidal electric field 
+\begin_inset Formula $E_{z}$
+\end_inset
+
+ into the grill mouth (i.e.
+ for 
+\begin_inset Formula $x=0$
+\end_inset
+
+.) ;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+aloha_plot_directivity
+\family default
+ : plot the directivity of the antenna for the scenario.
+ The directivity definition can be set with an optionnal parameter.
+\end_layout
+
+\begin_layout Standard
+See the help for each of these function.
+\end_layout
+
+\begin_layout Subsection
+Other functions, documentation
+\end_layout
+
+\begin_layout Standard
+All ALOHA functions begin with 
+\family typewriter
+aloha_
+\family default
+.
+ All the functions of the ALOHA library are described in the 
+\family typewriter
+documentation
+\family default
+ directory which should be in the main directory (see 
+\family typewriter
+index.html
+\family default
+ in this directory).
+ If this directory does not exist, one could generate this documentation
+ using the 
+\family typewriter
+aloha_install_doc
+\family default
+ function.
+ 
+\end_layout
+
+\begin_layout Section
+FAQ
+\end_layout
+
+\begin_layout Standard
+TO-DO
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "bib/biblio"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Antenna geometrical and RF description
+\end_layout
+
+\begin_layout Subsection
+General description
+\end_layout
+
+\begin_layout Standard
+The global frame, as defined in classical papers 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Brambilla1976a,Bers1983"
+
+\end_inset
+
+, is illustrated in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALOHA_frame"
+
+\end_inset
+
+: 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x$
+\end_inset
+
+ is the radial direction towards plasma.
+ 
+\begin_inset Formula $x=0$
+\end_inset
+
+ is the plane of the antenna mouth;
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $y$
+\end_inset
+
+ is the poloidal direction;
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $z$
+\end_inset
+
+ is the toroidal direction.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/repere_ALOHA.png
+	lyxscale 20
+	width 50text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALOHA_frame"
+
+\end_inset
+
+Axes definition in ALOHA.
+ 
+\begin_inset Formula $z$
+\end_inset
+
+ is the toroidal direction, 
+\begin_inset Formula $y$
+\end_inset
+
+ the poloidal direction and 
+\begin_inset Formula $x$
+\end_inset
+
+ the radial direction towards plasma.
+ 
+\begin_inset Formula $x=0$
+\end_inset
+
+ in the plane of the antenna mouth.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In ALOHA the coupling between waveguides and plasma is calculated in the
+ plane 
+\begin_inset Formula $x=0$
+\end_inset
+
+.
+ An account of the curvature of an antenna can be made with its scattering
+ matrix.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Antenna feeding
+\end_layout
+
+\begin_layout Standard
+In ALOHA, a LH antenna is described as an assembling of one or many modules.
+ Transmission lines which feed the antenna are supposed to be connected
+ to each module.
+ Thus, assuming that power input of an antenna is defined with a vector
+ 
+\begin_inset Formula $\mathbf{P}_{in}$
+\end_inset
+
+, size vector will be of the size 
+\begin_inset Formula $\left(1\times N_{mod}\right)$
+\end_inset
+
+ where 
+\begin_inset Formula $N_{mod}$
+\end_inset
+
+ is the total number of modules.
+ Amplitude and phase informations are required for each module, which means
+ that the vector 
+\begin_inset Formula $\mathbf{P}_{in}$
+\end_inset
+
+ may be complex valued.
+ 
+\end_layout
+
+\begin_layout Subsection
+Experimental feeding from Tore Supra database
+\end_layout
+
+\begin_layout Standard
+In Tore Supra, all builted LH antennas consisted in 2 rows of 8 modules.
+ Modules are indexed as illustrated in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Tore-Supra-module-description"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/ToreSupra_Modules_Description.png
+	lyxscale 80
+	width 80text%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Tore-Supra-module-description"
+
+\end_inset
+
+Tore Supra module indexing description as viewed from the plasma.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Tore Supra database signals for injected power are : 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+GPINJC1
+\family default
+
+\begin_inset Formula $(t,16)$
+\end_inset
+
+ : incident power in module 
+\begin_inset Formula $n=\left(1\ldots16\right)$
+\end_inset
+
+ for the first coupler in kW;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+GPINJC2
+\family default
+
+\begin_inset Formula $(t,16)$
+\end_inset
+
+ : incident power in module 
+\begin_inset Formula $n=\left(1\ldots16\right)$
+\end_inset
+
+ for the second coupler in kW;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+GPHIC1
+\family default
+ 
+\begin_inset Formula $(t,16)$
+\end_inset
+
+ : incident phase in module 
+\begin_inset Formula $n=\left(1\ldots16\right)$
+\end_inset
+
+ for the first coupler in degree;
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+GPHIC2
+\family default
+
+\begin_inset Formula $(t,16)$
+\end_inset
+
+ : incident phase in module 
+\begin_inset Formula $n=\left(1\ldots16\right)$
+\end_inset
+
+ for the second coupler in degree.
+\end_layout
+
+\begin_layout Standard
+Since in ALOHA, module indexing starts from the left to the right as view
+ from the plasma, the following reordering is made automatically when using
+ database signals:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+p_inc_mes = p_inc_mes([15 13 11 9 7 5 3 1 16 14 12 10 8 6 4 2]);
+\end_layout
+
+\end_inset
+
+which means that the 8 first values of 
+\family typewriter
+p_inc_mes
+\family default
+ correspond to upper module injected power and the 8 last values correspond
+ to lower modules.
+\end_layout
+
+\begin_layout Paragraph*
+Remark : 
+\end_layout
+
+\begin_layout Standard
+Each module consists in a multi-junction, which RF properties are different
+ due to the toroidal and poloidal curvatures of the antenna.
+ Thus, each module have its own scattering matrix.
+ Modules are referenced as in the following Table.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Antenna
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Module reference, Left to Right (view from plasma)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C2 (before flip) Top 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2H 1H 2H 1H 2H 1H 2H 1H 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2B 1B 2B 1B 2B 1B 2B 1B
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C2 (after flip) Top
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1B 2B 1B 2B 1B 2B 1B 2B 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1H 2H 1H 2H 1H 2H 1H 2H
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C3 Top
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24H 23H 22H 21H 14H 13H 12H 11H 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24B 23B 22B 21B 14B 13B 12B 11B
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C4 Top
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24H 23H 22H 21H 14H 13H 12H 11H 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24B 23B 22B 21B 14B 13B 12B 11B 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Tore Supra LH antenna modules reference.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Spectrum of the whole antenna
+\end_layout
+
+\begin_layout Standard
+Suppose that the whole antenna is composed by the two same half-antennas,
+ and that the electric fields in both antenna waveguides are the same.
+ Then the total electric and magnetric fields are :
+\begin_inset Formula 
+\begin{eqnarray}
+\mathbf{E}_{\mathrm{total}}(y,z) & = & \mathbf{E}(y-\frac{\Delta}{2},z)+\mathbf{E}(y+\frac{\Delta}{2},z)\\
+\mathbf{H}_{\mathrm{total}}(y,z) & = & \mathbf{H}(y-\frac{\Delta}{2},z)+\mathbf{H}(y+\frac{\Delta}{2},z)
+\end{eqnarray}
+
+\end_inset
+
+If we define fourier transform as :
+\begin_inset Formula 
+\begin{equation}
+\tilde{A}=\frac{1}{2\pi}\iint A(y,z)e^{jk_{y}y+jk_{z}z}dy\,dz
+\end{equation}
+
+\end_inset
+
+Then the fourier transform of the fields are :
+\begin_inset Formula 
+\begin{eqnarray}
+\tilde{\mathbf{E}}_{\mathrm{total}}(k_{y},k_{z}) & = & e^{-jk_{y}\frac{\Delta}{2}}\tilde{\mathbf{E}}(k_{y},k_{z})+e^{+jk_{y}\frac{\Delta}{2}}\tilde{\mathbf{E}}(k_{y},k_{z})\nonumber \\
+ & = & 2\cos\left(k_{y}\frac{\Delta}{2}\right)\tilde{\mathbf{E}}(k_{y},k_{z})
+\end{eqnarray}
+
+\end_inset
+
+The complex power spectrum, which is related to the product 
+\begin_inset Formula 
+\begin{equation}
+d\mathbf{P}_{\mathrm{total}}\equiv\mathbf{\tilde{E}}_{\mathrm{total}}\times\mathbf{\tilde{H}}_{\mathrm{total}}^{*}
+\end{equation}
+
+\end_inset
+
+can then be found in function of the spectrum of one half-antenna:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+d\mathbf{P}_{\mathrm{total}}=4\cos^{2}\left(k_{y}\frac{\Delta}{2}\right)d\mathbf{P}_{1/2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
