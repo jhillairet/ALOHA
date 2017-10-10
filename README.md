@@ -24,6 +24,12 @@ which have a strong attribution requirement (which goes much further than a simp
 Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
 
 
+## How to use the code ?
+The documentation of the code is located in the /doc directory, as a [LyX](http://www.lyx.org/) document. The .pdf version is also included and can be read [here](https://github.com/jhillairet/ALOHA/blob/master/doc/ALOHA_Manual.pdf). 
+
+The documentation has been made few years ago, so please let me know in case of any question on the code usage. 
+
+
 ## How to Contribute to the Code ?
 
 **ALOHA** uses the Fork + Pull collaborative development model. If this new to you, see github’s articles on  [forking](https://help.github.com/articles/fork-a-repo) and [pull requests](http://help.github.com/send-pull-requests/). 
