@@ -23,6 +23,12 @@ This licence is fully compatible with BSD-like licenses (BSD, X11, MIT)
 which have a strong attribution requirement (which goes much further than a simple copyright notice).
 Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
 
+## How to install the code ?
+The code is should work out-of-the-box on any Linux 64bits. In order to download the code, use git. On a Linux terminal:
+
+`
+ git clone git@github.com:jhillairet/ALOHA.git
+`
 
 ## How to use the code ?
 The documentation of the code is located in the /doc directory, as a [LyX](http://www.lyx.org/) document. The .pdf version is also included and can be read [here](https://github.com/jhillairet/ALOHA/blob/master/doc/ALOHA_Manual.pdf). 
