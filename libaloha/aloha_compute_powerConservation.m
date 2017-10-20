@@ -51,4 +51,4 @@ nu = Ptr_plasma_spectrum/sum(Ptr_plasma_RC);
 disp(aloha_message(['-> Ratio nu=Ptr_plasma_spectre/[(1-R)P_inc] = ',num2str(nu)]));
 
 % save values into the scenario
-scenario.results = aloha_setfield(scenario.results, Pin, Ptr_plasma_RC, Ptr_plasma_spectrum, nu);
+scenario.results = aloha_setfield([scenario.results], Pin, Ptr_plasma_RC, Ptr_plasma_spectrum, nu);

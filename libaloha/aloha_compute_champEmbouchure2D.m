@@ -156,5 +156,5 @@ for idx_wg = 1:nbre_guides
 end
 
 abs_z = zz;
-scenario.results = aloha_setfield(scenario.results, y, z, abs_z, EE, Ez_g, Ey, Ez, nbre_guides); 
+scenario.results = aloha_setfield([scenario.results], y, z, abs_z, EE, Ez_g, Ey, Ez, nbre_guides); 
 
