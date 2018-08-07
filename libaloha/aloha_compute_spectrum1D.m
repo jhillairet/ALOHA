@@ -237,7 +237,7 @@ end
     % MAJ JH Jullet 2009 :
     % Il y a un facteur 2 de trop ! 
     % On divise donc le spectre par 2.
-    % cela reviend certainement à supprimer les racines de 2 devant les poids des champs
+    % cela reviend certainement ?? supprimer les racines de 2 devant les poids des champs
     dP = -1/2*(k0/2/pi)^2 .* reshape((sum(E_spc,1).*conj(sum(H_spc,1))), length(ny), length(nz));
     dP_nz = dny*sum(dP);
 
@@ -246,5 +246,10 @@ end
     nz0 = nz(id_max_nz);
     disp(aloha_message(['Main n_z peak ("n_z0") : ', num2str(nz0)]));  
 
+    
+    
+    
+    
+    
 % save results into the scenario
-scenario.results = aloha_setfield(scenario.results, ny, nz, nz0, dny, dnz, dP, dP_nz); 
+scenario.results = aloha_setfield([scenario.results], ny, nz, nz0, dny, dnz, dP, dP_nz); 

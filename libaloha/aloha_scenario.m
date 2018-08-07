@@ -161,10 +161,11 @@ for idx_sc = 1:length(scenarios)
         otherwise
             error('Version_code not (correctly) defined !');
     end
-    scenario.options = aloha_setfield(scenario.options, chemin_binaire_fortran); 
+
+    scenario.options = aloha_setfield([scenario.options], chemin_binaire_fortran); 
     
     % Save plasma scattering parameters into the scenario
-    scenario.results = aloha_setfield(scenario.results, S_plasma, rac_Zhe, K_cpl); 
+    scenario.results = aloha_setfield([scenario.results], S_plasma, rac_Zhe, K_cpl); 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % voies passives et voies actives
@@ -178,7 +179,7 @@ for idx_sc = 1:length(scenarios)
     disp(aloha_message('Take into account Antenna Scattering matrices'));
     S_antenne;
      % save global antenna S parameters into the scenario
-    scenario.results = aloha_setfield(scenario.results, S_ant_11, S_ant_12, S_ant_21, S_ant_22);
+    scenario.results = aloha_setfield([scenario.results], S_ant_11, S_ant_12, S_ant_21, S_ant_22);
 
     
     
@@ -193,7 +194,7 @@ for idx_sc = 1:length(scenarios)
     disp(scenario.results.RC);    
     
     % save some constants into the scenario (for check purpose essentially)
-    scenario.results = aloha_setfield(scenario.results, k0);
+    scenario.results = aloha_setfield([scenario.results], k0);
 
     % show and save execution time
     disp(aloha_message(['Execution time : ', num2str(toc), ' s']));

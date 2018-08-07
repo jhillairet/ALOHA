@@ -19,12 +19,13 @@ PLAT =
 #  selected.  Define LOADER and LOADOPTS to refer to the loader
 #  and desired load options for your machine.
 #
-FORTRAN  = g95 -fimplicit-none -g
+FORTRAN  = gfortran -fimplicit-none -g #g95 -fimplicit-none -g
 OPTS     =
 DRVOPTS  = $(OPTS)
 NOOPT    =
-LOADER   = g95 -g
+LOADER   = gfortran -g#g95 -g
 LOADOPTS =
+
 #
 # Timer for the SECOND and DSECND routines
 #

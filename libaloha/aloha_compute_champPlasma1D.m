@@ -244,5 +244,5 @@ end
  
 
 % save resukts to the scenario
-scenario.results = aloha_setfield(scenario.results, x_coord, z_coord, Ez_x_z, Hy_x_z);
+scenario.results = aloha_setfield([scenario.results], x_coord, z_coord, Ez_x_z, Hy_x_z);
    
