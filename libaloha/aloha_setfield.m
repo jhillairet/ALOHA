@@ -19,10 +19,16 @@ function S = aloha_setfield(S, varargin)
 %      var1: 1
 %      var2: 0
 %      var3: 'test'
-%      
+%  
+% Since Matlab 2015b, there is a know incompatibility:  if the input 
+% argument contains a dot indexing, the output will be an empty char array
+% A workaround to this consists in wrapping the input argument with braces,
+% that is : aloha_setfield([structure.field], varargin)
+%    
 %  AUTOR: JH
 %  LAST UPDATE: 
 %   - 02/09/2008 creation
+%   - 20/10/2017 workaround for a know incompatibility since R2015b 
 %  
 
     for ind=1:length(varargin)

@@ -1,0 +1,1366 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ALOHA_1D" />
+		<Option pch_mode="2" />
+		<Option compiler="gfortran" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/ALOHA_1D" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+				<Compiler>
+					<Add option="-ffixed-form" />
+					<Add option="-ffree-form" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/ALOHA_1D" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="coupl_plasma_version6.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="libairy/Src/Fortran90/Drivers/test_install.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="libairy/Src/Fortran90/Src/airy_functions.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="libairy/Src/Fortran90/Src/test_install.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="libaloha/aloha_config.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="libaloha/aloha_constants.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="libaloha/aloha_function.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="libaloha/aloha_integration.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="libaloha/aloha_scattering_matrix_utils.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="libaloha/aloha_sgrill.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_double.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_double_dcomplex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_single.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_single_complex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_single_double.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_single_double_complex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f77_lapack_single_double_complex_dcomplex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_double.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_double_dcomplex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_single.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_single_complex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_single_double.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_single_double_complex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/f95_lapack_single_double_complex_dcomplex.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_auxmod.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgbtrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgeequ.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgees.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgeesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgeev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgeevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgegs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgegv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgels.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgels1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelsd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelsd1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelss.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelss1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelsx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelsx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelsy.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgelsy1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgerfs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgerfs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgesdd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgesv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgesv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgesvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgesvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgesvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgetrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgetri.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgetrs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgetrs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgges.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cggesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cggev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cggevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cggglm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgglse.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cggsvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgtsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgtsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgtsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cgtsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chbev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chbevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chbevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chbgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chbgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chbgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cheev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cheevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cheevr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cheevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chegst.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chegv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chegvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chegvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chesv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chesv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chesvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chesvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chetrd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_chpsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_clagge.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_clange.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_clange1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cpbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cpbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cpbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cpbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cposv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cposv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cposvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cposvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cpotrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cppsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cppsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cppsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cppsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cptsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cptsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cptsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cptsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cspsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cspsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cspsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cspsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csygst.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csygv.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csygvd.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csysv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csysv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csysvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csysvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_csytrd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_cungtr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgbtrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgeequ.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgees.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgeesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgeev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgeevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgegs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgegv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgels.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgels1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelsd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelsd1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelss.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelss1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelsx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelsx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelsy.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgelsy1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgerfs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgerfs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgesdd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgesv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgesv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgesvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgesvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgesvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgetrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgetri.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgetrs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgetrs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgges.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dggesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dggev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dggevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dggglm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgglse.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dggsvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgtsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgtsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgtsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dgtsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dlagge.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dlamch.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dlange.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dlange1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dorgtr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dpbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dpbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dpbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dpbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dposv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dposv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dposvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dposvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dpotrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dppsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dppsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dppsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dppsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dptsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dptsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dptsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dptsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsbev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsbevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsbevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsbgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsbgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsbgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dspsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dstev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dstevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dstevr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dstevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsyev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsyevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsyevr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsyevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsygst.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsygv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsygvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsygvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsysv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsysv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsysvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsysvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_dsytrd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_erinfo.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgbtrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgeequ.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgees.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgeesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgeev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgeevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgegs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgegv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgels.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgels1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelsd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelsd1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelss.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelss1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelsx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelsx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelsy.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgelsy1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgerfs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgerfs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgesdd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgesv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgesv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgesvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgesvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgesvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgetrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgetri.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgetrs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgetrs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgges.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sggesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sggev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sggevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sggglm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgglse.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sggsvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgtsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgtsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgtsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sgtsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_slagge.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_slamch.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_slange.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_slange1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sorgtr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_spbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_spbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_spbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_spbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sposv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sposv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sposvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sposvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_spotrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sppsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sppsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sppsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sppsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sptsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sptsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sptsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sptsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssbev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssbevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssbevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssbgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssbgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssbgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sspsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sstev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sstevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sstevr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_sstevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssyev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssyevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssyevr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssyevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssygst.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssygv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssygvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssygvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssysv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssysv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssysvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssysvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ssytrd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ws_gels.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_ws_gelss.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgbtrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgeequ.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgees.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgeesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgeev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgeevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgegs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgegv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgels.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgels1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelsd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelsd1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelss.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelss1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelsx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelsx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelsy.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgelsy1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgerfs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgerfs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgesdd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgesv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgesv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgesvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgesvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgesvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgetrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgetri.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgetrs.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgetrs1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgges.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zggesx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zggev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zggevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zggglm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgglse.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zggsvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgtsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgtsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgtsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zgtsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhbev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhbevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhbevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhbgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhbgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhbgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zheev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zheevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zheevr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zheevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhegst.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhegv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhegvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhegvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhesv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhesv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhesvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhesvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhetrd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpev.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpevd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpevx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpgv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpgvd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpgvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zhpsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zlagge.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zlange.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zlange1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zpbsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zpbsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zpbsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zpbsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zposv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zposv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zposvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zposvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zpotrf.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zppsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zppsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zppsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zppsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zptsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zptsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zptsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zptsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zspsv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zspsv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zspsvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zspsvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsygst.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsygv.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsygvd.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsysv.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsysv1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsysvx.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsysvx1.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zsytrd.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="liblapack95/SRC/la_zungtr.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="libquadpack/quadpack.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="libquadpack/quadpack_constants.f90">
+			<Option weight="0" />
+		</Unit>
+		<Extensions>
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
