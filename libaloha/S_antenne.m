@@ -44,7 +44,7 @@ for ind = 1:(nb_g_pol/nb_g_module_pol)*nb_modules_tor
       % otherwise if it has a .mat extension, load it a matlab matrix 
       load(nom);
       
-    elseif regexp(ext, '.s.p')
+    elseif regexp(ext, '.s\d*p')
       % touchstone file
       % Problem is : how many header lines does the file have ? Depends on the RF software which creates the file....
       %[S,f]=aloha_touchstone_read(nom, 1); % sometime doesn't work properly
