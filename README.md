@@ -27,7 +27,7 @@ Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informatio
 The code is should work out-of-the-box on any Linux 64bits. In order to download the code, use git. On a Linux terminal:
 
 `
- git clone git@github.com:jhillairet/ALOHA.git
+ git clone https://github.com/IRFM/ALOHA.git
 `
 
 ## How to use the code ?
