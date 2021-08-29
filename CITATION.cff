@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Hillairet"
+  given-names: "Julien"
+  orcid: "https://orcid.org/0000-0002-1073-6383"
+title: "ALOHA"
+url: "https://github.com/IRFM/ALOHA"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Hillairet"
+    given-names: "Julien"
+    orcid: "https://orcid.org/0000-0002-1073-6383"
+  - family-names: "Voyer"
+    given-names: "Damien"
+  - family-names: "Ekedahl"
+    given-names: "Annika"
+  - family-names: "Goniche"
+    given-names: "Marc"
+  - family-names: "Kazda"
+    given-names: "Michal"
+  - family-names: "Meneghini"
+    given-names: "Orso"
+  - family-names: "Milanesio"
+    given-names: "Daniele"
+  - family-names: "Preynas"
+    given-names: "Melanie"
+  doi: "10.1088/0029-5515/50/12/125010"
+  journal: "Nuclear Fusion"
+  url: "https://doi.org/10.1088/0029-5515/50/12/125010"
+  month: 11
+  title: "ALOHA: an Advanced LOwer Hybrid Antenna coupling code"
+  issue: 12
+  volume: 50
+  year: 2010
