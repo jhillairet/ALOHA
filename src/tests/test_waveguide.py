@@ -40,3 +40,4 @@ class WaveguideTests(unittest.TestCase):
                         assert np.isclose(wg.guided_wavelength(f0,m,n), wg_skrf.lambda_guide)
                         assert np.isclose(wg.phase_velocity(f0,m,n), wg_skrf.v_p)
                         assert np.isclose(wg.characteristic_impedance(f0,m,n,mode), wg_skrf.z0_characteristic)
+                        assert np.isclose(wg.characteristic_admittance(f0, m, n, mode), 1/wg_skrf.z0_characteristic)
