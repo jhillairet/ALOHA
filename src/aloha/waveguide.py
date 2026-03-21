@@ -1,6 +1,6 @@
 import numpy as np
 
-from aloha.constants import c, pi, mu_0, epsilon_0
+from aloha.constants import c, epsilon_0, mu_0, pi
 
 
 class Waveguide:
