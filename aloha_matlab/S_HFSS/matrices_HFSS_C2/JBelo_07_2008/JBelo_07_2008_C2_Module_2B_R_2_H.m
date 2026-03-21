@@ -11,4 +11,3 @@ S(1,:,:) = [   -5.773154E-002 +    2.398109E-003i,   -2.725723E-001 +    2.15444
 
 % modif JH 25/09/2008 : compatibilite avec ALOHA
 S = reshape(S,1,length(S)*length(S)); 
-

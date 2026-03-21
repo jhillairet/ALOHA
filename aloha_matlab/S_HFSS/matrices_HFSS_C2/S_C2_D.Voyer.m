@@ -53,5 +53,3 @@ S(6:9,6:9) = S(6:9,6:9)*exp(i*pi/2);
 S_test = S;
 
 S = reshape(S,1,length(S)*length(S)); 
-
-

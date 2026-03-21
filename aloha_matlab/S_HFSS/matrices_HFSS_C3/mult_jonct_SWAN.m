@@ -22,4 +22,3 @@ S_phase = [176.0900   91.3800 -178.6200  -89.6800    0.3200   92.1400 -177.8600
 S = S_module.*exp(i*S_phase*pi./180);
 
 S = reshape(S,1,length(S)*length(S)); 
-
