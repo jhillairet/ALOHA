@@ -2,14 +2,16 @@
 import unittest
 from glob import glob
 from pathlib import Path
+
 from aloha.antenna import Antenna
 
 ANTENNAS_DIR = Path(__file__).resolve().parent.parent.parent / "antennas"
 
+
 class TestAntenna(unittest.TestCase):
     def test_antenna_constructor(self):
         filename = ANTENNAS_DIR / "simple_antenna.toml"
-        ant = Antenna(filename)
+        Antenna(filename)
 
     def test_validate_antenna_files(self):
         """

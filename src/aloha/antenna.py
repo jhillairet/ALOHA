@@ -1,13 +1,17 @@
-import numpy as np
-import tomllib
 import os
+import tomllib
+
+import numpy as np
+
 from .constants import pi
 from .waveguide import Waveguide
 
-class Antenna(object):
+
+class Antenna:
     """
     ALOHA antenna description.
     """
+
     def __init__(self, filename: str | os.PathLike = None):
         """
         ALOHA antenna description.
