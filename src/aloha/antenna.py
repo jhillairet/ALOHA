@@ -12,7 +12,7 @@ class Antenna:
     ALOHA antenna description.
     """
 
-    def __init__(self, filename: str | os.PathLike = None):
+    def __init__(self, filename: str | os.PathLike = None) -> None:
         """
         ALOHA antenna description.
 
