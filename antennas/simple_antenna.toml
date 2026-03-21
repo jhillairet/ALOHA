@@ -1,0 +1,44 @@
+# 8 waveguides single row antenna
+name = "8 waveguides single row antenna"
+frequency = 3.7e9
+
+[modules]
+# nbre de lignes de guides poloidales
+nb_g_pol = 1
+
+# mettre autant de modules que de guides
+# nbre de modules sur une ligne poloidale
+nb_modules_tor = 8
+
+# nbre de guides par module dans le sens poloidal
+nb_g_module_pol = 1
+
+# nbre de guides par module ds le sens toroidal
+nb_g_module_tor = 1
+pass_module_tor = []
+
+# nbre de guides passifs entre les modules
+nb_g_passifs_inter_modules = 0
+# nbre de guides passifs sur chaque bord
+nb_g_passifs_bord = 0
+
+[waveguides]
+# espacement entre les grills juxtaposes poloidalement
+espacement_g_pol = 12e-3
+# hauteur des guides ds le sens poloidal
+a = 70e-3
+
+#antenne_standard = 1; # = 0 il faut decrire l'antenne sur une ligne : tableaux b et e
+#                      # = 1 parametres scalaires : b_g_actif, b_g_pass et e
+
+# largeur des guides actifs
+b_g_actif = 6.5e-3
+# largeur des guides passifs
+b_g_pass = nan
+# epaisseur des parois des guides dans le sens toroidal
+e = 1e-3
+# longueur du court-circuit (en lambda guidee);
+lcc = 0.25
+
+[sparameters]
+# matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
