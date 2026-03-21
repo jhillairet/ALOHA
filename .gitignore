@@ -4,3 +4,5 @@
 *.a
 *.old
 *.depend
+
+.idea/

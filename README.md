@@ -24,6 +24,7 @@ which have a strong attribution requirement (which goes much further than a simp
 Cf. the LICENSE file or https://en.wikipedia.org/wiki/CeCILL for more informations 
 
 ## How to install the code ?
+### Matlab
 The code is should work out-of-the-box on any Linux 64bits. In order to download the code, use git. On a Linux terminal:
 
 `
