@@ -8,22 +8,19 @@ from .waveguide import Waveguide
 
 
 class Antenna:
-    """
-    ALOHA antenna description.
-    """
-
     def __init__(self, filename: str | os.PathLike = None) -> None:
         """
         ALOHA antenna description.
 
         Parameters
         ----------
-        filename : str | os.PathLike
+        filename : str or Path
             Path to a TOML ALOHA antenna file.
 
         """
-        if filename:
-            self.antenna = self.load(filename)
+        if not filename:
+            return
+        self.antenna = self.load(filename)
 
     @classmethod
     def load(cls, filename: str | os.PathLike) -> dict:
@@ -32,8 +29,8 @@ class Antenna:
 
         Parameters
         ----------
-        filename : str
-            path to a TOML file.
+        filename : str or Path
+            Path to a TOML file.
 
         Returns
         -------

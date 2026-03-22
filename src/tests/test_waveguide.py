@@ -23,7 +23,8 @@ class WaveguideTests(unittest.TestCase):
         "Test various waveguide properties for a few modes"
         a, b = 76e-3, 14e-3
         f0 = 3.7e9
-        wg = Waveguide(a, b)
+        L = 50e-3
+        wg = Waveguide(a, b, L=L)
         # scikit-rf reference
         freq = Frequency(f0, f0, npoints=1, unit="Hz")
         for m in range(1, 3):
@@ -43,6 +44,9 @@ class WaveguideTests(unittest.TestCase):
                         assert np.isclose(wg.phase_velocity(f0, m, n), wg_skrf.v_p)
                         assert np.isclose(wg.characteristic_impedance(f0, m, n, mode), wg_skrf.z0_characteristic)
                         assert np.isclose(wg.characteristic_admittance(f0, m, n, mode), 1 / wg_skrf.z0_characteristic)
+                        assert np.isclose(wg.electric_length(f0, m, n), wg_skrf.electrical_length(L))
+                        # specify directly L
+                        assert np.isclose(wg.electric_length(f0, m, n, L=2 * L), wg_skrf.electrical_length(2 * L))
 
     def test_characteristic_admittance(self):
         """
