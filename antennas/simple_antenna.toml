@@ -1,0 +1,71 @@
+# 8 active Herewaveguides single row antenna
+# Each waveguide is fed independantly,
+# ie. each waveguide is an independant module.
+name = "8 waveguides single row antenna"
+frequency = 3.7e9
+
+# global description of the modules
+[global]
+# Number of modules per antenna in the toroidal direction. (nma_phi)
+nb_mod_phi = 8
+# Number of modules per antenna in the poloidal direction. (nma_theta)
+nb_mod_theta = 1
+# Position index of the modules in the following order: (ima)
+# 1) toroidal direction (from low phi to high phi,
+# ie. counter-clockwise when seen from above).
+# 2) poloidal direction (from low theta to high theta,
+# i.e. from bottom to top if the antenna is on LFS).
+idx_mod = [1, 2, 3, 4, 5, 6, 7, 8]
+# Spacing between toroidally neighboring modules [m] (sm_phi)
+spacing_btw_mod_phi = 0
+# Spacing between poloidally neighboring modules [m] (sm_theta)
+spacing_btw_mod_theta = 0
+
+# module description
+[module]
+# Number of waveguides per module in the poloidal direction. (passive and active) (nmw_theta)
+nb_wg_theta = 1
+# Number of waveguides per module in the toroidal direction. (passive and active) (nmw_phi)
+nb_wg_phi = 1
+# Mask of passive and active waveguides for an internal module
+# 1 for active -- 0 for passive.
+mask = [1]
+# Number of passive waveguide between modules in the toroidal direction. (npwbm_phi)
+nb_pwg_btw_mod_phi = 0
+# Number of passive waveguides on each antenna edge in the toroidal direction. (npwe_phi)
+nb_pwg_edge = 1
+# Spacing between poloidally neighboring waveguides [m] (sw_theta)
+space_btw_wg_theta = 12e-3
+# Height of waveguides in the poloidal direction [m] (hw_theta)
+wg_size_theta = 70e-3
+# Width of active waveguides [m] (bwa)
+# if scalar, same thickness for all waveguides
+awg_size_phi = 10e-3
+# Width of internal passive waveguides [m] (biwp)
+# if scalar, same thickness for all waveguides
+pwg_size_phi = 8e-3
+# Width of edge passive waveguides [m] (bewp)
+# if scalar, same thickness for all waveguides
+pwg_size_edge_phi = 8e-3
+# Thickness between waveguides in the toroidal direction [m]
+# if scalar, same thickness for all waveguides
+e_phi = 2e-3
+# Thickness between passive waveguides
+e_phi_pwg = 3e-3
+# Short circuit depth for passive waveguides in guided wavelegth
+# if scalar, same value for all passive waveguides (scl)
+pwg_depth = 0.25
+
+# S-parameters description
+[sparameters]
+# S-parameters file for each module
+filenames = ["S_elem", "S_elem", "S_elem", "S_elem", "S_elem", "S_elem", "S_elem", "S_elem"]
+# Phase deembedding for each module inputs
+phases_deembedded = [0, 0, 0, 0, 0, 0, 0, 0]
+
+# Antenna default power and phase excitations
+[excitation]
+# Default forward power for all modules [watt]
+magnitudes = [1, 1, 1, 1, 1, 1, 1, 1]
+# Default phase shifts for all modules [deg]
+phases = [0, 90, 180, 270, 0, 90, 180, 270]
