@@ -1,0 +1,82 @@
+# ALOHA scenario example
+#
+# This file contains all the parameters needed by ALOHA to run.
+comment = "Simple scenario example for ALOHA"
+
+# ------------------------------------------------------------------
+#   Antenna description
+# ------------------------------------------------------------------
+[antenna]
+# Antenna name. Should match an existing antenna name
+# in the antennas folder.
+file = "simple_antenna.toml"
+
+[antenna.excitation]
+# Antenna modules' excitations
+# source frequency [Hz]
+f = 3.7e9
+# Use experimental data from Tore Supra/WEST
+experimental = false
+
+# Forward power per module [W] (only if experimental = false)
+power = [1, 1, 1, 1, 1, 1, 1, 1]
+# Phase per module [deg] (only if experimental = false)
+phase = [0, 90, 180, 270, 0, 90, 180, 270]
+
+# Tore Supra/WEST port selection (only if experimental = true)
+# LH1 in "Q6A", LH2 in "Q6B"
+port = "Q6B"
+# Tore Supra/WEST pulse number (only if experimental = true)
+pulse = 45155
+# Time window [start, stop] for averaging experimental data [s] (only if experimental = true)
+avg_times = [7, 8]
+
+
+# ------------------------------------------------------------------
+#   Plasma description
+# ------------------------------------------------------------------
+[plasma]
+# Solver type: "spectral_1D", "spectral_2D", "FEM_1D", "FEM_2D"
+solver = "spectral_1D"
+
+[plasma.spectral_1D]
+# profile type: 'linear', 'bilinear', 'experimental
+profile = 'bilinear'
+
+# Number of evanescent modes added to the propagating modes in the waveguides
+nb_evanescent_modes = 2
+
+[plasma.spectral_1D.bilinear]
+# vacuum gap width between the antenna and the first layer of the plasma [m]
+d_vide = 0.0
+# edge density [1/m^3]
+ne0 = 5e17
+# gradients scrape-off lengths [m]
+lambda_n = [0.002, 0.02]
+# width of the first plasma layer [m]
+d_couche = 0.002
+# toroidal magnetic field at the antenna mouth [T]
+B0 = 2.95
+# Use same density profile for each rows of waveguides
+identical_profiles = true
+# spectral domain
+nz_min = -20
+nz_max = 20
+dnz = 0.01
+ny_min = -2
+ny_max = 2
+dny = 0.1
+# spatial domain
+z_min = -0.015
+z_max = 0.075
+nb_z = 60
+x_max = 0.05
+nb_x = 8
+
+
+# ------------------------------------------------------------------
+#   Options
+# ------------------------------------------------------------------
+[options]
+# ALOHA options
+debug = false
