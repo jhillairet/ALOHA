@@ -23,6 +23,8 @@ class TestAntenna(unittest.TestCase):
         """
         Validation of the TOML schema of all the pre-defined antennas.
         """
+        # Check if some fields are in the antenna description
+        # Some logic (number of modules, etc) is tested when creating an Antenna object.
         values = ["name", "frequency", "global", "module", "sparameters"]
 
         antenna_filenames = glob("*.toml", root_dir=ANTENNAS_DIR)
