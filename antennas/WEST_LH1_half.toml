@@ -2,78 +2,55 @@
 name = "Tore Supra/WEST C3/LH1 antenna (half)"
 frequency = 3.7e9
 
-[modules]
+# global description of the modules
+[global]
 # Number of modules per antenna in the poloidal direction.
 nma_theta = 1
 # Number of modules per antenna in the toroidal direction.
 nma_phi = 8
-
-# Position index of the module in the poloidal direction (from low theta to high theta,
-# i.e. from bottom to top if the antenna is on LFS).
-ima_theta = [1, 1, 1, 1, 1, 1, 1, 1]
-
-# Position index of the module in the toroidal direction (from low phi to high phi,
+# Position index of the modules in the followinf order:
+# 1) toroidal direction (from low phi to high phi,
 # ie. counter-clockwise when seen from above).
-# numbering in ALOHA goes from left to right as view from the plasma.
-ima_phi = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+# 2) poloidal direction (from low theta to high theta,
+# i.e. from bottom to top if the antenna is on LFS).
+ima = [1, 2, 3, 4, 5, 6, 7, 8]
 
+# Spacing between toroidally neighboring modules [m]
+sm_phi = 0
 # Spacing between poloidally neighboring modules [m]
 sm_theta = 0
 
-[waveguides]
-# Number of waveguides per module in the poloidal direction. (passive and active)
-nwm_theta = 3
-
+# module description
+[module]
 # Number of waveguides per module in the toroidal direction. (passive and active)
 nwm_phi = 6
-
+# Number of waveguides per module in the poloidal direction. (passive and active)
+nwm_theta = 3
 # Mask of passive and active waveguides for an internal module
 # 1 for active -- 0 for passive.
 mask = [1, 1, 1, 1, 1, 1]
-
 # Number of passive waveguide between modules in the toroidal direction.
 npwbm_phi = 1
-
 # Number of passive waveguides on each antenna edge in the toroidal direction.
 npwe_phi = 1
-
 # Spacing between poloidally neighboring waveguides [m]
 sw_theta = 12e-3
-
 # Height of waveguides in the poloidal direction [m]
 hw_theta = 70e-3
-
 # Width of active waveguides [m]
 bwa = 8e-3
-
 # Width of internal passive waveguides [m]
 biwp = 6.5e-3
-
 # Width of edge passive waveguides [m]
 bewp = 6.5e-3
-
 # Thickness between waveguides in the toroidal direction [m]
-# Reminder : length(e_phi) = nma_phi*nwm_phi + (nma_phi - 1)*npwbm_phi + 2*npwe_phi - 1
-e = 2e-3  # between active waveguides
-e_pwg = 3e-3  # between passive waveguides
-
-#e_aw = [e, e, e, e, e]
-#e_mod = [e_pwg e_aw e_pwg];
-#waveguides.e_phi = repmat(e_mod, 1, 8);
-
-# Short circuit length for passive waveguides [m]
-# Reminder : length(scl) = nma_phi*npwm_phi + (nma_phi - 1)*npwbm_phi + 2*npwe_phi
-#nscl = waveguides.npwbm_phi*(modules.nma_phi-1) + ...
-#       waveguides.npwe_phi*2 + ...
-#       sum(not(waveguides.mask))*modules.nma_phi
-#waveguides.scl = repmat(1/4, 1, nscl)
+e_phi = 2e-3  # between active waveguides
+# Thicness between passive waveguides
+e_phi_pwg = 3e-3
+# Short circuit depth for passive waveguides in guided wavelegth
+scl = [0.25]
 
 [sparameters]
-# Modules Scattering parameters
-# matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
-sparams_pathFrom = "."
-sparams_pathTo = "S_HFSS/matrices_HFSS_C3"
-
 # modules C3
 # La modelisation HFSS de l'antenne debute au voisinage du CM.
 # Pour prendre en compte le dephasage entre la mesure de phase et le debut de la modelisation HFSS
@@ -115,7 +92,7 @@ sparams_pathTo = "S_HFSS/matrices_HFSS_C3"
 #  modules.Sparameters.SFileNames = ['S_C3_24h';'S_C3_23h';'S_C3_22h';'S_C3_21h';'S_C3_14h';'S_C3_13h';'S_C3_12h';'S_C3_11h'];
 #  phase_rallonge = (pi/180)*[17-168.6; 11+154.7; 1+130; 15+118.7; 16+113.3; 22+117.9; 17+132.6; 15+164.3];
 
-sparams_filenames = ['S_C3_24b', 'S_C3_23b', 'S_C3_22b', 'S_C3_21b', 'S_C3_14b', 'S_C3_13b', 'S_C3_12b', 'S_C3_11b']
+filenames = ['S_C3_24b', 'S_C3_23b', 'S_C3_22b', 'S_C3_21b', 'S_C3_14b', 'S_C3_13b', 'S_C3_12b', 'S_C3_11b']
 
 
 ## Phase deembedding
@@ -124,24 +101,11 @@ sparams_filenames = ['S_C3_24b', 'S_C3_23b', 'S_C3_22b', 'S_C3_21b', 'S_C3_14b',
 # This is only usefull when using input data from experiments.
 # modules.Sparameters.phase_deembedded = zeros(nma_phi,1);
 # in degrees
-#sparams_phase_deembedded = [0-166.44, -5.5+160.9, 8+135.3, 14+122, 8.5+116.1, 20+131.2, 10+139.8, 20+166.9]
+phases_deembedded = [-166.44, 155.4, 143.3, 136, 124.6, 151.2, 149.8, 186.9]
 
-## --------------------------------
-## Other antenna_lh CPO parameters
-## --------------------------------
-## Not defined here in ALOHA
-#  Plasma edge characteristics in front of the antenna.
-antenna_lh.plasmaedge = []
-
-#  Amplitude of the TE10 mode injected in the module [W], Matrix (nantenna_lh,max_nmodules). Time-dependent
-#modules.amplitude = sqrt(4.0320e6/16)*ones(modules.nma_phi,1)
-
-#  Phase of the TE10 mode injected in the module [rd], Matrix (nantenna_lh, max_nmodules). Time-dependent
-# in degrees
-#modules.phase = -90*(0:modules.nma_phi-1)
-
-## Not used at all in ALOHA -
-#  Reference global antenna position. Vectors (nantenna_lh). Time-dependent
-antenna_lh.position = []
-#  Beam characteristics
-antenna_lh.beam = []
+# Antenna default power and phase excitations
+[excitation]
+# Default forward power for all modules [watt]
+magnitudes = [1, 1, 1, 1, 1, 1, 1, 1]
+# Default phase shifts for all modules [deg]
+phases = [0, 90, 180, 270, 0, 90, 180, 270]

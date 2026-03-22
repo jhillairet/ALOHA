@@ -23,7 +23,7 @@ class TestAntenna(unittest.TestCase):
         """
         Validation of the TOML schema of all the pre-defined antennas.
         """
-        values = ["name", "frequency", "modules", "waveguides", "sparameters"]
+        values = ["name", "frequency", "global", "module", "sparameters"]
 
         antenna_filenames = glob("*.toml", root_dir=ANTENNAS_DIR)
         for antenna_filename in antenna_filenames:
