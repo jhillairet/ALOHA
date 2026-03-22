@@ -68,4 +68,5 @@ line-ending = "auto"
 testpaths = [
     "src", "doc"
 ]
-addopts = "--cov=aloha --ignore-glob='*.ipynb_checkpoints'"
+# warning: coverage makes PyCharm not stop at breakpoints
+addopts = "--ignore-glob='*.ipynb_checkpoints'"
