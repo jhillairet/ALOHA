@@ -1,12 +1,13 @@
 import os
 import pathlib
-import sys
 
 # Use tomllib for Python 3.11+, tomli for earlier versions
 try:
     import tomllib
 except ModuleNotFoundError:
     import tomli as tomllib
+
+from aloha.utils import load_matlab_mat_file, load_matlab_scenario_file
 
 
 class Scenario:
@@ -54,8 +55,40 @@ class Scenario:
         return str(self.scenario)
 
     @classmethod
-    def from_matlab(cls, filename) -> dict:
-        """Load scenario from an ALOHA matlab file."""
+    def from_matlab(cls, filename: str | os.PathLike) -> tuple[dict, dict]:
+        """
+        Load scenario from an ALOHA MATLAB file (.m or .mat).
+
+        Parameters
+        ----------
+        filename : str | os.PathLike
+            Path to a MATLAB file (.m script or .mat binary file).
+
+        Returns
+        -------
+        tuple[dict, dict]
+            A tuple containing:
+            - scenario_dict: Dictionary following the TOML schema used in scenario_example.toml
+            - results_dict: Dictionary containing results if available, otherwise empty dict
+
+        Raises
+        ------
+        ValueError
+            If the file extension is not .m or .mat, or if scipy is required but not available.
+        FileNotFoundError
+            If the file does not exist.
+        """
+        filepath = pathlib.Path(filename)
+
+        if not filepath.exists():
+            raise FileNotFoundError(f"MATLAB file not found: {filepath}")
+
+        if filepath.suffix.lower() == ".mat":
+            return load_matlab_mat_file(filepath)
+        elif filepath.suffix.lower() == ".m":
+            return load_matlab_scenario_file(filepath)
+        else:
+            raise ValueError(f"Unsupported file format: {filepath.suffix}. Expected .m or .mat")
 
     def run(self) -> None:
         """
