@@ -1,0 +1,46 @@
+comment = "8 active waveguides simple antenna"
+
+[antenna]
+file = "antenna_8_active_waveguides"
+
+[antenna.excitation]
+f = 3700000000.0
+experimental = false
+power = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+phase = [0.0, 90.0, 180.0, 270.0, 360.0, 450.0, 540.0, 630.0]
+port = ""
+pulse = nan
+avg_times = nan
+
+
+[plasma]
+solver = "spectral_1D"
+
+[plasma.spectral_1D]
+profile = "bilinear"
+nb_evanescent_modes = 2
+nz_min = -20
+nz_max = 20
+dnz = 0.01
+ny_min = -2
+ny_max = 2
+dny = 0.1
+z_min = -0.015
+z_max = 0.075
+nb_z = 60
+x_max = 0.05
+nb_x = 8
+
+[plasma.spectral_1D.bilinear]
+identical_profiles = true
+ne0 = 5e+17
+lambda_n = [0.002]
+plasma_layer_length = 0.002
+d_couche = 0.002
+B0 = 2.95
+vacuum_layer_length = 0.0
+d_vide = 0.0
+infinite_waveguide = false
+
+[options]
+debug = false

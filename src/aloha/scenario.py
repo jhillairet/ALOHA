@@ -463,19 +463,25 @@ class Scenario:
         # Start with the scenario dictionary
         toml_lines = []
 
-        # Add comment if present (handle both string and list)
+        # Add comment at the beginning of the file
+        # Use empty string if no comment is found in the scenario
+        comment_value = ""
         if "comment" in self.scenario:
             comment = self.scenario["comment"]
             if isinstance(comment, list):
-                # Handle list of comments (MATLAB style)
-                non_empty_comments = [line for line in comment if line.strip()]
+                # Handle list of comments (MATLAB style) - convert all elements to strings
+                non_empty_comments = [str(line) for line in comment if str(line).strip()]
                 if non_empty_comments:
-                    for comment_line in non_empty_comments:
-                        toml_lines.append(f"# {comment_line}")
-                    toml_lines.append("")
-            elif comment.strip():
-                toml_lines.append(f"# {comment}")
-                toml_lines.append("")
+                    comment_value = " ".join(non_empty_comments)
+            elif isinstance(comment, str) and comment.strip():
+                comment_value = comment
+
+        # Always add a comment at the beginning
+        if comment_value.strip():
+            toml_lines.append(f"# {comment_value}")
+        else:
+            toml_lines.append("# ALOHA scenario")
+        toml_lines.append("")
 
         # Convert the scenario dictionary to TOML (excluding comment which is handled separately)
         scenario_data = {k: v for k, v in self.scenario.items() if k != "comment"}
