@@ -155,7 +155,9 @@ class Scenario:
                 architecture_str = architecture
             # Map MATLAB antenna names to TOML file names
             antenna_name_mapping = {
-                "antenne_elementaire": "simple_antenna.toml",
+                "antenne_elementaire": "8_active_waveguides.toml",
+                "tutorial_aloha_antenna_simple_grill_8waveguides": "8_active_waveguides.toml",
+                "antenna_8_active_waveguides": "8_active_waveguides.toml",
                 # Add more mappings as needed
             }
             antenna["file"] = antenna_name_mapping.get(architecture_str, architecture_str)
@@ -588,11 +590,22 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
             from aloha.antenna import Antenna
 
             # Try to find the antenna file in the antennas directory
+            # Try both .toml and .m extensions
             antenna_paths = [
                 Path(antenna_file),  # Try as-is
                 Path(__file__).parent.parent / "antennas" / antenna_file,  # Try in antennas directory
                 Path(__file__).parent.parent.parent / "antennas" / antenna_file,  # Try in parent antennas directory
             ]
+
+            # Also try with .m extension (for MATLAB antenna files)
+            if not any(path.exists() for path in antenna_paths):
+                antenna_paths.extend(
+                    [
+                        Path(f"{antenna_file}.m"),
+                        Path(__file__).parent.parent / "antennas" / f"{antenna_file}.m",
+                        Path(__file__).parent.parent.parent / "antennas" / f"{antenna_file}.m",
+                    ]
+                )
 
             for path in antenna_paths:
                 if path.exists():
@@ -627,31 +640,41 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     # Convert to arrays for multiple poloidal rows
     nb_g_pol = 1  # Default, will be calculated from antenna layout
 
+    # Initialize antenna layout parameters with defaults
+    nb_mod_phi = 1  # Number of modules in toroidal direction
+    nb_mod_theta = 1  # Number of modules in poloidal direction
+
     # Extract antenna layout parameters
     layout = antenna_data.get("layout", {})
     if layout:
-        nb_mod_phi = layout.get("nb_mod_phi", 1)  # Number of modules in toroidal direction
-        nb_mod_theta = layout.get("nb_mod_theta", 1)  # Number of modules in poloidal direction
+        nb_mod_phi = layout.get("nb_mod_phi", nb_mod_phi)
+        nb_mod_theta = layout.get("nb_mod_theta", nb_mod_theta)
         nb_g_pol = nb_mod_theta  # Number of poloidal rows
 
+    # Initialize module parameters with defaults
+    nb_wg_theta = 1  # Number of waveguides per module in poloidal direction
+    nb_wg_phi = 1  # Number of waveguides per module in toroidal direction
+    mask = [1]  # Mask of active/passive waveguides
+    nb_pwg_btw_mod_phi = 0  # Number of passive waveguides between modules
+    nb_pwg_edge = 1  # Number of passive waveguides on each edge
+
     module = antenna_data.get("module", {})
-    nb_wg_theta = module.get("nb_wg_theta", 1)  # Number of waveguides per module in poloidal direction
-    nb_wg_phi = module.get("nb_wg_phi", 1)  # Number of waveguides per module in toroidal direction
-    mask = module.get("mask", [1])  # Mask of active/passive waveguides
-    nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", 0)  # Number of passive waveguides between modules
-    nb_pwg_edge = module.get("nb_pwg_edge", 1)  # Number of passive waveguides on each edge
+    if module:
+        nb_wg_theta = module.get("nb_wg_theta", nb_wg_theta)
+        nb_wg_phi = module.get("nb_wg_phi", nb_wg_phi)
+        mask = module.get("mask", mask)
+        nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", nb_pwg_btw_mod_phi)
+        nb_pwg_edge = module.get("nb_pwg_edge", nb_pwg_edge)
 
     # Calculate total number of waveguides per poloidal row
-    # Active waveguides: nb_mod_phi * nb_wg_phi * (sum of mask)
-    # Plus passive waveguides
-    active_wg_per_row = nb_mod_phi * nb_wg_phi * sum(mask)
-    passive_wg_between = nb_mod_phi * nb_pwg_btw_mod_phi
-    passive_wg_edges = 2 * nb_pwg_edge
-    nb_g_total_ligne = active_wg_per_row + passive_wg_between + passive_wg_edges
+    # Using the MATLAB formula: nb_g_total_ligne = nb_wg_phi * nb_mod_phi + 2 * nb_pwg_edge
+    # + nb_pwg_btw_mod_phi * (nb_mod_phi - 1)
+    # This matches the waveguide logic in aloha_utils_getAntennaCoordinates.m
+    nb_g_total_ligne = nb_wg_phi * nb_mod_phi + 2 * nb_pwg_edge + nb_pwg_btw_mod_phi * (nb_mod_phi - 1)
 
-    # Waveguide dimensions
-    awg_size_phi = module.get("awg_size_phi", 10e-3)  # Width of active waveguides [m]
+    # Waveguide dimensions from antenna module parameters
     wg_size_theta = module.get("wg_size_theta", 70e-3)  # Height of waveguides in poloidal direction [m]
+    awg_size_phi = module.get("awg_size_phi", 10e-3)  # Width of active waveguides [m]
 
     # For version 6, we need to provide arrays for each poloidal row
     # Convert scalar values to arrays with length nb_g_pol
@@ -661,10 +684,17 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     dne1_array = [ne0 / lambda_n[1] if lambda_n and len(lambda_n) > 1 else 0.0] * nb_g_pol
     d_vide_array = [vacuum_layer_length] * nb_g_pol
 
-    # Waveguide parameters
-    a = awg_size_phi  # Waveguide width parameter [m]
-    b = [wg_size_theta] * nb_g_total_ligne  # Waveguide height parameters [m]
-    z = [0.0] * nb_g_total_ligne  # Waveguide position parameters [m] (simplified)
+    # Waveguide parameters using MATLAB waveguide logic from aloha_utils_getAntennaCoordinates.m
+    # a = waveguide height in poloidal direction (constant for all waveguides in a line)
+    a = wg_size_theta
+
+    # b = array of waveguide widths in toroidal direction
+    # For version 6, use active waveguide width for all waveguides (simplified)
+    b = [awg_size_phi] * nb_g_total_ligne
+
+    # z = array of waveguide positions in toroidal direction
+    # For version 6, use simplified positions starting from 0
+    z = [0.0] * nb_g_total_ligne
 
     # Other parameters (using typical defaults for version 6)
     T_grill = 1.0  # Grill periodicity parameter

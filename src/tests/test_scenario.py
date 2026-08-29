@@ -94,7 +94,7 @@ class TestScenario(unittest.TestCase):
 
         # Check antenna file mapping
         self.assertIn("file", antenna)
-        self.assertEqual(antenna["file"], "simple_antenna.toml")
+        self.assertEqual(antenna["file"], "8_active_waveguides.toml")
 
         # Check excitation parameters
         self.assertIn("excitation", antenna)
@@ -273,6 +273,103 @@ class TestScenario(unittest.TestCase):
         # Check that both have the same spectral_1D profile
         self.assertEqual(
             m_scenario["plasma"]["spectral_1D"]["profile"], mat_scenario["plasma"]["spectral_1D"]["profile"]
+        )
+
+    def test_run_method_consistency_across_file_formats(self):
+        """Test that run() method generates the same results for scenarios from different file formats."""
+        import numpy as np
+
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+
+        # Check if the Fortran binary exists before running tests
+        from aloha.plasma import get_binary_path
+
+        binary_path = get_binary_path(6, "glnxa64")
+        if not binary_path.exists():
+            self.skipTest(f"Fortran binary not found: {binary_path}")
+
+        # Create scenarios from different file formats
+        scenario_from_toml = Scenario.from_file(toml_file)
+        scenario_from_mat = Scenario.from_matlab(mat_file)
+        scenario_from_m = Scenario.from_matlab(m_file)
+
+        # Run each scenario to generate results
+        try:
+            scenario_from_toml.run()
+            scenario_from_mat.run()
+            scenario_from_m.run()
+        except RuntimeError as e:
+            if "Binary execution failed" in str(e):
+                self.skipTest(f"Fortran binary execution failed: {e}")
+            else:
+                raise
+
+        # Verify all scenarios have results
+        self.assertIn("S_plasma", scenario_from_toml.results)
+        self.assertIn("rac_Zhe", scenario_from_toml.results)
+        self.assertIn("S_plasma", scenario_from_mat.results)
+        self.assertIn("rac_Zhe", scenario_from_mat.results)
+        self.assertIn("S_plasma", scenario_from_m.results)
+        self.assertIn("rac_Zhe", scenario_from_m.results)
+
+        # Compare S_plasma matrices
+        S_plasma_toml = scenario_from_toml.results["S_plasma"]
+        S_plasma_mat = scenario_from_mat.results["S_plasma"]
+        S_plasma_m = scenario_from_m.results["S_plasma"]
+
+        # Check shapes are the same
+        self.assertEqual(
+            S_plasma_toml.shape,
+            S_plasma_mat.shape,
+            f"S_plasma shape mismatch: TOML={S_plasma_toml.shape}, MAT={S_plasma_mat.shape}",
+        )
+        self.assertEqual(
+            S_plasma_toml.shape,
+            S_plasma_m.shape,
+            f"S_plasma shape mismatch: TOML={S_plasma_toml.shape}, M={S_plasma_m.shape}",
+        )
+
+        # Compare rac_Zhe matrices
+        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
+        rac_Zhe_mat = scenario_from_mat.results["rac_Zhe"]
+        rac_Zhe_m = scenario_from_m.results["rac_Zhe"]
+
+        # Check shapes are the same
+        self.assertEqual(
+            rac_Zhe_toml.shape,
+            rac_Zhe_mat.shape,
+            f"rac_Zhe shape mismatch: TOML={rac_Zhe_toml.shape}, MAT={rac_Zhe_mat.shape}",
+        )
+        self.assertEqual(
+            rac_Zhe_toml.shape,
+            rac_Zhe_m.shape,
+            f"rac_Zhe shape mismatch: TOML={rac_Zhe_toml.shape}, M={rac_Zhe_m.shape}",
+        )
+
+        # Compare values with tolerance (due to potential numerical differences)
+        np.testing.assert_allclose(
+            S_plasma_toml,
+            S_plasma_mat,
+            rtol=1e-10,
+            atol=1e-10,
+            err_msg="S_plasma values differ between TOML and MAT files",
+        )
+        np.testing.assert_allclose(
+            S_plasma_toml, S_plasma_m, rtol=1e-10, atol=1e-10, err_msg="S_plasma values differ between TOML and M files"
+        )
+
+        np.testing.assert_allclose(
+            rac_Zhe_toml,
+            rac_Zhe_mat,
+            rtol=1e-10,
+            atol=1e-10,
+            err_msg="rac_Zhe values differ between TOML and MAT files",
+        )
+        np.testing.assert_allclose(
+            rac_Zhe_toml, rac_Zhe_m, rtol=1e-10, atol=1e-10, err_msg="rac_Zhe values differ between TOML and M files"
         )
 
 
