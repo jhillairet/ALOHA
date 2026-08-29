@@ -43,6 +43,21 @@ class TestScenario(unittest.TestCase):
         with self.assertRaises(ValueError):
             Scenario(123)
 
+    def test_scenario_constructor_matlab_files(self):
+        """Test that the constructor can handle .m and .mat files directly."""
+        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
+
+        # Test .m file
+        scenario_from_m = Scenario(m_file)
+        self.assertIsInstance(scenario_from_m, Scenario)
+        self.assertTrue(scenario_from_m.scenario)
+
+        # Test .mat file
+        scenario_from_mat = Scenario(mat_file)
+        self.assertIsInstance(scenario_from_mat, Scenario)
+        self.assertTrue(scenario_from_mat.scenario)
+
     def test_parse_matlab_scenario_scripts(self):
         """Test parsing antenna_8_active_waveguides.m file."""
         m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "antenna_8_active_waveguides.m"
@@ -193,8 +208,8 @@ class TestScenario(unittest.TestCase):
         """Test that reading MATLAB scenario, saving to TOML, and reading back produces the same scenario dictionary."""
         m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
 
-        # Step 1: Read the MATLAB scenario using from_matlab method
-        scenario_obj = Scenario.from_matlab(m_file)
+        # Step 1: Read the MATLAB scenario using constructor
+        scenario_obj = Scenario(m_file)
 
         # Step 2: Save the scenario to a temporary TOML file
         with tempfile.NamedTemporaryFile(mode="w", suffix=".toml", delete=False) as tmp_file:
@@ -221,9 +236,9 @@ class TestScenario(unittest.TestCase):
         m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
         mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
 
-        # Load both files using from_matlab
-        scenario_from_m = Scenario.from_matlab(m_file)
-        scenario_from_mat = Scenario.from_matlab(mat_file)
+        # Load both files using constructor
+        scenario_from_m = Scenario(m_file)
+        scenario_from_mat = Scenario(mat_file)
 
         # Verify both are Scenario objects
         self.assertIsInstance(scenario_from_m, Scenario)
@@ -293,8 +308,8 @@ class TestScenario(unittest.TestCase):
 
         # Create scenarios from different file formats
         scenario_from_toml = Scenario.from_file(toml_file)
-        scenario_from_mat = Scenario.from_matlab(mat_file)
-        scenario_from_m = Scenario.from_matlab(m_file)
+        scenario_from_mat = Scenario(mat_file)
+        scenario_from_m = Scenario(m_file)
 
         # Run each scenario to generate results
         try:

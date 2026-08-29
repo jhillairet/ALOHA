@@ -24,7 +24,7 @@ class Scenario:
     Parameters
     ----------
     scenario: str | path | dict or None (default)
-        Path to a scenario file (TOML format), or dictionary containing scenario inputs.
+        Path to a scenario file (TOML, .m, or .mat format), or dictionary containing scenario inputs.
 
     """
 
@@ -33,7 +33,20 @@ class Scenario:
         self.scenario = {}
         self.results = {}
         if isinstance(scenario, (str, os.PathLike)):
-            self.scenario = self.load(scenario)
+            filepath = pathlib.Path(scenario)
+            if filepath.suffix.lower() in (".m", ".mat"):
+                # Handle MATLAB files directly in constructor
+                if filepath.suffix.lower() == ".mat":
+                    matlab_scenario, results_dict = load_mat_file(filepath)
+                else:  # .m file
+                    matlab_scenario, results_dict = load_m_file(filepath)
+
+                # Convert the MATLAB scenario to the TOML schema
+                self.scenario = self.convert_matlab_scenario(matlab_scenario)
+                self.results = results_dict
+            else:
+                # Assume TOML file
+                self.scenario = self.load(scenario)
         elif isinstance(scenario, dict):
             # TODO : verify that the passed dictionary is relevant
             self.scenario = scenario
