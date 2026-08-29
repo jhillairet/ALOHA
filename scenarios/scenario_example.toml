@@ -48,17 +48,21 @@ nb_evanescent_modes = 2
 
 [plasma.spectral_1D.bilinear]
 # vacuum gap width between the antenna and the first layer of the plasma [m]
-d_vide = 0.0
+vacuum_layer_length = 0.0
 # edge density [1/m^3]
 ne0 = 5e17
 # gradients scrape-off lengths [m]
 lambda_n = [0.002, 0.02]
 # width of the first plasma layer [m]
-d_couche = 0.002
+plasma_layer_length = 0.002
 # toroidal magnetic field at the antenna mouth [T]
 B0 = 2.95
 # Use same density profile for each rows of waveguides
 identical_profiles = true
+# field normalization convention.
+# False for infinite poloidal waveguide (SWAN code)
+# True for finite poloidal waveguide (ALOHA code)
+infinite_waveguide = true
 # spectral domain
 nz_min = -20
 nz_max = 20
@@ -72,7 +76,6 @@ z_max = 0.075
 nb_z = 60
 x_max = 0.05
 nb_x = 8
-
 
 # ------------------------------------------------------------------
 #   Options
