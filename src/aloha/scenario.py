@@ -500,6 +500,196 @@ class Scenario:
         """
         Run ALOHA scenario.
 
+        This method executes the appropriate plasma coupling calculation based on the
+        scenario configuration. Currently, it only supports spectral_1D solver with
+        bilinear profile (version 6).
         """
-        # TODO: run options, like logging levels, etc.
-        pass
+        # Check if we have plasma configuration
+        if "plasma" not in self.scenario:
+            raise ValueError("Scenario must contain a 'plasma' section to run")
+
+        plasma = self.scenario["plasma"]
+        solver = plasma.get("solver", "")
+
+        # Only proceed if solver is spectral_1D
+        if solver == "spectral_1D":
+            spectral_1D = plasma.get("spectral_1D", {})
+            if not spectral_1D:
+                raise ValueError("spectral_1D section is required in plasma for spectral_1D solver")
+
+            profile = spectral_1D.get("profile", "")
+
+            # Only run S_plasma_1D if profile is bilinear (version 6)
+            if profile == "bilinear":
+                from aloha.plasma import S_plasma_1D
+
+                # Execute the plasma coupling calculation
+                S_plasma, rac_Zhe = S_plasma_1D(self)
+
+                # Store results in the scenario
+                self.results["S_plasma"] = S_plasma
+                self.results["rac_Zhe"] = rac_Zhe
+
+                return
+            else:
+                raise ValueError(
+                    f"Unsupported plasma profile '{profile}' for spectral_1D solver. Only 'bilinear' is supported."
+                )
+        else:
+            raise ValueError(f"Unsupported solver '{solver}'. Only 'spectral_1D' is currently supported.")
+
+
+def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
+    """
+    Convert a Scenario object from TOML schema to MATLAB-style parameter dictionary.
+
+    This function maps the TOML schema parameters to the MATLAB-style parameters
+    expected by the Fortran binary and S_plasma_1D_matlab_inputs function.
+    """
+    # Extract parameters from the scenario
+    scenario_dict = scenario.scenario
+
+    # Check that we have the required plasma section
+    if "plasma" not in scenario_dict:
+        raise ValueError("Scenario must contain a 'plasma' section")
+
+    plasma = scenario_dict["plasma"]
+
+    # Check solver type - we only support spectral_1D for now
+    solver = plasma.get("solver", "")
+    if solver != "spectral_1D":
+        raise ValueError(f"_convert_scenario_to_matlab_inputs only supports 'spectral_1D' solver, got '{solver}'")
+
+    spectral_1D = plasma.get("spectral_1D", {})
+    if not spectral_1D:
+        raise ValueError("spectral_1D section is required in plasma")
+
+    # Extract antenna parameters
+    if "antenna" not in scenario_dict:
+        raise ValueError("Scenario must contain an 'antenna' section")
+
+    antenna = scenario_dict["antenna"]
+    excitation = antenna.get("excitation", {})
+
+    # Load antenna file to get waveguide parameters
+    antenna_file = antenna.get("file")
+    antenna_data = {}
+    if antenna_file:
+        # Try to load the antenna file to get waveguide parameters
+        try:
+            from pathlib import Path
+
+            from aloha.antenna import Antenna
+
+            # Try to find the antenna file in the antennas directory
+            antenna_paths = [
+                Path(antenna_file),  # Try as-is
+                Path(__file__).parent.parent / "antennas" / antenna_file,  # Try in antennas directory
+                Path(__file__).parent.parent.parent / "antennas" / antenna_file,  # Try in parent antennas directory
+            ]
+
+            for path in antenna_paths:
+                if path.exists():
+                    antenna_obj = Antenna.from_file(path)
+                    antenna_data = antenna_obj.antenna
+                    break
+        except (FileNotFoundError, ImportError):
+            # If we can't load the antenna file, we'll use default values
+            pass
+
+    # Get frequency from antenna excitation or antenna default
+    freq = excitation.get("f", antenna.get("frequency", antenna_data.get("frequency", None)))
+    if freq is None:
+        raise ValueError("Frequency (f) is required in antenna.excitation or antenna")
+
+    # Extract plasma profile parameters from spectral_1D section
+    profile = spectral_1D.get("profile", "")
+    if profile != "bilinear":
+        raise ValueError(f"Unsupported plasma profile '{profile}'. Only 'bilinear' is supported.")
+
+    bilinear = spectral_1D.get("bilinear", {})
+    if not bilinear:
+        raise ValueError("bilinear section is required in plasma.spectral_1D")
+
+    # Extract bilinear profile parameters
+    ne0 = bilinear.get("ne0", 0.0)  # edge density [1/m^3]
+    lambda_n = bilinear.get("lambda_n", [0.002, 0.02])  # gradients scrape-off lengths [m]
+    plasma_layer_length = bilinear.get("plasma_layer_length", 0.002)  # width of the first plasma layer [m]
+    vacuum_layer_length = bilinear.get("vacuum_layer_length", 0.0)  # vacuum gap width [m]
+
+    # For version 6, we need to map the bilinear profile to the linear profile parameters
+    # Convert to arrays for multiple poloidal rows
+    nb_g_pol = 1  # Default, will be calculated from antenna layout
+
+    # Extract antenna layout parameters
+    layout = antenna_data.get("layout", {})
+    if layout:
+        nb_mod_phi = layout.get("nb_mod_phi", 1)  # Number of modules in toroidal direction
+        nb_mod_theta = layout.get("nb_mod_theta", 1)  # Number of modules in poloidal direction
+        nb_g_pol = nb_mod_theta  # Number of poloidal rows
+
+    module = antenna_data.get("module", {})
+    nb_wg_theta = module.get("nb_wg_theta", 1)  # Number of waveguides per module in poloidal direction
+    nb_wg_phi = module.get("nb_wg_phi", 1)  # Number of waveguides per module in toroidal direction
+    mask = module.get("mask", [1])  # Mask of active/passive waveguides
+    nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", 0)  # Number of passive waveguides between modules
+    nb_pwg_edge = module.get("nb_pwg_edge", 1)  # Number of passive waveguides on each edge
+
+    # Calculate total number of waveguides per poloidal row
+    # Active waveguides: nb_mod_phi * nb_wg_phi * (sum of mask)
+    # Plus passive waveguides
+    active_wg_per_row = nb_mod_phi * nb_wg_phi * sum(mask)
+    passive_wg_between = nb_mod_phi * nb_pwg_btw_mod_phi
+    passive_wg_edges = 2 * nb_pwg_edge
+    nb_g_total_ligne = active_wg_per_row + passive_wg_between + passive_wg_edges
+
+    # Waveguide dimensions
+    awg_size_phi = module.get("awg_size_phi", 10e-3)  # Width of active waveguides [m]
+    wg_size_theta = module.get("wg_size_theta", 70e-3)  # Height of waveguides in poloidal direction [m]
+
+    # For version 6, we need to provide arrays for each poloidal row
+    # Convert scalar values to arrays with length nb_g_pol
+    ne0_array = [ne0] * nb_g_pol
+    dne0_array = [ne0 / lambda_n[0] if lambda_n and len(lambda_n) > 0 else 0.0] * nb_g_pol
+    d_couche_array = [plasma_layer_length] * nb_g_pol
+    dne1_array = [ne0 / lambda_n[1] if lambda_n and len(lambda_n) > 1 else 0.0] * nb_g_pol
+    d_vide_array = [vacuum_layer_length] * nb_g_pol
+
+    # Waveguide parameters
+    a = awg_size_phi  # Waveguide width parameter [m]
+    b = [wg_size_theta] * nb_g_total_ligne  # Waveguide height parameters [m]
+    z = [0.0] * nb_g_total_ligne  # Waveguide position parameters [m] (simplified)
+
+    # Other parameters (using typical defaults for version 6)
+    T_grill = 1.0  # Grill periodicity parameter
+    D_guide_max = 10.0  # Maximum guide decoupling distance [m]
+    erreur_rel = 1e-6  # Relative error tolerance
+    pertes = 0.0  # Loss parameter
+
+    # Mode numbers (from spectral_1D or defaults)
+    nb_evanescent_modes = spectral_1D.get("nb_evanescent_modes", 2)
+    Nmh = 1  # Number of magnetic modes (typical default)
+    Nme = nb_evanescent_modes  # Number of electric modes = nb_evanescent_modes
+
+    # Build the MATLAB-style parameter dictionary
+    matlab_params = {
+        "antenna": {"freq": freq},
+        "ne0": ne0_array,
+        "dne0": dne0_array,
+        "d_couche": d_couche_array,
+        "dne1": dne1_array,
+        "nb_g_pol": nb_g_pol,
+        "nb_g_total_ligne": nb_g_total_ligne,
+        "a": a,
+        "b": b,
+        "z": z,
+        "T_grill": T_grill,
+        "D_guide_max": D_guide_max,
+        "erreur_rel": erreur_rel,
+        "pertes": pertes,
+        "d_vide": d_vide_array,
+        "Nmh": Nmh,
+        "Nme": Nme,
+    }
+
+    return matlab_params

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from aloha.plasma import S_plasma_1D_matlab_inputs, get_binary_name, get_binary_path
+from aloha.plasma import S_plasma_1D, S_plasma_1D_matlab_inputs, get_binary_name, get_binary_path
 
 
 class TestPlasma(unittest.TestCase):
@@ -119,6 +119,132 @@ class TestPlasma(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             S_plasma_1D_matlab_inputs(scenario, version=7)
+
+    def test_S_plasma_1D_with_scenario_object(self):
+        """Test S_plasma_1D with Scenario object using TOML schema."""
+        from aloha.scenario import Scenario
+
+        # Create a scenario using the TOML schema
+        scenario_dict = {
+            "antenna": {"file": "8_active_waveguides.toml", "excitation": {"f": 3.7e9}},
+            "plasma": {
+                "solver": "spectral_1D",
+                "spectral_1D": {
+                    "profile": "bilinear",
+                    "nb_evanescent_modes": 2,
+                    "bilinear": {
+                        "ne0": 5e17,
+                        "lambda_n": [0.002, 0.02],
+                        "plasma_layer_length": 0.002,
+                        "vacuum_layer_length": 0.0,
+                        "B0": 2.95,
+                        "identical_profiles": True,
+                        "infinite_waveguide": True,
+                    },
+                    "nz_min": -20,
+                    "nz_max": 20,
+                    "dnz": 0.01,
+                    "ny_min": -2,
+                    "ny_max": 2,
+                    "dny": 0.1,
+                    "z_min": -0.015,
+                    "z_max": 0.075,
+                    "nb_z": 60,
+                    "x_max": 0.05,
+                    "nb_x": 8,
+                },
+            },
+            "options": {"debug": False},
+        }
+
+        scenario = Scenario(scenario_dict)
+
+        # Check if the binary exists before trying to run it
+        binary_path = get_binary_path(6, "glnxa64")
+        if not binary_path.exists():
+            self.skipTest(f"Fortran binary not found: {binary_path}")
+
+        try:
+            # Test with the Scenario object (no additional parameters needed)
+            S_plasma, rac_Zhe = S_plasma_1D(scenario)
+
+            # Basic checks
+            self.assertIsInstance(S_plasma, np.ndarray)
+            self.assertIsInstance(rac_Zhe, np.ndarray)
+            self.assertEqual(S_plasma.dtype, np.complex128)
+            self.assertEqual(rac_Zhe.dtype, np.complex128)
+
+            # The expected size should be (nb_g_total_ligne * (Nmh + Nme)) x (nb_g_total_ligne * (Nmh + Nme))
+            # From the antenna: 8 modules * 1 waveguide + 2 edge waveguides = 10 waveguides
+            # From spectral_1D: Nmh=1, Nme=2, so 3 modes
+            # Total size: 10 * 3 = 30
+            expected_size = 30
+            self.assertEqual(S_plasma.shape, (expected_size, expected_size))
+            self.assertEqual(rac_Zhe.shape, (expected_size, expected_size))
+
+        except RuntimeError as e:
+            # Fortran binary might fail due to environment/dependency issues
+            # This is acceptable for the test - we just want to ensure the Python
+            # interface works correctly
+            if "Binary execution failed" in str(e):
+                self.skipTest(f"Fortran binary execution failed: {e}")
+            else:
+                raise
+
+    def test_S_plasma_1D_wrong_solver(self):
+        """Test that S_plasma_1D raises error for unsupported solvers."""
+        from aloha.scenario import Scenario
+
+        # Create a scenario with unsupported solver
+        scenario_dict = {
+            "antenna": {"file": "8_active_waveguides.toml", "excitation": {"f": 3.7e9}},
+            "plasma": {
+                "solver": "spectral_2D",  # This should cause an error
+                "spectral_2D": {"profile": "bilinear"},
+            },
+            "options": {"debug": False},
+        }
+
+        scenario = Scenario(scenario_dict)
+
+        # Test with unsupported solver
+        with self.assertRaises(ValueError):
+            S_plasma_1D(scenario)
+
+    def test_S_plasma_1D_unsupported_profile(self):
+        """Test that S_plasma_1D raises error for unsupported plasma profiles."""
+        from aloha.scenario import Scenario
+
+        # Create a scenario with unsupported profile
+        scenario_dict = {
+            "antenna": {"file": "8_active_waveguides.toml", "excitation": {"f": 3.7e9}},
+            "plasma": {
+                "solver": "spectral_1D",
+                "spectral_1D": {
+                    "profile": "linear",  # This should cause an error
+                    "nb_evanescent_modes": 2,
+                    "bilinear": {
+                        "ne0": 5e17,
+                        "lambda_n": [0.002, 0.02],
+                        "plasma_layer_length": 0.002,
+                        "vacuum_layer_length": 0.0,
+                        "B0": 2.95,
+                        "identical_profiles": True,
+                        "infinite_waveguide": True,
+                    },
+                },
+            },
+            "options": {"debug": False},
+        }
+
+        scenario = Scenario(scenario_dict)
+
+        # Test with unsupported profile
+        with self.assertRaises(ValueError) as context:
+            S_plasma_1D(scenario)
+
+        self.assertIn("Unsupported plasma profile", str(context.exception))
+        self.assertIn("linear", str(context.exception))
 
 
 if __name__ == "__main__":

@@ -4,10 +4,14 @@ ALOHA Plasma coupling calculation module.
 
 import subprocess
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy.constants import c, epsilon_0, m_e
 from scipy.constants import e as q_e
+
+if TYPE_CHECKING:
+    from aloha.scenario import Scenario
 
 
 def get_binary_name(version: int, architecture: str = "glnxa64") -> str:
@@ -328,3 +332,74 @@ def S_plasma_1D_matlab_inputs(
             print(f"{text_ind}Sum(rac_Zhe)={np.sum(rac_Zhe)}")  # noqa: T201
 
     return S_plasma, rac_Zhe
+
+
+def S_plasma_1D(scenario: "Scenario") -> tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate the plasma S-parameter matrix using ALOHA Fortran binary with a Scenario object.
+
+    This function takes a Scenario object following the TOML schema and converts it to the
+    MATLAB-style parameter format expected by S_plasma_1D_matlab_inputs.
+
+    Parameters
+    ----------
+    scenario : Scenario
+        A Scenario object containing scenario parameters in TOML schema format.
+        The function extracts the following parameters from the scenario:
+        - version: from plasma.spectral_1D.profile (only 'bilinear' supported)
+        - architecture: default 'glnxa64'
+        - bool_lignes_identiques: from plasma.spectral_1D.bilinear.identical_profiles
+        - bool_debug: from options.debug
+        - max_nz: from plasma.spectral_1D.max_nz or default 100
+
+    Returns
+    -------
+    tuple of np.ndarray
+        Tuple of (S_plasma, rac_Zhe) numpy arrays
+
+    Raises
+    ------
+    ValueError
+        If scenario conversion fails
+    RuntimeError
+        If Fortran binary execution fails
+    """
+    # Import the conversion function from scenario module
+    from aloha.scenario import _convert_scenario_to_matlab_inputs
+
+    # Extract parameters from scenario
+    scenario_dict = scenario.scenario
+
+    # Get version from plasma.spectral_1D.profile
+    # For now, we only support version 6 (linear profile)
+    # The profile type is mapped to version: 'bilinear' -> version 6
+    version = 6  # Default version for bilinear profile
+
+    # Get architecture (default to glnxa64)
+    architecture = "glnxa64"
+
+    # Get bool_lignes_identiques from plasma.spectral_1D.bilinear.identical_profiles
+    plasma = scenario_dict.get("plasma", {})
+    spectral_1D = plasma.get("spectral_1D", {})
+    bilinear = spectral_1D.get("bilinear", {})
+    bool_lignes_identiques = bilinear.get("identical_profiles", False)
+
+    # Get bool_debug from options.debug
+    options = scenario_dict.get("options", {})
+    bool_debug = options.get("debug", False)
+
+    # Get max_nz from plasma.spectral_1D or default to 100
+    max_nz = spectral_1D.get("max_nz", 100)
+
+    # Convert the Scenario object to MATLAB-style parameter dictionary
+    matlab_scenario = _convert_scenario_to_matlab_inputs(scenario)
+
+    # Call the existing S_plasma_1D_matlab_inputs function with the converted parameters
+    return S_plasma_1D_matlab_inputs(
+        matlab_scenario,
+        version=version,
+        architecture=architecture,
+        bool_lignes_identiques=bool_lignes_identiques,
+        bool_debug=bool_debug,
+        max_nz=max_nz,
+    )
