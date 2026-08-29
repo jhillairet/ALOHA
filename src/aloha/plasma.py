@@ -138,7 +138,7 @@ def read_fortran_output_file(filename: str | Path) -> tuple[np.ndarray, np.ndarr
     return S_plasma, rac_Zhe, K_cpl
 
 
-def S_plasma_1D(
+def S_plasma_1D_matlab_inputs(
     scenario: dict,
     version: int = 6,
     architecture: str = "glnxa64",

@@ -31,6 +31,7 @@ class Scenario:
     def __init__(self, scenario: str | os.PathLike | dict | None = None):
 
         self.scenario = {}
+        self.results = {}
         if isinstance(scenario, (str, os.PathLike)):
             self.scenario = self.load(scenario)
         elif isinstance(scenario, dict):
@@ -58,7 +59,7 @@ class Scenario:
         return str(self.scenario)
 
     @classmethod
-    def from_matlab(cls, filename: str | os.PathLike) -> tuple[dict, dict]:
+    def from_matlab(cls, filename: str | os.PathLike) -> "Scenario":
         """
         Load scenario from an ALOHA MATLAB file (.m or .mat).
 
@@ -69,10 +70,9 @@ class Scenario:
 
         Returns
         -------
-        tuple[dict, dict]
-            A tuple containing:
-            - scenario_dict: Dictionary following the TOML schema used in scenario_example.toml
-            - results_dict: Dictionary containing results if available, otherwise empty dict
+        Scenario
+            A Scenario object containing the scenario data following the TOML schema.
+            The results dictionary (if available) is stored in the Scenario.results attribute.
 
         Raises
         ------
@@ -95,7 +95,9 @@ class Scenario:
 
         # Convert the MATLAB scenario to the TOML schema
         scenario_dict = cls.convert_matlab_scenario(matlab_scenario)
-        return scenario_dict, results_dict
+        scenario_obj = cls(scenario_dict)
+        scenario_obj.results = results_dict
+        return scenario_obj
 
     @classmethod
     def convert_matlab_scenario(cls, matlab_scenario: dict) -> dict:
@@ -139,14 +141,24 @@ class Scenario:
         antenna = {}
 
         # antenna.architecture -> antenna.file
+        architecture_str = None
         if "antenna" in matlab_scenario and "architecture" in matlab_scenario["antenna"]:
             architecture = matlab_scenario["antenna"]["architecture"]
+            # Convert list of ASCII codes to string (for .mat files)
+            if isinstance(architecture, list):
+                # Handle nested lists (e.g., [[97], [98], ...] from .mat files)
+                if architecture and isinstance(architecture[0], list):
+                    architecture_str = "".join(chr(code[0]) for code in architecture)
+                else:
+                    architecture_str = "".join(chr(code) for code in architecture)
+            else:
+                architecture_str = architecture
             # Map MATLAB antenna names to TOML file names
             antenna_name_mapping = {
                 "antenne_elementaire": "simple_antenna.toml",
                 # Add more mappings as needed
             }
-            antenna["file"] = antenna_name_mapping.get(architecture, architecture)
+            antenna["file"] = antenna_name_mapping.get(architecture_str, architecture_str)
 
         # antenna.freq -> antenna.excitation.f
         excitation = {}
@@ -160,10 +172,9 @@ class Scenario:
         # Get number of modules to determine default array size
         # Try to get from antenna architecture or default to 8
         num_modules = 8  # Default value
-        if "antenna" in matlab_scenario and "architecture" in matlab_scenario["antenna"]:
-            architecture = matlab_scenario["antenna"]["architecture"]
+        if architecture_str:
             # Try to extract number from architecture name if it contains a number
-            arch_numbers = re.findall(r"\d+", architecture)
+            arch_numbers = re.findall(r"\d+", architecture_str)
             if arch_numbers:
                 num_modules = int(arch_numbers[0])
 
@@ -171,6 +182,9 @@ class Scenario:
         if "antenna" in matlab_scenario and "a_ampl" in matlab_scenario["antenna"]:
             a_ampl = matlab_scenario["antenna"]["a_ampl"]
             if isinstance(a_ampl, (list, np.ndarray)):
+                # Handle nested lists from .mat files
+                if a_ampl and isinstance(a_ampl[0], list):
+                    a_ampl = a_ampl[0]  # Extract the inner list
                 # Convert to list of floats and square the values (power = amplitude^2)
                 excitation["power"] = [float(x) ** 2 for x in a_ampl]
             else:
@@ -182,6 +196,9 @@ class Scenario:
         if "antenna" in matlab_scenario and "a_phase" in matlab_scenario["antenna"]:
             a_phase = matlab_scenario["antenna"]["a_phase"]
             if isinstance(a_phase, (list, np.ndarray)):
+                # Handle nested lists from .mat files
+                if a_phase and isinstance(a_phase[0], list):
+                    a_phase = a_phase[0]  # Extract the inner list
                 # Convert radians to degrees
                 excitation["phase"] = [float(x) * 180 / np.pi for x in a_phase]
             else:
@@ -272,6 +289,9 @@ class Scenario:
         if "lambda_n" in plasma_data:
             lambda_n_value = plasma_data["lambda_n"]
             if isinstance(lambda_n_value, (list, np.ndarray)):
+                # Handle nested lists from .mat files
+                if lambda_n_value and isinstance(lambda_n_value[0], list):
+                    lambda_n_value = lambda_n_value[0]  # Extract the inner list
                 lambda_n = [float(x) for x in lambda_n_value]
             else:
                 lambda_n = [float(lambda_n_value)]

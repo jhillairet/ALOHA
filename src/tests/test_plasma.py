@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from aloha.plasma import S_plasma_1D, get_binary_name, get_binary_path
+from aloha.plasma import S_plasma_1D_matlab_inputs, get_binary_name, get_binary_path
 
 
 class TestPlasma(unittest.TestCase):
@@ -64,7 +64,7 @@ class TestPlasma(unittest.TestCase):
 
         try:
             # Run with debug output
-            S_plasma, rac_Zhe = S_plasma_1D(
+            S_plasma, rac_Zhe = S_plasma_1D_matlab_inputs(
                 scenario,
                 version=6,
                 architecture="glnxa64",
@@ -115,10 +115,10 @@ class TestPlasma(unittest.TestCase):
 
         # Test with unsupported version
         with self.assertRaises(ValueError):
-            S_plasma_1D(scenario, version=3)
+            S_plasma_1D_matlab_inputs(scenario, version=3)
 
         with self.assertRaises(ValueError):
-            S_plasma_1D(scenario, version=7)
+            S_plasma_1D_matlab_inputs(scenario, version=7)
 
 
 if __name__ == "__main__":

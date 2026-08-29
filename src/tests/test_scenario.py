@@ -1,4 +1,5 @@
 import pathlib
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -187,6 +188,92 @@ class TestScenario(unittest.TestCase):
         # Check debug flag
         self.assertIn("debug", options)
         self.assertTrue(options["debug"])
+
+    def test_matlab_to_toml_roundtrip(self):
+        """Test that reading MATLAB scenario, saving to TOML, and reading back produces the same scenario dictionary."""
+        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+
+        # Step 1: Read the MATLAB scenario using from_matlab method
+        scenario_obj = Scenario.from_matlab(m_file)
+
+        # Step 2: Save the scenario to a temporary TOML file
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".toml", delete=False) as tmp_file:
+            tmp_path = Path(tmp_file.name)
+
+        try:
+            # Save to TOML
+            scenario_obj.to_toml(tmp_path)
+
+            # Step 3: Read the TOML file using Scenario constructor
+            scenario_from_toml = Scenario(tmp_path)
+
+            # Step 4: Assert that the scenario dictionaries are the same
+            # Note: The 'comment' field is intentionally not preserved in TOML format
+            # as it's converted to actual TOML comments, so we exclude it from comparison
+            scenario_dict_no_comment = {k: v for k, v in scenario_obj.scenario.items() if k != "comment"}
+            self.assertEqual(scenario_from_toml.scenario, scenario_dict_no_comment)
+        finally:
+            # Clean up the temporary file
+            tmp_path.unlink()
+
+    def test_matlab_files_consistency(self):
+        """Test that loading scenario from .m and .mat files produces similar Scenario objects."""
+        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
+
+        # Load both files using from_matlab
+        scenario_from_m = Scenario.from_matlab(m_file)
+        scenario_from_mat = Scenario.from_matlab(mat_file)
+
+        # Verify both are Scenario objects
+        self.assertIsInstance(scenario_from_m, Scenario)
+        self.assertIsInstance(scenario_from_mat, Scenario)
+
+        # Verify both have scenario and results attributes
+        self.assertTrue(hasattr(scenario_from_m, "scenario"))
+        self.assertTrue(hasattr(scenario_from_m, "results"))
+        self.assertTrue(hasattr(scenario_from_mat, "scenario"))
+        self.assertTrue(hasattr(scenario_from_mat, "results"))
+
+        # Verify both have the expected top-level keys in their scenario
+        expected_keys = {"antenna", "plasma", "options"}
+        self.assertTrue(expected_keys.issubset(scenario_from_m.scenario.keys()))
+        self.assertTrue(expected_keys.issubset(scenario_from_mat.scenario.keys()))
+
+        # Verify that the MAT file has results (since it's a computed scenario)
+        self.assertTrue(len(scenario_from_mat.results) > 0)
+
+        # Compare the structure of the scenario dictionaries (excluding comment)
+        m_scenario = {k: v for k, v in scenario_from_m.scenario.items() if k != "comment"}
+        mat_scenario = {k: v for k, v in scenario_from_mat.scenario.items() if k != "comment"}
+
+        # Check that both have the same top-level keys
+        self.assertEqual(set(m_scenario.keys()), set(mat_scenario.keys()))
+
+        # Check that frequency is the same
+        self.assertEqual(m_scenario["antenna"]["excitation"]["f"], mat_scenario["antenna"]["excitation"]["f"])
+
+        # Check that power arrays have the same length
+        m_power = m_scenario["antenna"]["excitation"]["power"]
+        mat_power = mat_scenario["antenna"]["excitation"]["power"]
+        self.assertEqual(len(m_power), len(mat_power))
+
+        # Check that phase arrays have the same length
+        m_phase = m_scenario["antenna"]["excitation"]["phase"]
+        mat_phase = mat_scenario["antenna"]["excitation"]["phase"]
+        self.assertEqual(len(m_phase), len(mat_phase))
+
+        # Check that both have the same plasma solver
+        self.assertEqual(m_scenario["plasma"]["solver"], mat_scenario["plasma"]["solver"])
+
+        # Check that both have spectral_1D in plasma
+        self.assertIn("spectral_1D", m_scenario["plasma"])
+        self.assertIn("spectral_1D", mat_scenario["plasma"])
+
+        # Check that both have the same spectral_1D profile
+        self.assertEqual(
+            m_scenario["plasma"]["spectral_1D"]["profile"], mat_scenario["plasma"]["spectral_1D"]["profile"]
+        )
 
 
 if __name__ == "__main__":
