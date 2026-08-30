@@ -35,7 +35,7 @@ mask = [1]
 nb_pwg_btw_mod_phi = 0
 # Number of passive waveguides on each antenna edge in the toroidal direction. (npwe_phi)
 # Scalar value
-nb_pwg_edge = 1
+nb_pwg_edge = 0
 # Spacing between poloidally neighboring waveguides [m] (sw_theta)
 # Scalar value
 space_btw_wg_theta = 12e-3
@@ -45,18 +45,18 @@ wg_size_theta = 70e-3
 # Width of active waveguides [m] (bwa)
 # if scalar, same thickness for all active waveguides
 # if array, one thickness for each active waveguide
-awg_size_phi = 10e-3
+awg_size_phi = 6.5e-3
 # Width of internal passive waveguides [m] (biwp)
 # if scalar, same thickness for all passive waveguides
 # if array, one thickness for each passive waveguide
-pwg_size_phi = 8e-3
+pwg_size_phi = 0
 # Width of edge passive waveguides [m] (bewp)
 # Scalar value, same thickness for all waveguides
-pwg_size_edge_phi = 8e-3
+pwg_size_edge_phi = 0
 # Thickness between waveguides in the toroidal direction [m]
 # if scalar, same thickness for all waveguide walls
 # if array, one value for each wall thickness
-e_phi = 2e-3
+e_phi = 1e-3
 # Thickness between passive waveguides
 # Scalar value
 e_phi_pwg = 3e-3

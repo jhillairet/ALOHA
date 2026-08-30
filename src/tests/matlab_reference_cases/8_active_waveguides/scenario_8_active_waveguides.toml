@@ -1,16 +1,19 @@
-comment = "8 active waveguides simple antenna"
+# ALOHA scenario
+#
+# This file contains all the parameters needed by ALOHA to run.
+comment = "one row of 8 active waveguides"
 
 [antenna]
-file = "antenna_8_active_waveguides"
+file = "8_active_waveguides.toml"
 
 [antenna.excitation]
 f = 3700000000.0
-experimental = false
+experimental = true
 power = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-phase = [0.0, 90.0, 180.0, 270.0, 360.0, 450.0, 540.0, 630.0]
-port = ""
-pulse = nan
-avg_times = nan
+phase = [0.0, 90.0, 180.0, 270.0, 0.0, 90.0, 180.0, 270.0]
+port = "Q6B"
+pulse = 45155
+avg_times = [7.0, 8.0]
 
 
 [plasma]
@@ -34,13 +37,13 @@ nb_x = 8
 [plasma.spectral_1D.bilinear]
 identical_profiles = true
 ne0 = 5e+17
-lambda_n = [0.002]
+lambda_n = [0.002, 0.02]
 plasma_layer_length = 0.002
 d_couche = 0.002
 B0 = 2.95
 vacuum_layer_length = 0.0
 d_vide = 0.0
-infinite_waveguide = false
+infinite_waveguide = true
 
 [options]
-debug = false
+debug = true

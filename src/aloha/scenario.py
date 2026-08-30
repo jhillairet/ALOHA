@@ -694,7 +694,11 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     ne0_array = [ne0] * nb_g_pol
     dne0_array = [ne0 / lambda_n[0] if lambda_n and len(lambda_n) > 0 else 0.0] * nb_g_pol
     d_couche_array = [plasma_layer_length] * nb_g_pol
-    dne1_array = [ne0 / lambda_n[1] if lambda_n and len(lambda_n) > 1 else 0.0] * nb_g_pol
+    # Fix dne1 calculation to match MATLAB: (1 + d_couche/lambda_n[0]) * ne0 / lambda_n[1]
+    if lambda_n and len(lambda_n) > 1:
+        dne1_array = [(1 + plasma_layer_length / lambda_n[0]) * ne0 / lambda_n[1]] * nb_g_pol
+    else:
+        dne1_array = [0.0] * nb_g_pol
     d_vide_array = [vacuum_layer_length] * nb_g_pol
 
     # Waveguide parameters using MATLAB waveguide logic from aloha_utils_getAntennaCoordinates.m
@@ -702,18 +706,24 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     a = wg_size_theta
 
     # b = array of waveguide widths in toroidal direction
-    # For version 6, use active waveguide width for all waveguides (simplified)
+    # For version 6, use active waveguide width for all waveguides
     b = [awg_size_phi] * nb_g_total_ligne
 
     # z = array of waveguide positions in toroidal direction
-    # For version 6, use simplified positions starting from 0
+    # Calculate positions based on waveguide widths and spacing (e_phi)
+    # From MATLAB: z(1,ind) = z(1,ind-1) + b(ind-1) + e_phi
+    # Get the spacing between waveguides from antenna module parameters
+    e_phi = module.get("e_phi", 1e-3)  # Default spacing if not specified
     z = [0.0] * nb_g_total_ligne
+    for ind in range(1, nb_g_total_ligne):
+        z[ind] = z[ind - 1] + b[ind - 1] + e_phi
 
     # Other parameters (using typical defaults for version 6)
-    T_grill = 1.0  # Grill periodicity parameter
-    D_guide_max = 10.0  # Maximum guide decoupling distance [m]
+    # Match MATLAB defaults from aloha_init.m
+    T_grill = 7.0  # Grill periodicity parameter
+    D_guide_max = 100.0  # Maximum guide decoupling distance [m]
     erreur_rel = 1e-6  # Relative error tolerance
-    pertes = 0.0  # Loss parameter
+    pertes = 1e-6  # Loss parameter (match MATLAB default from aloha_init.m)
 
     # Mode numbers (from spectral_1D or defaults)
     nb_evanescent_modes = spectral_1D.get("nb_evanescent_modes", 2)

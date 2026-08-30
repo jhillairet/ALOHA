@@ -62,17 +62,27 @@ def save_fortran_input_file(filename: str | Path, parameters: list) -> None:
     Save parameters to a Fortran input file.
 
     Each parameter is written on a separate line with scientific notation.
+    If a parameter is an array-like object (numpy array or list), all its elements
+    are written on the same line with space separation, matching the MATLAB behavior.
 
     Parameters
     ----------
     filename : str or Path
         Output filename
     parameters : list
-        List of parameter values to write
+        List of parameter values to write. Can contain scalars, numpy arrays, or lists.
     """
     with open(filename, "w") as f:
         for param in parameters:
-            f.write(f"  {param:1.7e}\n")
+            # Check if the parameter is array-like (numpy array or list)
+            if isinstance(param, (np.ndarray, list)):
+                # Write all elements of the array on the same line with space separation
+                param_array = np.asarray(param)
+                line = "  " + "  ".join([f"{x:1.7e}" for x in param_array.flat])
+                f.write(line + "\n")
+            else:
+                # Write scalar parameter on its own line
+                f.write(f"  {param:1.7e}\n")
 
 
 def read_fortran_output_file(filename: str | Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -263,7 +273,7 @@ def S_plasma_1D_matlab_inputs(
         # Order: Nmh, Nme, freq, ne0(ind), dne0(ind), d_couche(ind), dne1(ind),
         #        nb_g_total_ligne, a, b, z, T_grill, D_guide_max, erreur_rel, pertes, max_nz, d_vide(ind)
 
-        # For version 6, we need to write arrays element by element
+        # For version 6, we need to pass arrays b and z as arrays, not flattened
         # First, write scalar parameters
         var_list = [
             float(Nmh),
@@ -275,18 +285,15 @@ def S_plasma_1D_matlab_inputs(
             float(dne1[ind]),
             float(nb_g_total_ligne),
             float(a),
+            b,  # Keep as numpy array for proper formatting
+            z,  # Keep as numpy array for proper formatting
+            float(T_grill),
+            float(D_guide_max),
+            float(erreur_rel),
+            float(pertes),
+            float(max_nz),
+            float(d_vide[ind]),
         ]
-
-        # Then write b array
-        var_list.extend([float(bi) for bi in b])
-
-        # Then write z array
-        var_list.extend([float(zi) for zi in z])
-
-        # Then write remaining scalar parameters
-        var_list.extend(
-            [float(T_grill), float(D_guide_max), float(erreur_rel), float(pertes), float(max_nz), float(d_vide[ind])]
-        )
 
         # Write parameters to file
         save_fortran_input_file(fortran_input_file, var_list)
