@@ -175,10 +175,10 @@ class TestPlasma(unittest.TestCase):
             self.assertEqual(rac_Zhe.dtype, np.complex128)
 
             # The expected size should be (nb_g_total_ligne * (Nmh + Nme)) x (nb_g_total_ligne * (Nmh + Nme))
-            # From the antenna: 8 modules * 1 waveguide + 2 edge waveguides = 10 waveguides
+            # From the antenna: 8 modules * 1 waveguide + 0 edge waveguides = 8 waveguides
             # From spectral_1D: Nmh=1, Nme=2, so 3 modes
-            # Total size: 10 * 3 = 30
-            expected_size = 30
+            # Total size: 8 * 3 = 24
+            expected_size = 24
             self.assertEqual(S_plasma.shape, (expected_size, expected_size))
             self.assertEqual(rac_Zhe.shape, (expected_size, expected_size))
 

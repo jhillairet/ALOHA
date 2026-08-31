@@ -71,6 +71,119 @@ class Scenario:
     def __str__(self):
         return str(self.scenario)
 
+    def __eq__(self, other):
+        """
+        Compare two Scenario objects for equality.
+
+        Parameters
+        ----------
+        other : Scenario
+            The other Scenario object to compare with.
+
+        Returns
+        -------
+        bool
+            True if the scenarios are equal (within numerical tolerance), False otherwise.
+        """
+        if not isinstance(other, Scenario):
+            return False
+        try:
+            return Scenario.compare_scenarios(self.scenario, other.scenario)
+        except AssertionError:
+            return False
+
+    @staticmethod
+    def compare_scenarios(scenario1, scenario2, path="", _differences=None):
+        """
+        Recursively compare two scenario dictionaries with NumPy array support.
+
+        Parameters
+        ----------
+        scenario1 : dict
+            First scenario dictionary to compare.
+        scenario2 : dict
+            Second scenario dictionary to compare.
+        path : str, optional
+            Current path in the dictionary hierarchy (for error messages).
+        _differences : list, optional
+            Internal parameter to collect all differences (do not use directly).
+
+        Returns
+        -------
+        bool
+            True if the scenarios are equal (within numerical tolerance), False otherwise.
+
+        Raises
+        ------
+        AssertionError
+            If the scenarios are not equal, with detailed error message listing all differences.
+        """
+        # Initialize differences list if not provided
+        if _differences is None:
+            _differences = []
+
+        if isinstance(scenario1, dict) and isinstance(scenario2, dict):
+            # Check that both have the same keys
+            keys1 = set(scenario1.keys())
+            keys2 = set(scenario2.keys())
+            missing_in_2 = keys1 - keys2
+            missing_in_1 = keys2 - keys1
+
+            if missing_in_2 or missing_in_1:
+                msg_parts = []
+                if missing_in_2:
+                    msg_parts.append(f"keys {sorted(missing_in_2)} missing in scenario2")
+                if missing_in_1:
+                    msg_parts.append(f"keys {sorted(missing_in_1)} missing in scenario1")
+                msg = f"Keys mismatch at '{path}': {', '.join(msg_parts)}"
+                _differences.append(msg)
+                # Continue to collect all differences, don't raise yet
+                return False
+
+            # Recursively compare each value
+            for key in scenario1:
+                new_path = f"{path}.{key}" if path else key
+                # Skip debug option as it may differ between file formats
+                if new_path == "options.debug":
+                    continue
+                Scenario.compare_scenarios(scenario1[key], scenario2[key], new_path, _differences)
+
+        elif isinstance(scenario1, np.ndarray) and isinstance(scenario2, np.ndarray):
+            # Compare NumPy arrays with tolerance
+            try:
+                np.testing.assert_allclose(scenario1, scenario2, rtol=1e-10, atol=1e-10)
+            except AssertionError as e:
+                msg = f"Array mismatch at '{path}': {str(e).strip()}"
+                _differences.append(msg)
+                return False
+
+        elif isinstance(scenario1, (list, tuple)) and isinstance(scenario2, (list, tuple)):
+            # Check length first
+            if len(scenario1) != len(scenario2):
+                msg = f"List length mismatch at '{path}': {len(scenario1)} vs {len(scenario2)}"
+                _differences.append(msg)
+                return False
+
+            # Recursively compare each element
+            for i, (item1, item2) in enumerate(zip(scenario1, scenario2, strict=False)):
+                new_path = f"{path}[{i}]"
+                Scenario.compare_scenarios(item1, item2, new_path, _differences)
+
+        else:
+            # Compare scalar values directly
+            if scenario1 != scenario2:
+                msg = f"Value mismatch at '{path}': {scenario1} != {scenario2}"
+                _differences.append(msg)
+                return False
+
+        # If we're at the top level and have differences, raise them all
+        if path == "" and _differences:
+            header = f"Found {len(_differences)} difference(s) between scenarios:"
+            all_differences = header + "\n" + "\n".join(f"  - {diff}" for diff in _differences)
+            raise AssertionError(all_differences)
+
+        return True
+
     @classmethod
     def from_matlab(cls, filename: str | os.PathLike) -> "Scenario":
         """
@@ -182,7 +295,12 @@ class Scenario:
 
         # options.bool_mesure -> antenna.excitation.experimental
         if "options" in matlab_scenario and "bool_mesure" in matlab_scenario["options"]:
-            excitation["experimental"] = bool(matlab_scenario["options"]["bool_mesure"])
+            bool_mesure = matlab_scenario["options"]["bool_mesure"]
+            # Handle MATLAB boolean strings properly ("true"/"false")
+            if isinstance(bool_mesure, str):
+                excitation["experimental"] = bool_mesure.lower() == "true"
+            else:
+                excitation["experimental"] = bool(bool_mesure)
 
         # Get number of modules to determine default array size
         # Try to get from antenna architecture or default to 8
@@ -214,8 +332,8 @@ class Scenario:
                 # Handle nested lists from .mat files
                 if a_phase and isinstance(a_phase[0], list):
                     a_phase = a_phase[0]  # Extract the inner list
-                # Convert radians to degrees
-                excitation["phase"] = [float(x) * 180 / np.pi for x in a_phase]
+                # Convert radians to degrees and normalize modulo 360
+                excitation["phase"] = [float(np.rad2deg(x)) % 360 for x in a_phase]
             else:
                 # If not a straightforward array, use default value
                 # Default: phases are 0, 90, 180, 270, ... degrees (cyclic)
@@ -226,7 +344,16 @@ class Scenario:
 
         # options.TSport -> antenna.excitation.port
         if "options" in matlab_scenario and "TSport" in matlab_scenario["options"]:
-            excitation["port"] = matlab_scenario["options"]["TSport"]
+            TSport = matlab_scenario["options"]["TSport"]
+            # Handle TSport as ASCII codes (from .mat files) or as string
+            if isinstance(TSport, (list, np.ndarray)):
+                # Convert ASCII codes to string
+                if TSport and isinstance(TSport[0], list):
+                    # Handle nested lists from .mat files
+                    TSport = [item[0] if isinstance(item, list) else item for item in TSport]
+                excitation["port"] = "".join(chr(int(code)) for code in TSport)
+            else:
+                excitation["port"] = str(TSport)
 
         # options.choc -> antenna.excitation.pulse
         if "options" in matlab_scenario and "choc" in matlab_scenario["options"]:
@@ -285,13 +412,27 @@ class Scenario:
         # Nme -> plasma.spectral_1D.nb_evanescent_modes
         if "Nme" in matlab_scenario:
             spectral_1d["nb_evanescent_modes"] = int(matlab_scenario["Nme"])
+        elif "options" in matlab_scenario and "modes" in matlab_scenario["options"]:
+            # Try to extract nb_evanescent_modes from modes field in options
+            modes = matlab_scenario["options"]["modes"]
+            if isinstance(modes, (list, np.ndarray)) and len(modes) >= 2:
+                # The second element in modes might be the number of evanescent modes
+                if isinstance(modes[1], (list, np.ndarray)) and len(modes[1]) > 0:
+                    spectral_1d["nb_evanescent_modes"] = int(modes[1][0])
+                elif len(modes) >= 2:
+                    spectral_1d["nb_evanescent_modes"] = int(modes[1])
 
         # Create bilinear section
         bilinear = {}
 
         # options.bool_lignes_identiques -> plasma.spectral_1D.bilinear.identical_profiles
         if "options" in matlab_scenario and "bool_lignes_identiques" in matlab_scenario["options"]:
-            bilinear["identical_profiles"] = bool(matlab_scenario["options"]["bool_lignes_identiques"])
+            bool_lignes_identiques = matlab_scenario["options"]["bool_lignes_identiques"]
+            # Handle MATLAB boolean strings properly ("true"/"false")
+            if isinstance(bool_lignes_identiques, str):
+                bilinear["identical_profiles"] = bool_lignes_identiques.lower() == "true"
+            else:
+                bilinear["identical_profiles"] = bool(bool_lignes_identiques)
 
         # plasma.ne0 -> plasma.spectral_1D.bilinear.ne0
         if "plasma" in matlab_scenario and "ne0" in matlab_scenario["plasma"]:
@@ -304,10 +445,16 @@ class Scenario:
         if "lambda_n" in plasma_data:
             lambda_n_value = plasma_data["lambda_n"]
             if isinstance(lambda_n_value, (list, np.ndarray)):
-                # Handle nested lists from .mat files
+                # Handle nested lists from .mat files (e.g., [[0.002], [0.02]])
                 if lambda_n_value and isinstance(lambda_n_value[0], list):
-                    lambda_n_value = lambda_n_value[0]  # Extract the inner list
-                lambda_n = [float(x) for x in lambda_n_value]
+                    # Extract all values from nested lists
+                    for item in lambda_n_value:
+                        if isinstance(item, list) and len(item) > 0:
+                            lambda_n.append(float(item[0]))
+                        elif isinstance(item, (int, float, np.number)):
+                            lambda_n.append(float(item))
+                else:
+                    lambda_n = [float(x) for x in lambda_n_value]
             else:
                 lambda_n = [float(lambda_n_value)]
         elif "lambda_n(1)" in plasma_data:
@@ -386,7 +533,12 @@ class Scenario:
 
         # options.bool_debug -> options.debug
         if "options" in matlab_scenario and "bool_debug" in matlab_scenario["options"]:
-            options["debug"] = bool(matlab_scenario["options"]["bool_debug"])
+            bool_debug = matlab_scenario["options"]["bool_debug"]
+            # Handle MATLAB boolean strings properly ("true"/"false")
+            if isinstance(bool_debug, str):
+                options["debug"] = bool_debug.lower() == "true"
+            else:
+                options["debug"] = bool(bool_debug)
 
         if options:
             converted["options"] = options

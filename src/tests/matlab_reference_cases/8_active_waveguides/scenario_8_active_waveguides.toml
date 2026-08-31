@@ -8,7 +8,7 @@ file = "8_active_waveguides.toml"
 
 [antenna.excitation]
 f = 3700000000.0
-experimental = true
+experimental = false
 power = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 phase = [0.0, 90.0, 180.0, 270.0, 0.0, 90.0, 180.0, 270.0]
 port = "Q6B"
