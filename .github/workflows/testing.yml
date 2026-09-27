@@ -26,7 +26,7 @@ jobs:
       if: ${{ always() }}
       run: |
         uv sync --dev
-        uv run pytest -n auto --timeout=60 -v --junitxml=test-results/junit-${{ matrix.python-version }}.xml --junit-prefix=${{ matrix.python-version }}
+        uv run pytest -n auto --timeout=60 -v --junitxml=test-results/junit-${{ matrix.python-version }}.xml --junit-prefix=${{ matrix.python-version }} --cov=src/aloha --cov-report=xml
 
     - name: Upload Test Results
       if: always()
@@ -42,7 +42,7 @@ jobs:
       if: ${{ always() }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
+        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
         COVERALLS_PARALLEL: true
       run: |
         uv pip install coveralls
