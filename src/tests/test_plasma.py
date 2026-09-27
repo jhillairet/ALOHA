@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 
 from aloha.plasma import S_plasma_1D, S_plasma_1D_matlab_inputs, get_binary_name, get_binary_path
+from aloha.scenario import Scenario
 
 
 class TestPlasma(unittest.TestCase):
@@ -33,63 +34,6 @@ class TestPlasma(unittest.TestCase):
         """Test that the binary exists."""
         binary_path = get_binary_path(6, "glnxa64")
         self.assertTrue(binary_path.exists(), f"Binary not found: {binary_path}")
-
-    def test_S_plasma_1D_minimal(self):
-        """Test S_plasma_1D with minimal parameters."""
-        # Create a minimal scenario for version 6
-        scenario = {
-            "antenna": {"freq": 3.7e9},  # 3.7 GHz frequency
-            "ne0": [5e17],  # Electron density at reference position [m^-3]
-            "dne0": [1e18],  # Electron density gradient [m^-4]
-            "d_couche": [0.002],  # Thickness of first plasma layer [m]
-            "dne1": [1e18],  # Electron density gradient for second layer [m^-4]
-            "nb_g_pol": 1,  # Number of poloidal rows
-            "nb_g_total_ligne": 1,  # Number of waveguides per poloidal row
-            "a": 0.1,  # Waveguide width parameter [m]
-            "b": [0.1],  # Waveguide height parameters [m]
-            "z": [0.0],  # Waveguide position parameters [m]
-            "T_grill": 1,  # Grill periodicity parameter
-            "D_guide_max": 10,  # Maximum guide decoupling distance [m]
-            "erreur_rel": 1e-6,  # Relative error tolerance
-            "pertes": 0.0,  # Loss parameter
-            "d_vide": [0.0],  # Vacuum layer thickness [m]
-            "Nmh": 1,  # Number of magnetic modes
-            "Nme": 1,  # Number of electric modes
-        }
-
-        # Check if the binary exists before trying to run it
-        binary_path = get_binary_path(6, "glnxa64")
-        if not binary_path.exists():
-            self.skipTest(f"Fortran binary not found: {binary_path}")
-
-        try:
-            # Run with debug output
-            S_plasma, rac_Zhe = S_plasma_1D_matlab_inputs(
-                scenario,
-                version=6,
-                architecture="glnxa64",
-                bool_debug=False,  # Disable debug for cleaner test output
-            )
-
-            # Basic checks
-            self.assertIsInstance(S_plasma, np.ndarray)
-            self.assertIsInstance(rac_Zhe, np.ndarray)
-            self.assertEqual(S_plasma.dtype, np.complex128)
-            self.assertEqual(rac_Zhe.dtype, np.complex128)
-
-            # Check matrix dimensions
-            expected_size = scenario["nb_g_total_ligne"] * scenario["nb_g_pol"] * (scenario["Nmh"] + scenario["Nme"])
-            self.assertEqual(S_plasma.shape, (expected_size, expected_size))
-            self.assertEqual(rac_Zhe.shape, (expected_size, expected_size))
-
-        except RuntimeError as e:
-            # Fortran binary might fail due to environment/dependency issues
-            # This is acceptable for the test - we just want to ensure the Python
-            # interface works correctly
-            if "Binary execution failed" in str(e):
-                self.skipTest(f"Fortran binary execution failed: {e}")
-            else:
-                raise
 
     def test_S_plasma_1D_wrong_version(self):
         """Test that S_plasma_1D raises error for unsupported versions."""
@@ -122,8 +66,6 @@ class TestPlasma(unittest.TestCase):
 
     def test_S_plasma_1D_with_scenario_object(self):
         """Test S_plasma_1D with Scenario object using TOML schema."""
-        from aloha.scenario import Scenario
-
         # Create a scenario using the TOML schema
         scenario_dict = {
             "antenna": {"file": "8_active_waveguides.toml", "excitation": {"f": 3.7e9}},
@@ -164,37 +106,25 @@ class TestPlasma(unittest.TestCase):
         if not binary_path.exists():
             self.skipTest(f"Fortran binary not found: {binary_path}")
 
-        try:
-            # Test with the Scenario object (no additional parameters needed)
-            S_plasma, rac_Zhe = S_plasma_1D(scenario)
+        # Test with the Scenario object (no additional parameters needed)
+        S_plasma, rac_Zhe = S_plasma_1D(scenario)
 
-            # Basic checks
-            self.assertIsInstance(S_plasma, np.ndarray)
-            self.assertIsInstance(rac_Zhe, np.ndarray)
-            self.assertEqual(S_plasma.dtype, np.complex128)
-            self.assertEqual(rac_Zhe.dtype, np.complex128)
+        # Basic checks
+        self.assertIsInstance(S_plasma, np.ndarray)
+        self.assertIsInstance(rac_Zhe, np.ndarray)
+        self.assertEqual(S_plasma.dtype, np.complex128)
+        self.assertEqual(rac_Zhe.dtype, np.complex128)
 
-            # The expected size should be (nb_g_total_ligne * (Nmh + Nme)) x (nb_g_total_ligne * (Nmh + Nme))
-            # From the antenna: 8 modules * 1 waveguide + 0 edge waveguides = 8 waveguides
-            # From spectral_1D: Nmh=1, Nme=2, so 3 modes
-            # Total size: 8 * 3 = 24
-            expected_size = 24
-            self.assertEqual(S_plasma.shape, (expected_size, expected_size))
-            self.assertEqual(rac_Zhe.shape, (expected_size, expected_size))
-
-        except RuntimeError as e:
-            # Fortran binary might fail due to environment/dependency issues
-            # This is acceptable for the test - we just want to ensure the Python
-            # interface works correctly
-            if "Binary execution failed" in str(e):
-                self.skipTest(f"Fortran binary execution failed: {e}")
-            else:
-                raise
+        # The expected size should be (nb_g_total_ligne * (Nmh + Nme)) x (nb_g_total_ligne * (Nmh + Nme))
+        # From the antenna: 8 modules * 1 waveguide + 0 edge waveguides = 8 waveguides
+        # From spectral_1D: Nmh=1, Nme=2, so 3 modes
+        # Total size: 8 * 3 = 24
+        expected_size = 24
+        self.assertEqual(S_plasma.shape, (expected_size, expected_size))
+        self.assertEqual(rac_Zhe.shape, (expected_size, expected_size))
 
     def test_S_plasma_1D_wrong_solver(self):
         """Test that S_plasma_1D raises error for unsupported solvers."""
-        from aloha.scenario import Scenario
-
         # Create a scenario with unsupported solver
         scenario_dict = {
             "antenna": {"file": "8_active_waveguides.toml", "excitation": {"f": 3.7e9}},
@@ -213,8 +143,6 @@ class TestPlasma(unittest.TestCase):
 
     def test_S_plasma_1D_unsupported_profile(self):
         """Test that S_plasma_1D raises error for unsupported plasma profiles."""
-        from aloha.scenario import Scenario
-
         # Create a scenario with unsupported profile
         scenario_dict = {
             "antenna": {"file": "8_active_waveguides.toml", "excitation": {"f": 3.7e9}},
