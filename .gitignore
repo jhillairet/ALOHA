@@ -1,4 +1,4 @@
-*.m~ 
+*.m~
 *.o
 *.mod
 *.a
@@ -10,3 +10,5 @@
 src/aloha/__pycache__/
 
 src/tests/__pycache__/
+
+src/aloha/.ipynb_checkpoints/

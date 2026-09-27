@@ -303,13 +303,67 @@ class Scenario:
                 excitation["experimental"] = bool(bool_mesure)
 
         # Get number of modules to determine default array size
-        # Try to get from antenna architecture or default to 8
-        num_modules = 8  # Default value
+        # Try to get from antenna architecture
+        num_modules = None
         if architecture_str:
             # Try to extract number from architecture name if it contains a number
             arch_numbers = re.findall(r"\d+", architecture_str)
             if arch_numbers:
                 num_modules = int(arch_numbers[0])
+            else:
+                # If no number can be extracted, check if a_ampl or a_phase exists to infer the count
+                if "antenna" in matlab_scenario:
+                    if "a_ampl" in matlab_scenario["antenna"]:
+                        a_ampl = matlab_scenario["antenna"]["a_ampl"]
+                        if isinstance(a_ampl, (list, np.ndarray)):
+                            num_modules = len(a_ampl)
+                        elif isinstance(a_ampl, str):
+                            # Try to extract the number from MATLAB expressions like ones(8,1) or (0:7)
+                            if ":" in a_ampl:
+                                # Handle colon operator (e.g., 0:7 -> 8 elements)
+                                colon_parts = a_ampl.split(":")
+                                if len(colon_parts) >= 2:
+                                    start = int(colon_parts[0].strip())
+                                    end = int(colon_parts[1].strip().rstrip(")' "))
+                                    num_modules = end - start + 1
+                            else:
+                                # For expressions like sqrt(1)*ones(8,1), extract the number from ones(8,1)
+                                # Use regex to find the last occurrence of ones(N,1) or zeros(N,1)
+                                ones_match = re.search(r"ones\((\d+),\s*\d+\)", a_ampl)
+                                zeros_match = re.search(r"zeros\((\d+),\s*\d+\)", a_ampl)
+                                if ones_match:
+                                    num_modules = int(ones_match.group(1))
+                                elif zeros_match:
+                                    num_modules = int(zeros_match.group(1))
+                                else:
+                                    # Fallback: use the last number in the expression
+                                    a_ampl_numbers = re.findall(r"\d+", a_ampl)
+                                    if a_ampl_numbers:
+                                        num_modules = int(a_ampl_numbers[-1])
+                    elif "a_phase" in matlab_scenario["antenna"]:
+                        a_phase = matlab_scenario["antenna"]["a_phase"]
+                        if isinstance(a_phase, (list, np.ndarray)):
+                            num_modules = len(a_phase)
+                        elif isinstance(a_phase, str):
+                            # Try to extract the number from MATLAB expressions
+                            a_phase_numbers = re.findall(r"\d+", a_phase)
+                            if a_phase_numbers:
+                                if ":" in a_phase:
+                                    # Handle colon operator (e.g., 0:7 -> 8 elements)
+                                    colon_parts = a_phase.split(":")
+                                    if len(colon_parts) >= 2:
+                                        start = int(colon_parts[0].strip())
+                                        end = int(colon_parts[1].strip().rstrip(")' "))
+                                        num_modules = end - start + 1
+                                else:
+                                    # Use the first number in the expression
+                                    num_modules = int(a_phase_numbers[0])
+
+                if num_modules is None:
+                    raise ValueError(
+                        f"Cannot determine the number of modules for architecture '{architecture_str}'. "
+                        "Please ensure the number of modules exists or provide 'a_ampl' or 'a_phase' as arrays."
+                    )
 
         # antenna.a_ampl -> antenna.excitation.power
         if "antenna" in matlab_scenario and "a_ampl" in matlab_scenario["antenna"]:
@@ -318,10 +372,15 @@ class Scenario:
                 # Handle nested lists from .mat files
                 if a_ampl and isinstance(a_ampl[0], list):
                     a_ampl = a_ampl[0]  # Extract the inner list
-                # Convert to list of floats and square the values (power = amplitude^2)
-                excitation["power"] = [float(x) ** 2 for x in a_ampl]
+                # Convert to list of floats (assume same unit as MATLAB)
+                excitation["power"] = [float(x) for x in a_ampl]
             else:
-                # If not a straightforward array, use default value
+                # If not a straightforward array, raise an error if num_modules is not available
+                if num_modules is None:
+                    raise ValueError(
+                        "Cannot determine the number of modules and 'a_ampl' is not a valid array. "
+                        "Please provide 'a_ampl' as a list or array."
+                    )
                 # Default: all modules have power of 1.0
                 excitation["power"] = [1.0] * num_modules
 
@@ -335,7 +394,12 @@ class Scenario:
                 # Convert radians to degrees and normalize modulo 360
                 excitation["phase"] = [float(np.rad2deg(x)) % 360 for x in a_phase]
             else:
-                # If not a straightforward array, use default value
+                # If not a straightforward array, raise an error if num_modules is not available
+                if num_modules is None:
+                    raise ValueError(
+                        "Cannot determine the number of modules and 'a_phase' is not a valid array. "
+                        "Please provide 'a_phase' as a list or array."
+                    )
                 # Default: phases are 0, 90, 180, 270, ... degrees (cyclic)
                 default_phases = []
                 for i in range(num_modules):

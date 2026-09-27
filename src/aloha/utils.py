@@ -358,15 +358,21 @@ def _parse_matlab_value(value_str: str) -> Any:
         except ValueError:
             pass
 
-    # Handle MATLAB functions
+    # Handle MATLAB booleans
+    if value_str.lower() == "true":
+        return True
+    if value_str.lower() == "false":
+        return False
+
+    # Handle MATLAB functions (raise error for unsupported functions)
     if value_str.startswith("ones(") or value_str.startswith("zeros("):
-        return value_str
+        raise ValueError(f"MATLAB function '{value_str}' is not supported. Please provide explicit arrays.")
 
     if value_str.startswith("repmat("):
-        return value_str
+        raise ValueError(f"MATLAB function '{value_str}' is not supported. Please provide explicit arrays.")
 
     if value_str.startswith("linspace("):
-        return value_str
+        raise ValueError(f"MATLAB function '{value_str}' is not supported. Please provide explicit arrays.")
 
     if value_str.startswith("mfilename"):
         return value_str
@@ -375,8 +381,14 @@ def _parse_matlab_value(value_str: str) -> Any:
         return value_str
 
     # Handle arrays (e.g., [1, 2, 3] or [1 2 3])
-    if value_str.startswith("[") and value_str.endswith("]"):
-        inner = value_str[1:-1].strip()
+    # Also handle MATLAB transpose operator (') at the end
+    if value_str.startswith("[") and (value_str.endswith("]") or value_str.endswith("]'")):
+        # Strip the transpose operator if present
+        if value_str.endswith("]'"):
+            inner = value_str[1:-2].strip()
+        else:
+            inner = value_str[1:-1].strip()
+
         if "," in inner:
             elements = [x.strip() for x in inner.split(",")]
         else:
@@ -385,7 +397,19 @@ def _parse_matlab_value(value_str: str) -> Any:
         parsed_elements = []
         for elem in elements:
             if elem:
-                parsed_elements.append(_parse_matlab_value(elem))
+                # Handle expressions like 1/8, etc.
+                if any(op in elem for op in ["+", "-", "*", "/", "^"]):
+                    # Try to evaluate the expression safely
+                    try:
+                        # Replace MATLAB-specific constants
+                        elem_clean = elem.replace("pi", str(np.pi))
+                        # Evaluate the expression
+                        parsed_elements.append(float(eval(elem_clean, {"__builtins__": {}}, {})))
+                    except (ValueError, SyntaxError, NameError):
+                        # If evaluation fails, raise an error
+                        raise ValueError(f"Cannot parse MATLAB expression: {elem}")
+                else:
+                    parsed_elements.append(_parse_matlab_value(elem))
 
         return parsed_elements
 
@@ -396,6 +420,53 @@ def _parse_matlab_value(value_str: str) -> Any:
     # Handle variables (e.g., modules.nma_phi)
     if "." in value_str and not value_str.startswith("'") and not value_str.startswith('"'):
         return value_str
+
+    # Handle expressions involving arrays (e.g., (pi/180)*[0 -90*1 -90*2 ...])
+    # Check if the string contains an array and operators
+    if "[" in value_str and "]" in value_str and any(op in value_str for op in ["+", "-", "*", "/", "^"]):
+        # Extract the array part, including the transpose operator if present
+        array_start = value_str.find("[")
+        array_end = value_str.rfind("]")
+        # Check if there's a transpose operator after the array
+        if array_end + 1 < len(value_str) and value_str[array_end + 1] == "'":
+            array_str = value_str[array_start : array_end + 2]  # Include the transpose operator
+        else:
+            array_str = value_str[array_start : array_end + 1]
+
+        # Parse the array
+        try:
+            array_value = _parse_matlab_value(array_str)
+        except ValueError:
+            raise ValueError(f"Cannot parse MATLAB array expression: {value_str}")
+
+        if isinstance(array_value, list):
+            # Extract the scalar multiplier or expression (the part outside the array)
+            prefix = value_str[:array_start].strip()
+            # Skip the array and transpose operator (if present) for the suffix
+            suffix_start = (
+                array_end + 2 if (array_end + 1 < len(value_str) and value_str[array_end + 1] == "'") else array_end + 1
+            )
+            suffix = value_str[suffix_start:].strip()
+
+            # Combine prefix and suffix for the scalar part
+            scalar_expr = (prefix + suffix).strip()
+
+            # Remove any trailing operators (e.g., '*' or '/' at the end)
+            scalar_expr = scalar_expr.rstrip("* / + - ^").strip()
+
+            # Replace MATLAB-specific constants in the scalar expression
+            scalar_expr_clean = scalar_expr.replace("pi", str(np.pi))
+
+            # Evaluate the scalar expression
+            try:
+                scalar = float(eval(scalar_expr_clean, {"__builtins__": {}}, {}))
+            except (ValueError, SyntaxError, NameError):
+                raise ValueError(f"Cannot parse MATLAB scalar expression: {scalar_expr}")
+
+            # Multiply the array by the scalar
+            return [scalar * x for x in array_value]
+        else:
+            raise ValueError(f"Cannot parse MATLAB array expression: {value_str}")
 
     # If we can't parse it, return the string as-is
     return value_str

@@ -89,62 +89,70 @@ class TestScenario(unittest.TestCase):
 
     def test_matlab_files_consistency(self):
         """Test that loading scenario from .m and .mat files produces similar Scenario objects."""
-        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
-        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
+        m_files = [
+            MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m",
+            MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.m",
+        ]
 
-        # Load both files using constructor
-        scenario_from_m = Scenario(m_file)
-        scenario_from_mat = Scenario(mat_file)
+        mat_files = [
+            MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat",
+            MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.mat",
+        ]
 
-        # Verify both are Scenario objects
-        self.assertIsInstance(scenario_from_m, Scenario)
-        self.assertIsInstance(scenario_from_mat, Scenario)
+        for m_file, mat_file in zip(m_files, mat_files, strict=True):
+            # Load both files using constructor
+            scenario_from_m = Scenario(m_file)
+            scenario_from_mat = Scenario(mat_file)
 
-        # Verify both have scenario and results attributes
-        self.assertTrue(hasattr(scenario_from_m, "scenario"))
-        self.assertTrue(hasattr(scenario_from_m, "results"))
-        self.assertTrue(hasattr(scenario_from_mat, "scenario"))
-        self.assertTrue(hasattr(scenario_from_mat, "results"))
+            # Verify both are Scenario objects
+            self.assertIsInstance(scenario_from_m, Scenario)
+            self.assertIsInstance(scenario_from_mat, Scenario)
 
-        # Verify both have the expected top-level keys in their scenario
-        expected_keys = {"antenna", "plasma", "options"}
-        self.assertTrue(expected_keys.issubset(scenario_from_m.scenario.keys()))
-        self.assertTrue(expected_keys.issubset(scenario_from_mat.scenario.keys()))
+            # Verify both have scenario and results attributes
+            self.assertTrue(hasattr(scenario_from_m, "scenario"))
+            self.assertTrue(hasattr(scenario_from_m, "results"))
+            self.assertTrue(hasattr(scenario_from_mat, "scenario"))
+            self.assertTrue(hasattr(scenario_from_mat, "results"))
 
-        # Verify that the MAT file has results (since it's a computed scenario)
-        self.assertTrue(len(scenario_from_mat.results) > 0)
+            # Verify both have the expected top-level keys in their scenario
+            expected_keys = {"antenna", "plasma", "options"}
+            self.assertTrue(expected_keys.issubset(scenario_from_m.scenario.keys()))
+            self.assertTrue(expected_keys.issubset(scenario_from_mat.scenario.keys()))
 
-        # Compare the structure of the scenario dictionaries (excluding comment)
-        m_scenario = {k: v for k, v in scenario_from_m.scenario.items() if k != "comment"}
-        mat_scenario = {k: v for k, v in scenario_from_mat.scenario.items() if k != "comment"}
+            # Verify that the MAT file has results (since it's a computed scenario)
+            self.assertTrue(len(scenario_from_mat.results) > 0)
 
-        # Check that both have the same top-level keys
-        self.assertEqual(set(m_scenario.keys()), set(mat_scenario.keys()))
+            # Compare the structure of the scenario dictionaries (excluding comment)
+            m_scenario = {k: v for k, v in scenario_from_m.scenario.items() if k != "comment"}
+            mat_scenario = {k: v for k, v in scenario_from_mat.scenario.items() if k != "comment"}
 
-        # Check that frequency is the same
-        self.assertEqual(m_scenario["antenna"]["excitation"]["f"], mat_scenario["antenna"]["excitation"]["f"])
+            # Check that both have the same top-level keys
+            self.assertEqual(set(m_scenario.keys()), set(mat_scenario.keys()))
 
-        # Check that power arrays have the same length
-        m_power = m_scenario["antenna"]["excitation"]["power"]
-        mat_power = mat_scenario["antenna"]["excitation"]["power"]
-        self.assertEqual(len(m_power), len(mat_power))
+            # Check that frequency is the same
+            self.assertEqual(m_scenario["antenna"]["excitation"]["f"], mat_scenario["antenna"]["excitation"]["f"])
 
-        # Check that phase arrays have the same length
-        m_phase = m_scenario["antenna"]["excitation"]["phase"]
-        mat_phase = mat_scenario["antenna"]["excitation"]["phase"]
-        self.assertEqual(len(m_phase), len(mat_phase))
+            # Check that power arrays have the same length
+            m_power = m_scenario["antenna"]["excitation"]["power"]
+            mat_power = mat_scenario["antenna"]["excitation"]["power"]
+            self.assertEqual(len(m_power), len(mat_power))
 
-        # Check that both have the same plasma solver
-        self.assertEqual(m_scenario["plasma"]["solver"], mat_scenario["plasma"]["solver"])
+            # Check that phase arrays have the same length
+            m_phase = m_scenario["antenna"]["excitation"]["phase"]
+            mat_phase = mat_scenario["antenna"]["excitation"]["phase"]
+            self.assertEqual(len(m_phase), len(mat_phase))
 
-        # Check that both have spectral_1D in plasma
-        self.assertIn("spectral_1D", m_scenario["plasma"])
-        self.assertIn("spectral_1D", mat_scenario["plasma"])
+            # Check that both have the same plasma solver
+            self.assertEqual(m_scenario["plasma"]["solver"], mat_scenario["plasma"]["solver"])
 
-        # Check that both have the same spectral_1D profile
-        self.assertEqual(
-            m_scenario["plasma"]["spectral_1D"]["profile"], mat_scenario["plasma"]["spectral_1D"]["profile"]
-        )
+            # Check that both have spectral_1D in plasma
+            self.assertIn("spectral_1D", m_scenario["plasma"])
+            self.assertIn("spectral_1D", mat_scenario["plasma"])
+
+            # Check that both have the same spectral_1D profile
+            self.assertEqual(
+                m_scenario["plasma"]["spectral_1D"]["profile"], mat_scenario["plasma"]["spectral_1D"]["profile"]
+            )
 
     def test_run_method_consistency_across_file_formats(self):
         """Test that run() method generates the same results for scenarios from different file formats."""

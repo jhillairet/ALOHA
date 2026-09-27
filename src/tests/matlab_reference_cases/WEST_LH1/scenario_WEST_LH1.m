@@ -68,8 +68,8 @@ options.bool_homeMadeExcitation = true;
 % Warning : the length of the array must be correct
 % in respect to the number of module of your antenna !
 % help aloha_antenna_excitation for some examples
-antenna.a_ampl = sqrt(1/8)*ones(8,1);
-antenna.a_phase = -90*(pi/180)*(0:7)';
+antenna.a_ampl = [1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8]';
+antenna.a_phase = (pi/180)*[0 -90*1 -90*2 -90*3 -90*4 -90*5 -90*6 -90*7]';
 
 
 % [bool_mesure=true only]
