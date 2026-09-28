@@ -21,7 +21,7 @@ solver = "spectral_1D"
 
 [plasma.spectral_1D]
 profile = "bilinear"
-nb_evanescent_modes = 0
+nb_evanescent_modes = 2
 nz_min = -20
 nz_max = 20
 dnz = 0.01

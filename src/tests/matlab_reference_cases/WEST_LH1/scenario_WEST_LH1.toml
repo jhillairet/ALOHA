@@ -1,26 +1,26 @@
-# ALOHA scenario
-#
-# This file contains all the parameters needed by ALOHA to run.
-comment = "one row of 8 active waveguides"
+# ALOHA WEST LH1 example
+comment = "WEST LH1 example"
 
+# ------------------------------------------------------------------
+#   Antenna description
+# ------------------------------------------------------------------
 [antenna]
-file = "8_active_waveguides.toml"
+file = "WEST_LH1_top.toml"
 
 [antenna.excitation]
-f = 3700000000.0
+f = 3.7e9
 experimental = false
-power = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-phase = [0.0, 90.0, 180.0, 270.0, 0.0, 90.0, 180.0, 270.0]
+power = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+phase = [0.0, 270.0, 180.0, 90.0, 0.0, 270.0, 180.0, 90.0]
 port = "Q6B"
 pulse = 45155
 avg_times = [7.0, 8.0]
-
 
 [plasma]
 solver = "spectral_1D"
 
 [plasma.spectral_1D]
-profile = "bilinear"
+profile = 'bilinear'
 nb_evanescent_modes = 0
 nz_min = -20
 nz_max = 20
@@ -36,11 +36,11 @@ nb_x = 8
 
 [plasma.spectral_1D.bilinear]
 identical_profiles = true
-ne0 = 5e+17
+vacuum_layer_length = 0.0
+ne0 = 5e17
 lambda_n = [0.002, 0.02]
 plasma_layer_length = 0.002
 B0 = 2.95
-vacuum_layer_length = 0.0
 infinite_waveguide = true
 
 [options]

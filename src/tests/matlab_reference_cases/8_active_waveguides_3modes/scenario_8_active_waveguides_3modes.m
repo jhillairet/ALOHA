@@ -41,7 +41,7 @@ options.comment = [''];
 %  Ces valeurs correspondent aux noms des fichiers disponibles dans
 %  le dossier 'achitecture_antenne'.
 %
-antenna.architecture = 'antenna_C4_ITM';
+antenna.architecture = 'antenne_elementaire';
 
 %% #####################
 % Antenna excitation
@@ -68,8 +68,8 @@ options.bool_homeMadeExcitation = true;
 % Warning : the length of the array must be correct
 % in respect to the number of module of your antenna !
 % help aloha_antenna_excitation for some examples
-antenna.a_ampl = [408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954]';
-antenna.a_phase = (pi/180)*[0 180 0 180 0 180 0 180]';
+antenna.a_ampl = sqrt(1)*ones(8,1);
+antenna.a_phase = (90*pi/180)*(0:7)';
 
 
 % [bool_mesure=true only]
