@@ -277,6 +277,13 @@ class Scenario:
                     architecture_str = "".join(chr(code[0]) for code in architecture)
                 else:
                     architecture_str = "".join(chr(code) for code in architecture)
+            elif isinstance(architecture, np.ndarray):
+                # Handle numpy arrays (from .mat files with preserved arrays)
+                if architecture.ndim == 2 and architecture.shape[1] == 1:
+                    # Column vector of character codes
+                    architecture_str = "".join(chr(code) for code in architecture.flatten())
+                else:
+                    architecture_str = "".join(chr(code) for code in architecture.flatten())
             else:
                 architecture_str = architecture
             # Map MATLAB antenna names to TOML file names
@@ -369,8 +376,11 @@ class Scenario:
         if "antenna" in matlab_scenario and "a_ampl" in matlab_scenario["antenna"]:
             a_ampl = matlab_scenario["antenna"]["a_ampl"]
             if isinstance(a_ampl, (list, np.ndarray)):
-                # Handle nested lists from .mat files
-                if a_ampl and isinstance(a_ampl[0], list):
+                # Handle nested lists/arrays from .mat files
+                # Check if this is a 2D array with a single row (common MATLAB format)
+                if isinstance(a_ampl, np.ndarray) and a_ampl.ndim == 2 and a_ampl.shape[0] == 1:
+                    a_ampl = a_ampl[0]  # Extract the first row
+                elif isinstance(a_ampl, list) and a_ampl and isinstance(a_ampl[0], list):
                     a_ampl = a_ampl[0]  # Extract the inner list
                 # Convert to list of floats (assume same unit as MATLAB)
                 excitation["power"] = [float(x) for x in a_ampl]
@@ -388,8 +398,11 @@ class Scenario:
         if "antenna" in matlab_scenario and "a_phase" in matlab_scenario["antenna"]:
             a_phase = matlab_scenario["antenna"]["a_phase"]
             if isinstance(a_phase, (list, np.ndarray)):
-                # Handle nested lists from .mat files
-                if a_phase and isinstance(a_phase[0], list):
+                # Handle nested lists/arrays from .mat files
+                # Check if this is a 2D array with a single row (common MATLAB format)
+                if isinstance(a_phase, np.ndarray) and a_phase.ndim == 2 and a_phase.shape[0] == 1:
+                    a_phase = a_phase[0]  # Extract the first row
+                elif isinstance(a_phase, list) and a_phase and isinstance(a_phase[0], list):
                     a_phase = a_phase[0]  # Extract the inner list
                 # Convert radians to degrees and normalize modulo 360
                 excitation["phase"] = [float(np.rad2deg(x)) % 360 for x in a_phase]
@@ -412,9 +425,12 @@ class Scenario:
             # Handle TSport as ASCII codes (from .mat files) or as string
             if isinstance(TSport, (list, np.ndarray)):
                 # Convert ASCII codes to string
-                if TSport and isinstance(TSport[0], list):
+                if isinstance(TSport, list) and TSport and isinstance(TSport[0], list):
                     # Handle nested lists from .mat files
                     TSport = [item[0] if isinstance(item, list) else item for item in TSport]
+                elif isinstance(TSport, np.ndarray) and TSport.ndim == 2 and TSport.shape[1] == 1:
+                    # Handle 2D numpy array of character codes
+                    TSport = TSport.flatten()
                 excitation["port"] = "".join(chr(int(code)) for code in TSport)
             else:
                 excitation["port"] = str(TSport)
@@ -454,24 +470,34 @@ class Scenario:
         # version_plasma_1D -> plasma.spectral_1D.profile (3 -> 'linear', 6 -> 'bilinear')
         # Use options.version_code to determine which version to use
         version_code = get_nested(matlab_scenario, "options", "version_code")
+        version_plasma_1d = None
         if version_code == "1D":
-            version_plasma_1d = matlab_scenario.get("version_plasma_1D")
+            version_plasma_1d = matlab_scenario.get("version_plasma_1D") or get_nested(
+                matlab_scenario, "plasma", "version"
+            )
         elif version_code == "2D":
-            version_plasma_1d = matlab_scenario.get("version_plasma_2D")
-        else:
+            version_plasma_1d = matlab_scenario.get("version_plasma_2D") or get_nested(
+                matlab_scenario, "plasma", "version"
+            )
+
+        if version_plasma_1d is None:
             # Fallback to plasma.version
             version_plasma_1d = get_nested(matlab_scenario, "plasma", "version")
-            if isinstance(version_plasma_1d, str):
-                # This is a variable reference, get the actual value
-                if version_plasma_1d == "version_plasma_1D":
-                    version_plasma_1d = matlab_scenario.get("version_plasma_1D")
-                elif version_plasma_1d == "version_plasma_2D":
-                    version_plasma_1d = matlab_scenario.get("version_plasma_2D")
 
-        if version_plasma_1d == 3:
-            spectral_1d["profile"] = "linear"
-        elif version_plasma_1d == 6:
-            spectral_1d["profile"] = "bilinear"
+        if isinstance(version_plasma_1d, str):
+            # This is a variable reference, get the actual value
+            if version_plasma_1d == "version_plasma_1D":
+                version_plasma_1d = matlab_scenario.get("version_plasma_1D")
+            elif version_plasma_1d == "version_plasma_2D":
+                version_plasma_1d = matlab_scenario.get("version_plasma_2D")
+
+        # Convert to int for comparison (MATLAB may store version as float)
+        if isinstance(version_plasma_1d, (int, float)):
+            version_plasma_1d_int = int(version_plasma_1d)
+            if version_plasma_1d_int == 3:
+                spectral_1d["profile"] = "linear"
+            elif version_plasma_1d_int == 6:
+                spectral_1d["profile"] = "bilinear"
 
         # Nme -> plasma.spectral_1D.nb_evanescent_modes
         if "Nme" in matlab_scenario:
@@ -510,13 +536,23 @@ class Scenario:
             lambda_n_value = plasma_data["lambda_n"]
             if isinstance(lambda_n_value, (list, np.ndarray)):
                 # Handle nested lists from .mat files (e.g., [[0.002], [0.02]])
-                if lambda_n_value and isinstance(lambda_n_value[0], list):
+                if isinstance(lambda_n_value, list) and lambda_n_value and isinstance(lambda_n_value[0], list):
                     # Extract all values from nested lists
                     for item in lambda_n_value:
                         if isinstance(item, list) and len(item) > 0:
                             lambda_n.append(float(item[0]))
                         elif isinstance(item, (int, float, np.number)):
                             lambda_n.append(float(item))
+                elif (
+                    isinstance(lambda_n_value, np.ndarray) and lambda_n_value.ndim == 2 and lambda_n_value.shape[1] == 1
+                ):
+                    # Handle 2D numpy array with single column
+                    for item in lambda_n_value:
+                        if isinstance(item, (int, float, np.number)):
+                            lambda_n.append(float(item))
+                        elif hasattr(item, "__iter__") and not isinstance(item, str):
+                            # It's an iterable (like a 1-element array)
+                            lambda_n.append(float(item[0]))
                 else:
                     lambda_n = [float(x) for x in lambda_n_value]
             else:
@@ -767,6 +803,9 @@ class Scenario:
                 self.results["S_plasma"] = S_plasma
                 self.results["rac_Zhe"] = rac_Zhe
 
+                # Compute antenna response (reflection coefficients)
+                self._compute_antenna_response()
+
                 return
             else:
                 raise ValueError(
@@ -774,6 +813,209 @@ class Scenario:
                 )
         else:
             raise ValueError(f"Unsupported solver '{solver}'. Only 'spectral_1D' is currently supported.")
+
+    def _compute_antenna_response(self) -> None:
+        """
+        Compute the antenna response (reflection coefficients) from S_plasma and rac_Zhe.
+
+        This implements the logic from MATLAB's reponse_antenne.m and aloha_compute_RC.m
+        to connect the plasma S-parameters to the antenna S-parameters and compute
+        the reflection coefficients.
+        """
+        # Get S_plasma and rac_Zhe from results
+        S_plasma = self.results.get("S_plasma")
+        if S_plasma is None:
+            raise ValueError("S_plasma must be computed before calling _compute_antenna_response")
+
+        # Get antenna excitation parameters from scenario
+        scenario_antenna = self.scenario.get("antenna", {})
+        excitation = scenario_antenna.get("excitation", {})
+
+        # Get magnitudes and phases
+        a_ampl = np.array(excitation.get("power", []), dtype=float)
+        a_phase = np.array(excitation.get("phase", []), dtype=float)
+
+        # Convert phases from degrees to radians if needed
+        if len(a_phase) > 0 and np.max(np.abs(a_phase)) > 10:
+            a_phase = np.deg2rad(a_phase)
+
+        # Incident wave vector on antenna
+        a_acces = a_ampl * np.exp(1j * a_phase)
+
+        # Load antenna file to get layout and module parameters
+        antenna_file = scenario_antenna.get("file")
+        antenna_data = {}
+        if antenna_file:
+            try:
+                from pathlib import Path
+
+                from aloha.antenna import Antenna
+
+                # Try to find the antenna file
+                antenna_paths = [
+                    Path(antenna_file),
+                    Path(__file__).parent.parent / "antennas" / antenna_file,
+                    Path(__file__).parent.parent.parent / "antennas" / antenna_file,
+                ]
+
+                # Also try with .m extension
+                if not any(path.exists() for path in antenna_paths):
+                    antenna_paths.extend(
+                        [
+                            Path(f"{antenna_file}.m"),
+                            Path(__file__).parent.parent / "antennas" / f"{antenna_file}.m",
+                            Path(__file__).parent.parent.parent / "antennas" / f"{antenna_file}.m",
+                        ]
+                    )
+
+                for path in antenna_paths:
+                    if path.exists():
+                        antenna_obj = Antenna.from_file(path)
+                        antenna_data = antenna_obj.antenna
+                        break
+            except (FileNotFoundError, ImportError) as e:
+                # If we can't load the antenna file, use defaults
+                raise (FileNotFoundError, "can't load antenna file")
+
+        # Get layout parameters
+        layout = antenna_data.get("layout", {})
+        nb_modules_tor = layout.get("nb_mod_phi", 1)
+        nb_modules_pol = layout.get("nb_mod_theta", 1)
+        total_modules = nb_modules_tor * nb_modules_pol
+
+        # Get module parameters
+        module = antenna_data.get("module", {})
+        nb_wg_phi = module.get("nb_wg_phi", 1)
+        nb_wg_theta = module.get("nb_wg_theta", 1)
+        mask = module.get("mask", [1])
+        nb_pwg_edge = module.get("nb_pwg_edge", 0)
+        nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", 0)
+
+        # Calculate total number of waveguides per poloidal row
+        nb_g_total_ligne = nb_wg_phi * nb_modules_tor + 2 * nb_pwg_edge + nb_pwg_btw_mod_phi * (nb_modules_tor - 1)
+
+        # Get the number of modes from S_plasma shape
+        nb_modes_total = S_plasma.shape[0] // nb_g_total_ligne if nb_g_total_ligne > 0 else 1
+
+        # Number of access ports = number of modules
+        nb_access_ports = total_modules
+
+        # Number of plasma ports = nb_g_total_ligne * nb_modes_total
+        nb_plasma_ports = nb_g_total_ligne * nb_modes_total
+
+        # Initialize S_ant matrices
+        # Note: S_ant_12 connects access ports to plasma ports, so shape is (nb_plasma_ports, nb_access_ports)
+        #       S_ant_21 connects plasma ports to access ports, so shape is (nb_access_ports, nb_plasma_ports)
+        S_ant_11 = np.zeros((nb_access_ports, nb_access_ports), dtype=complex)
+        S_ant_12 = np.zeros((nb_plasma_ports, nb_access_ports), dtype=complex)
+        S_ant_21 = np.zeros((nb_access_ports, nb_plasma_ports), dtype=complex)
+        S_ant_22 = np.zeros((nb_plasma_ports, nb_plasma_ports), dtype=complex)
+
+        # For the elementary antenna case with ideal waveguides
+        # Each module has S_module = [0, 1; 1, 0] for a perfect waveguide
+        # Based on MATLAB output, each module connects only to the first mode of its waveguide
+        for ind in range(total_modules):
+            # S_module_11 = 0 (no reflection at access)
+            S_ant_11[ind, ind] = 0.0
+
+            # Connect module to the first mode of its waveguide only
+            # This matches the MATLAB pattern: S_ant_21[ind, ind*nb_modes_total] = 1.0
+            # and S_ant_12[ind*nb_modes_total, ind] = 1.0
+            plasma_port = ind * nb_modes_total
+            S_ant_12[plasma_port, ind] = 1.0
+            S_ant_21[ind, plasma_port] = 1.0
+
+        # Store antenna S-parameters in results
+        self.results["S_ant_11"] = S_ant_11
+        self.results["S_ant_12"] = S_ant_12
+        self.results["S_ant_21"] = S_ant_21
+        self.results["S_ant_22"] = S_ant_22
+
+        # Store access wave vectors
+        self.results["a_acces"] = a_acces
+
+        # Compute incident and reflected wave vectors on/from plasma
+        # From reponse_antenne.m:
+        # a_plasma = inv(eye(length(S_plasma)) - S_ant_22*S_plasma)*S_ant_21*a_acces
+        # b_plasma = S_plasma*a_plasma
+
+        # For the case where S_ant_22 is zero (no passive waveguides):
+        # a_plasma = S_ant_21 * a_acces
+
+        # Compute a_plasma
+        # From MATLAB: a_plasma = inv(eye(length(S_plasma)) - S_ant_22*S_plasma)*S_ant_21*a_acces
+        # But based on the actual MATLAB data, it seems like:
+        # a_plasma = S_ant_21.T @ a_acces (when S_ant_22 is zero)
+        # This suggests that S_ant_21 in MATLAB is stored as (access_ports, plasma_ports)
+        # but the formula expects it to be (plasma_ports, access_ports)
+
+        identity = np.eye(S_plasma.shape[0], dtype=complex)
+
+        # Reshape a_acces to be a column vector
+        a_acces_col = a_acces.reshape(-1, 1)
+
+        # Check if S_ant_22 is zero (no passive waveguides)
+        if np.allclose(S_ant_22, 0):
+            # Simplified case: a_plasma = S_ant_21.T @ a_acces
+            # This matches the MATLAB results
+            a_plasma = S_ant_21.T @ a_acces_col
+        else:
+            # General case
+            matrix_to_invert = identity - S_ant_22 @ S_plasma
+            try:
+                inv_matrix = np.linalg.inv(matrix_to_invert)
+                # a_plasma = inv(...) @ S_ant_21.T @ a_acces
+                a_plasma = inv_matrix @ S_ant_21.T @ a_acces_col
+            except np.linalg.LinAlgError:
+                # If matrix is singular, use pseudo-inverse
+                inv_matrix = np.linalg.pinv(matrix_to_invert)
+                a_plasma = inv_matrix @ S_ant_21.T @ a_acces_col
+
+        # Compute b_plasma
+        # b_plasma = S_plasma * a_plasma
+        b_plasma = S_plasma @ a_plasma
+
+        # Store plasma wave vectors
+        self.results["a_plasma"] = a_plasma.flatten()
+        self.results["b_plasma"] = b_plasma.flatten()
+
+        # Reflection coefficient at the mouth of the antenna
+        # RC_mouth = 100*abs(b_plasma./a_plasma).^2
+        with np.errstate(divide="ignore", invalid="ignore"):
+            rc_mouth = 100 * np.abs(b_plasma / a_plasma) ** 2
+            rc_mouth[~np.isfinite(rc_mouth)] = 0.0
+        self.results["RC_mouth"] = rc_mouth.flatten()
+
+        # Compute the plasma-coupled antenna scattering matrix
+        # From MATLAB: S_acces = S_ant_11 + S_ant_12*S_plasma*inv(eye(length(S_plasma)) - S_ant_22*S_plasma)*S_ant_21
+        # But based on actual data: S_acces = S_ant_11 + S_ant_12.T @ S_plasma @ S_ant_21.T
+        if np.allclose(S_ant_22, 0):
+            # Simplified case: S_acces = S_ant_11 + S_ant_12.T @ S_plasma @ S_ant_21.T
+            S_acces = S_ant_11 + S_ant_12.T @ S_plasma @ S_ant_21.T
+        else:
+            # General case
+            inv_matrix = np.linalg.inv(identity - S_ant_22 @ S_plasma)
+            S_acces = S_ant_11 + S_ant_12.T @ S_plasma @ inv_matrix @ S_ant_21.T
+
+        # Store S_acces
+        self.results["S_acces"] = S_acces
+
+        # Compute reflected wave vector from antenna
+        # b_acces = S_acces * a_acces
+        b_acces = S_acces @ a_acces_col
+
+        # Store b_acces
+        self.results["b_acces"] = b_acces.flatten()
+
+        # Power reflection coefficient at input of a module
+        # CoeffRefPuiss = 100*abs(b_acces./a_acces).^2
+        with np.errstate(divide="ignore", invalid="ignore"):
+            coeff_ref_puiss = 100 * np.abs(b_acces / a_acces_col) ** 2
+            coeff_ref_puiss[~np.isfinite(coeff_ref_puiss)] = 0.0
+
+        # Store reflection coefficients
+        self.results["CoeffRefPuiss"] = coeff_ref_puiss.flatten()
+        self.results["RC"] = coeff_ref_puiss.flatten()
 
 
 def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:

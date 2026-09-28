@@ -161,102 +161,92 @@ class TestScenario(unittest.TestCase):
         mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
         m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
 
-        # Check if the Fortran binary exists before running tests
-        from aloha.plasma import get_binary_path
-
-        binary_path = get_binary_path(6, "glnxa64")
-        if not binary_path.exists():
-            self.skipTest(f"Fortran binary not found: {binary_path}")
-
         # Create scenarios from different file formats
-        scenario_from_toml = Scenario.from_file(toml_file)
+        scenario_from_mat_ref = Scenario(mat_file)  # reference results to compare results (from ALOHA-matlab) with
         scenario_from_mat = Scenario(mat_file)
         scenario_from_m = Scenario(m_file)
+        scenario_from_toml = Scenario.from_file(toml_file)
 
-        # check that the scenario dictionnary is the same between formats
-        # "comment" is missing in the matlab version -- adding it to pass the test
-        scenario_from_m.scenario["comment"] = scenario_from_toml.scenario["comment"]
-        scenario_from_mat.scenario["comment"] = scenario_from_toml.scenario["comment"]
+        for scenario in [scenario_from_mat_ref, scenario_from_mat, scenario_from_m]:
+            # "comment" is missing in the matlab version -- adding it to pass the following tests
+            scenario.scenario["comment"] = scenario_from_toml.scenario["comment"]
 
-        # Compare all three scenario dictionaries using Scenario equality test
-        self.assertEqual(scenario_from_toml, scenario_from_m)
-        self.assertEqual(scenario_from_toml, scenario_from_mat)
+            # Compare all three scenario dictionaries using Scenario equality test
+            self.assertEqual(scenario_from_toml, scenario)
 
-        # Run each scenario to generate results
-        try:
-            scenario_from_toml.run()
-            scenario_from_mat.run()
-            scenario_from_m.run()
-        except RuntimeError as e:
-            if "Binary execution failed" in str(e):
-                self.skipTest(f"Fortran binary execution failed: {e}")
-            else:
-                raise
+        # Run each scenario to (re)generate results
+        scenario_from_toml.run()
+        scenario_from_mat.run()  # results are overwritten in this case
+        scenario_from_m.run()
 
-        # Verify all scenarios have results
-        self.assertIn("S_plasma", scenario_from_toml.results)
-        self.assertIn("rac_Zhe", scenario_from_toml.results)
-        self.assertIn("S_plasma", scenario_from_mat.results)
-        self.assertIn("rac_Zhe", scenario_from_mat.results)
-        self.assertIn("S_plasma", scenario_from_m.results)
-        self.assertIn("rac_Zhe", scenario_from_m.results)
+        # Verify all scenarios have a "results" fields
+        for fields in ["S_plasma", "rac_Zhe"]:
+            for scenario in [scenario_from_toml, scenario_from_m, scenario_from_mat, scenario_from_mat_ref]:
+                self.assertIn(fields, scenario.results)
 
         # Compare S_plasma matrices
-        S_plasma_toml = scenario_from_toml.results["S_plasma"]
+        S_plasma_mat_ref = scenario_from_mat_ref.results["S_plasma"]
         S_plasma_mat = scenario_from_mat.results["S_plasma"]
         S_plasma_m = scenario_from_m.results["S_plasma"]
+        S_plasma_toml = scenario_from_toml.results["S_plasma"]
 
-        # Check shapes are the same
-        self.assertEqual(
-            S_plasma_toml.shape,
-            S_plasma_mat.shape,
-            f"S_plasma shape mismatch: TOML={S_plasma_toml.shape}, MAT={S_plasma_mat.shape}",
-        )
-        self.assertEqual(
-            S_plasma_toml.shape,
-            S_plasma_m.shape,
-            f"S_plasma shape mismatch: TOML={S_plasma_toml.shape}, M={S_plasma_m.shape}",
-        )
+        for S_plasma in [S_plasma_toml, S_plasma_mat, S_plasma_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                S_plasma_mat_ref.shape,
+                S_plasma.shape,
+                f"S_plasma shape mismatch: ref={S_plasma_mat_ref.shape}, test={S_plasma.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                S_plasma_mat_ref,
+                S_plasma,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="S_plasma values differ between TOML and other}",
+            )
 
         # Compare rac_Zhe matrices
-        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
+        rac_Zhe_mat_ref = scenario_from_mat_ref.results["rac_Zhe"]
         rac_Zhe_mat = scenario_from_mat.results["rac_Zhe"]
         rac_Zhe_m = scenario_from_m.results["rac_Zhe"]
+        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
+
+        for rac_Zhe in [rac_Zhe_toml, rac_Zhe_mat, rac_Zhe_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                rac_Zhe_mat_ref.shape,
+                rac_Zhe.shape,
+                f"rac_Zhe shape mismatch: ref={rac_Zhe_mat_ref.shape}, test={rac_Zhe.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                rac_Zhe_mat_ref,
+                rac_Zhe,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="rac_Zhe values differ between ref and other}",
+            )
+
+        # Compare reflection coefficients (RC)
+        rc_mat_ref = scenario_from_mat_ref.results["RC"]
+        rc_mat = scenario_from_mat.results["RC"]
+        rc_m = scenario_from_m.results["RC"]
+        rc_toml = scenario_from_toml.results["RC"]
 
         # Check shapes are the same
-        self.assertEqual(
-            rac_Zhe_toml.shape,
-            rac_Zhe_mat.shape,
-            f"rac_Zhe shape mismatch: TOML={rac_Zhe_toml.shape}, MAT={rac_Zhe_mat.shape}",
-        )
-        self.assertEqual(
-            rac_Zhe_toml.shape,
-            rac_Zhe_m.shape,
-            f"rac_Zhe shape mismatch: TOML={rac_Zhe_toml.shape}, M={rac_Zhe_m.shape}",
-        )
+        for rc in [rc_toml, rc_mat, rc_m]:
+            self.assertEqual(
+                rc_mat_ref.shape,
+                rc.shape,
+                f"RC shape mismatch: ref={rc_mat_ref.shape}, test={rc.shape}",
+            )
 
-        # Compare values with tolerance (due to potential numerical differences)
-        np.testing.assert_allclose(
-            S_plasma_toml,
-            S_plasma_mat,
-            rtol=1e-10,
-            atol=1e-10,
-            err_msg="S_plasma values differ between TOML and MAT files",
-        )
-        np.testing.assert_allclose(
-            S_plasma_toml, S_plasma_m, rtol=1e-10, atol=1e-10, err_msg="S_plasma values differ between TOML and M files"
-        )
-
-        np.testing.assert_allclose(
-            rac_Zhe_toml,
-            rac_Zhe_mat,
-            rtol=1e-10,
-            atol=1e-10,
-            err_msg="rac_Zhe values differ between TOML and MAT files",
-        )
-        np.testing.assert_allclose(
-            rac_Zhe_toml, rac_Zhe_m, rtol=1e-10, atol=1e-10, err_msg="rac_Zhe values differ between TOML and M files"
-        )
+            np.testing.assert_allclose(
+                rc_mat_ref, rc, rtol=1e-10, atol=1e-10, err_msg="RC values differ between ref and other"
+            )
 
 
 if __name__ == "__main__":

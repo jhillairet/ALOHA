@@ -140,7 +140,34 @@ def _h5py_group_to_dict(group):
             if data.size == 1:
                 result[key] = data.item()
             else:
-                result[key] = data.tolist() if data.dtype != object else data
+                # Check if this is a character/string array (MATLAB stores strings as uint16 character codes)
+                if np.issubdtype(data.dtype, np.integer) and data.size > 0 and np.all(data >= 0) and np.all(data < 256):
+                    # Likely a character/string array - try to convert to string
+                    try:
+                        char_string = "".join(chr(i) for i in data.flatten())
+                        # If we successfully created a string with printable ASCII characters
+                        if char_string and all(32 <= ord(c) < 127 for c in char_string):
+                            result[key] = char_string
+                        else:
+                            # Not a valid string, treat as numerical
+                            result[key] = data
+                    except (TypeError, ValueError, OverflowError):
+                        # If conversion fails, treat as numerical array
+                        result[key] = data
+                # Check if this is a structured array representing complex numbers (real + imag fields)
+                elif data.dtype.names and set(data.dtype.names) == {"real", "imag"}:
+                    # Convert structured array to complex numpy array
+                    result[key] = data["real"] + 1j * data["imag"]
+                # Preserve numpy arrays for numerical data to maintain type consistency
+                # with results from running scenarios
+                elif np.issubdtype(data.dtype, np.number) or np.issubdtype(data.dtype, np.complexfloating):
+                    # Flatten single-row or single-column 2D arrays to 1D for consistency
+                    if data.ndim == 2 and (data.shape[0] == 1 or data.shape[1] == 1):
+                        result[key] = data.flatten()
+                    else:
+                        result[key] = data
+                else:
+                    result[key] = data.tolist() if data.dtype != object else data
         else:
             result[key] = item
     return result
@@ -205,16 +232,38 @@ def convert_matlab_value(value: Any) -> Any:
             # Structure array
             return {name: convert_matlab_value(value[name][0]) for name in value.dtype.names}
         elif value.ndim == 0:
-            # Scalar
+            # Scalar - always convert to Python scalar
             return value.item()
-        elif value.ndim == 1:
-            # Vector
-            return value.tolist()
-        elif value.ndim == 2:
-            # Matrix
-            return value.tolist()
         else:
-            return value.tolist()
+            # Check if this is a string/character array (MATLAB stores strings as uint16 character codes)
+            if value.dtype.kind in ("U", "S", "O"):  # Unicode, byte string, or object
+                # This is likely a string, try to convert it
+                try:
+                    return value.item() if value.size == 1 else "".join(chr(i) for i in value.flatten())
+                except (TypeError, ValueError):
+                    # If conversion fails, treat as object array
+                    return value.tolist()
+            # Check if this might be a character array (small integers representing ASCII/Unicode codes)
+            elif (
+                np.issubdtype(value.dtype, np.integer) and value.size > 0 and np.all(value >= 0) and np.all(value < 256)
+            ):
+                # Likely a character/string array - try to convert to string
+                try:
+                    char_string = "".join(chr(i) for i in value.flatten())
+                    # If we successfully created a string, check if it looks like a valid identifier/filename
+                    # (contains only printable ASCII characters)
+                    if char_string and all(32 <= ord(c) < 127 for c in char_string):
+                        return char_string
+                except (TypeError, ValueError, OverflowError):
+                    # If conversion fails, treat as numerical array
+                    pass
+            # For numerical arrays (vectors, matrices, etc.), preserve as numpy arrays
+            # to maintain type consistency with results from running scenarios
+            if np.issubdtype(value.dtype, np.number) or np.issubdtype(value.dtype, np.complexfloating):
+                return value
+            else:
+                # For non-numerical arrays, convert to list
+                return value.tolist()
     elif isinstance(value, (list, tuple)):
         return [convert_matlab_value(v) for v in value]
     elif isinstance(value, np.generic):
