@@ -46,27 +46,27 @@ pwg_depth = [0.25]
 [sparameters]
 # matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
 
-#filenames = [
-#    'Module_haut_plaque_long7_ext2',
-#    'Module_haut_plaque_long6_long7',
-#    'Module_haut_plaque_long5_long6',
-#    'Module_haut_plaque_long4_long5',
-#    'Module_haut_plaque_long3_long4',
-#    'Module_haut_plaque_long2_long3',
-#    'Module_haut_plaque_long1_long2',
-#    'Module_haut_plaque_ext1_long1'
-#]
-
 filenames = [
-    'Module_bas_plaque_long7_ext2',
-    'Module_bas_plaque_long6_long7',
-    'Module_bas_plaque_long5_long6',
-    'Module_bas_plaque_long4_long5',
-    'Module_bas_plaque_long3_long4',
-    'Module_bas_plaque_long2_long3',
-    'Module_bas_plaque_long1_long2',
-    'Module_bas_plaque_ext1_long1'
-    ]
+    'Module_haut_plaque_long7_ext2',
+    'Module_haut_plaque_long6_long7',
+    'Module_haut_plaque_long5_long6',
+    'Module_haut_plaque_long4_long5',
+    'Module_haut_plaque_long3_long4',
+    'Module_haut_plaque_long2_long3',
+    'Module_haut_plaque_long1_long2',
+    'Module_haut_plaque_ext1_long1'
+]
+
+#filenames = [
+#    'Module_bas_plaque_long7_ext2',
+#    'Module_bas_plaque_long6_long7',
+#    'Module_bas_plaque_long5_long6',
+#    'Module_bas_plaque_long4_long5',
+#    'Module_bas_plaque_long3_long4',
+#    'Module_bas_plaque_long2_long3',
+#    'Module_bas_plaque_long1_long2',
+#    'Module_bas_plaque_ext1_long1'
+#    ]
 
 
 ## Phase deembedding
