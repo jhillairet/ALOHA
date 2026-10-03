@@ -259,63 +259,71 @@ def S_plasma_1D_matlab_inputs(
     for ind in range(nb_g_pol):
         text_ind = f"[row #{ind + 1}/{nb_g_pol}]: "
 
-        # Skip calculation if lines are identical and this is not the first row
+        # Skip binary execution if lines are identical and this is not the first row
+        # But still need to read results and update matrices
         if bool_lignes_identiques and ind > 0:
             if bool_debug:
                 print(f"{text_ind}[bool_lignes_identiques=true]")  # noqa: T201
                 print(f"{text_ind}--> No need to calculate this row! taking previous result")  # noqa: T201
-            continue
+            # Skip binary execution but continue to read results
+            skip_binary = True
+        else:
+            skip_binary = False
 
-        if bool_debug:
-            print(f"{text_ind}Writing parameters file for the binary")  # noqa: T201
-
-        # Prepare parameters for version 6
-        # Order: Nmh, Nme, freq, ne0(ind), dne0(ind), d_couche(ind), dne1(ind),
-        #        nb_g_total_ligne, a, b, z, T_grill, D_guide_max, erreur_rel, pertes, max_nz, d_vide(ind)
-
-        # For version 6, we need to pass arrays b and z as arrays, not flattened
-        # First, write scalar parameters
-        var_list = [
-            float(Nmh),
-            float(Nme),
-            float(freq),
-            float(ne0[ind]),
-            float(dne0[ind]),
-            float(d_couche[ind]),
-            float(dne1[ind]),
-            float(nb_g_total_ligne),
-            float(a),
-            b,  # Keep as numpy array for proper formatting
-            z,  # Keep as numpy array for proper formatting
-            float(T_grill),
-            float(D_guide_max),
-            float(erreur_rel),
-            float(pertes),
-            float(max_nz),
-            float(d_vide[ind]),
-        ]
-
-        # Write parameters to file
-        save_fortran_input_file(fortran_input_file, var_list)
-
-        # Execute Fortran binary
-        if bool_debug:
-            print(f"{text_ind}Run binary {binary_path}")  # noqa: T201
-
-        try:
-            result = subprocess.run([str(binary_path)], cwd=working_dir, capture_output=True, text=True, check=True)
-
+        if not skip_binary:
             if bool_debug:
-                print(result.stdout)  # noqa: T201
-                if result.stderr:
-                    print(result.stderr)  # noqa: T201
+                print(f"{text_ind}Writing parameters file for the binary")  # noqa: T201
 
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Binary execution failed: {e}\nStdout: {e.stdout}\nStderr: {e.stderr}") from e
+            # Prepare parameters for version 6
+            # Order: Nmh, Nme, freq, ne0(ind), dne0(ind), d_couche(ind), dne1(ind),
+            #        nb_g_total_ligne, a, b, z, T_grill, D_guide_max, erreur_rel, pertes, max_nz, d_vide(ind)
 
-        # Read results
+            # For version 6, we need to pass arrays b and z as arrays, not flattened
+            # First, write scalar parameters
+            var_list = [
+                float(Nmh),
+                float(Nme),
+                float(freq),
+                float(ne0[ind]),
+                float(dne0[ind]),
+                float(d_couche[ind]),
+                float(dne1[ind]),
+                float(nb_g_total_ligne),
+                float(a),
+                b,  # Keep as numpy array for proper formatting
+                z,  # Keep as numpy array for proper formatting
+                float(T_grill),
+                float(D_guide_max),
+                float(erreur_rel),
+                float(pertes),
+                float(max_nz),
+                float(d_vide[ind]),
+            ]
+
+            # Write parameters to file
+            save_fortran_input_file(fortran_input_file, var_list)
+
+            # Execute Fortran binary
+            if bool_debug:
+                print(f"{text_ind}Run binary {binary_path}")  # noqa: T201
+
+            try:
+                result = subprocess.run([str(binary_path)], cwd=working_dir, capture_output=True, text=True, check=True)
+
+                if bool_debug:
+                    print(result.stdout)  # noqa: T201
+                    if result.stderr:
+                        print(result.stderr)  # noqa: T201
+
+            except subprocess.CalledProcessError as e:
+                raise RuntimeError(f"Binary execution failed: {e}\nStdout: {e.stdout}\nStderr: {e.stderr}") from e
+
+        # Read results (even if we skipped binary execution, we still need to read the previous results)
         if bool_debug:
-            print(f"{text_ind}Reading ascii result file")  # noqa: T201
+            if skip_binary:
+                print(f"{text_ind}Reading previous result file")  # noqa: T201
+            else:
+                print(f"{text_ind}Reading ascii result file")  # noqa: T201
 
         if not fortran_output_file.exists():
             raise FileNotFoundError(f"Output file not created: {fortran_output_file}")

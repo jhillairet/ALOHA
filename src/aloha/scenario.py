@@ -1147,9 +1147,10 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
         nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", nb_pwg_btw_mod_phi)
         nb_pwg_edge = module.get("nb_pwg_edge", nb_pwg_edge)
 
-    # number of poloidal waveguide rows (nb_wg_theta),
+    # Fix: nb_g_pol should be the number of poloidal waveguide rows (nb_wg_theta),
     # not the number of poloidal modules (nb_mod_theta).
     # This matches the MATLAB behavior in aloha_utils_ITM2oldAntenna.m line 6:
+    # "nb_g_pol = aloha_scenario_get(scenario, 'nwm_theta'); % 11/10/2013 - was nma_theta, but does not work..."
     nb_g_pol = nb_wg_theta
 
     # Calculate total number of waveguides per poloidal row
@@ -1161,6 +1162,10 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     # Waveguide dimensions from antenna module parameters
     wg_size_theta = module.get("wg_size_theta", 70e-3)  # Height of waveguides in poloidal direction [m]
     awg_size_phi = module.get("awg_size_phi", 10e-3)  # Width of active waveguides [m]
+    pwg_size_phi = module.get("pwg_size_phi", 6.5e-3)  # Width of internal passive waveguides [m]
+    pwg_size_edge_phi = module.get("pwg_size_edge_phi", 6.5e-3)  # Width of edge passive waveguides [m]
+    e_phi = module.get("e_phi", 2e-3)  # Spacing between active waveguides [m]
+    e_phi_pwg = module.get("e_phi_pwg", 3e-3)  # Spacing between passive waveguides [m]
 
     # For version 6, we need to provide arrays for each poloidal row
     # Convert scalar values to arrays with length nb_g_pol
@@ -1174,22 +1179,62 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
         dne1_array = [0.0] * nb_g_pol
     d_vide_array = [vacuum_layer_length] * nb_g_pol
 
-    # Waveguide parameters using MATLAB waveguide logic from aloha_utils_getAntennaCoordinates.m
+    # Waveguide parameters using MATLAB waveguide logic from aloha_utils_getAntennaCoordinatesFromCPO.m
     # a = waveguide height in poloidal direction (constant for all waveguides in a line)
     a = wg_size_theta
 
-    # b = array of waveguide widths in toroidal direction
-    # For version 6, use active waveguide width for all waveguides
-    b = [awg_size_phi] * nb_g_total_ligne
+    # Compute b array (waveguide widths in toroidal direction) to match MATLAB logic
+    # From aloha_utils_getAntennaCoordinatesFromCPO.m lines 31-41:
+    # b_module = wg.mask.*wg.bwa + not(wg.mask).*wg.biwp;
+    # b_edge = repmat(wg.bewp, 1, wg.npwe_phi);
+    # b_inter = repmat(wg.biwp, 1, wg.npwbm_phi);
+    # b = [b_edge, kron(ones(1,mod.nma_phi-1),[b_module, b_inter]),b_module, b_edge];
 
-    # z = array of waveguide positions in toroidal direction
-    # Calculate positions based on waveguide widths and spacing (e_phi)
-    # From MATLAB: z(1,ind) = z(1,ind-1) + b(ind-1) + e_phi
-    # Get the spacing between waveguides from antenna module parameters
-    e_phi = module.get("e_phi", 1e-3)  # Default spacing if not specified
-    z = [0.0] * nb_g_total_ligne
-    for ind in range(1, nb_g_total_ligne):
-        z[ind] = z[ind - 1] + b[ind - 1] + e_phi
+    # b_module: waveguide widths within a module (active or internal passive)
+    b_module = []
+    for m in mask:
+        if m == 1:
+            b_module.append(awg_size_phi)  # active waveguide
+        else:
+            b_module.append(pwg_size_phi)  # internal passive waveguide
+
+    # b_edge: passive waveguide widths on each edge
+    b_edge = [pwg_size_edge_phi] * nb_pwg_edge
+
+    # b_inter: passive waveguide widths between modules
+    b_inter = [pwg_size_phi] * nb_pwg_btw_mod_phi
+
+    # Construct b array following MATLAB logic
+    # [b_edge, kron(ones(1, nb_mod_phi-1), [b_module, b_inter]), b_module, b_edge]
+    b_parts = []
+    b_parts.extend(b_edge)  # leading edge
+    for _ in range(nb_mod_phi - 1):
+        b_parts.extend(b_module)
+        b_parts.extend(b_inter)
+    b_parts.extend(b_module)  # last module
+    b_parts.extend(b_edge)  # trailing edge
+
+    b = b_parts
+
+    # Compute e array (septum widths between waveguides)
+    # From MATLAB: e = wg.e_phi (this is an array)
+    # The spacing depends on the waveguide types:
+    # - e_phi_pwg (3e-3) when at least one adjacent waveguide is passive
+    # - e_phi (2e-3) when both adjacent waveguides are active
+    # This matches the pattern seen in MATLAB antenna structures
+    e = []
+    for i in range(len(b) - 1):
+        # Check if current or next waveguide is passive (width != awg_size_phi)
+        if b[i] != awg_size_phi or b[i + 1] != awg_size_phi:
+            e.append(e_phi_pwg)  # Use passive spacing
+        else:
+            e.append(e_phi)  # Use active spacing
+
+    # Compute z array (waveguide positions in toroidal direction)
+    # From MATLAB: z(1,ind) = z(1,ind-1) + b(ind-1) + e(ind-1)
+    z = [0.0] * len(b)
+    for ind in range(1, len(b)):
+        z[ind] = z[ind - 1] + b[ind - 1] + e[ind - 1]
 
     # Other parameters (using typical defaults for version 6)
     # Match MATLAB defaults from aloha_init.m
