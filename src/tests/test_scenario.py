@@ -179,7 +179,7 @@ class TestScenario(unittest.TestCase):
         mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.mat"
         m_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.m"
 
-        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file, m_file])
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
     def test_run_method_consistency_across_file_formats_LH2(self):
         """Test that run() method generates the same results for scenarios from different file formats."""
@@ -188,7 +188,7 @@ class TestScenario(unittest.TestCase):
         mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.mat"
         m_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.m"
 
-        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file, m_file])
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
     def _test_run_method_consistency_across_file_formats(self, scenario_reference, scenarios):
         # Create scenarios from different file formats

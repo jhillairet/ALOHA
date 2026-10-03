@@ -921,13 +921,17 @@ class Scenario:
             passive_wg_indices.append(current_pos + i)
 
         # Set diagonal values for passive waveguides
-        for wg_idx in passive_wg_indices:
-            if wg_idx < nb_g_total_ligne:  # Make sure it's within bounds
-                for mode in range(nb_modes_total):
-                    plasma_port = (wg_idx + 1) * nb_modes_total + mode - (nb_modes_total - 1) - 1
-                    # S_ant_22 is diagonal in MATLAB, so only set diagonal elements
-                    # In our transposed convention: S_ant_22[plasma_port, plasma_port]
-                    S_ant_22[plasma_port, plasma_port] = -np.exp(1j * 4 * np.pi * lcc_default)
+        # Passive waveguides exist in all poloidal rows
+        for pol_row in range(nb_wg_theta):
+            for wg_idx in passive_wg_indices:
+                if wg_idx < nb_g_total_ligne:  # Make sure it's within bounds
+                    for mode in range(nb_modes_total):
+                        # Calculate plasma port index accounting for poloidal row
+                        wg_index = wg_idx + pol_row * nb_g_total_ligne
+                        plasma_port = (wg_index + 1) * nb_modes_total + mode - (nb_modes_total - 1) - 1
+                        # S_ant_22 is diagonal in MATLAB, so only set diagonal elements
+                        # In our transposed convention: S_ant_22[plasma_port, plasma_port]
+                        S_ant_22[plasma_port, plasma_port] = -np.exp(1j * 4 * np.pi * lcc_default)
 
         # Precompute the active waveguide indices for each module
         # This is similar to MATLAB's modules_act
@@ -943,16 +947,19 @@ class Scenario:
             wg_start = nb_pwg_edge + tor_pos * (nb_wg_phi + nb_pwg_btw_mod_phi)
 
             # For each waveguide in the module, check if it's active (based on mask)
+            # The S-parameter files may include waveguides from multiple poloidal rows
             active_plasma_ports = []
-            for wg_offset in range(nb_wg_phi):
-                if wg_offset < len(mask) and mask[wg_offset] == 1:
-                    # This waveguide is active
-                    # Calculate the plasma port index for mode 0 of this waveguide
-                    # This matches MATLAB's convention: modules_act = modules_act * (Nme+Nmh) - (Nme+Nmh-1)
-                    # In 0-based indexing: plasma_port = wg_index * nb_modes_total
-                    wg_index = wg_start + wg_offset
-                    plasma_port = wg_index * nb_modes_total
-                    active_plasma_ports.append(plasma_port)
+            for pol_offset in range(nb_wg_theta):
+                for wg_offset in range(nb_wg_phi):
+                    if wg_offset < len(mask) and mask[wg_offset] == 1:
+                        # This waveguide is active
+                        # Calculate the waveguide index accounting for poloidal rows
+                        wg_index = wg_start + wg_offset + pol_offset * nb_g_total_ligne
+                        # Calculate the plasma port index for mode 0 of this waveguide
+                        # This matches MATLAB's convention: modules_act = modules_act * (Nme+Nmh) - (Nme+Nmh-1)
+                        # In 0-based indexing: plasma_port = wg_index * nb_modes_total
+                        plasma_port = wg_index * nb_modes_total
+                        active_plasma_ports.append(plasma_port)
 
             modules_act.append(active_plasma_ports)
 
@@ -1018,11 +1025,13 @@ class Scenario:
                     S_module = S_module.reshape((n, n))
 
                 # S_module is (n_ports, n_ports) where n_ports = 1 + nb_wg_per_module * nb_modes
-                # For WEST_LH1: n_ports = 1 + 6 * 3 = 19
+                # For WEST_LH1: n_ports = 1 + 6 * 3 = 19 (6 active waveguides * 3 poloidal rows * 1 mode)
                 n_ports = S_module.shape[0]
                 # Calculate the number of modes in the S-parameter file
-                # n_ports = 1 + nb_active_wg * nb_modes_sparam
-                nb_modes_sparam = (n_ports - 1) // nb_active_wg_phi
+                # The S-parameter files may include waveguides from multiple poloidal rows
+                # Total waveguides in S-parameter file = nb_active_wg_phi * nb_wg_theta
+                nb_wg_in_sparam = nb_active_wg_phi * max(nb_wg_theta, 1)
+                nb_modes_sparam = (n_ports - 1) // nb_wg_in_sparam
                 nb_wg_per_module = (n_ports - 1) // nb_modes_sparam
 
                 S_module_11 = S_module[0, 0]
@@ -1063,9 +1072,10 @@ class Scenario:
                 # S_module_21 has shape (nb_wg_per_module * nb_modes, 1)
 
                 # Check if we have modules_act (active waveguide indices per module)
-                # If nb_wg_per_module matches nb_active_wg_phi, then S-parameter files include only active waveguides
+                # If nb_wg_per_module matches the total active waveguides per module (nb_active_wg_phi * nb_wg_theta),
+                # then S-parameter files include only active waveguides
                 # In this case, we use modules_act to place the S-parameter data
-                if nb_wg_per_module == nb_active_wg_phi and len(modules_act) > ind:
+                if nb_wg_per_module == nb_active_wg_phi * nb_wg_theta and len(modules_act) > ind:
                     # S-parameter files include only active waveguides
                     # Use modules_act to get the correct plasma port indices
                     active_plasma_ports = modules_act[ind]
@@ -1244,13 +1254,15 @@ class Scenario:
         nb_g_total_ligne = nb_wg_phi * nb_modules_tor + 2 * nb_pwg_edge + nb_pwg_btw_mod_phi * (nb_modules_tor - 1)
 
         # Get the number of modes from S_plasma shape
-        nb_modes_total = S_plasma.shape[0] // nb_g_total_ligne if nb_g_total_ligne > 0 else 1
+        # Total waveguides = nb_g_total_ligne * nb_wg_theta (accounting for poloidal rows)
+        total_waveguides = nb_g_total_ligne * nb_wg_theta
+        nb_modes_total = S_plasma.shape[0] // total_waveguides if total_waveguides > 0 else 1
 
         # Number of access ports = number of modules
         nb_access_ports = total_modules
 
-        # Number of plasma ports = nb_g_total_ligne * nb_modes_total
-        nb_plasma_ports = nb_g_total_ligne * nb_modes_total
+        # Number of plasma ports = total_waveguides * nb_modes_total
+        nb_plasma_ports = total_waveguides * nb_modes_total
 
         # Initialize S_ant matrices only if not already loaded
         if S_ant_11 is None:
