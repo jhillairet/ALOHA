@@ -947,11 +947,12 @@ class Scenario:
             for wg_offset in range(nb_wg_phi):
                 if wg_offset < len(mask) and mask[wg_offset] == 1:
                     # This waveguide is active
-                    # Calculate the plasma port indices for this waveguide (one per mode)
-                    for mode in range(nb_modes_total):
-                        wg_index = wg_start + wg_offset
-                        plasma_port = (wg_index + 1) * nb_modes_total + mode - (nb_modes_total - 1) - 1
-                        active_plasma_ports.append(plasma_port)
+                    # Calculate the plasma port index for mode 0 of this waveguide
+                    # This matches MATLAB's convention: modules_act = modules_act * (Nme+Nmh) - (Nme+Nmh-1)
+                    # In 0-based indexing: plasma_port = wg_index * nb_modes_total
+                    wg_index = wg_start + wg_offset
+                    plasma_port = wg_index * nb_modes_total
+                    active_plasma_ports.append(plasma_port)
 
             modules_act.append(active_plasma_ports)
 
@@ -1031,14 +1032,15 @@ class Scenario:
 
                 # If the number of modes in the S-parameter file is less than nb_modes_total,
                 # we need to expand the S-parameter data to match the plasma modes.
-                # This is done by repeating the S-parameter data for each additional mode.
+                # However, following MATLAB's convention, we only connect to mode 0 of each waveguide,
+                # so we don't expand S_module_12 and S_module_21 (they stay as single values).
+                # We only expand S_module_22 to handle scattering between modes.
                 if nb_modes_sparam < nb_modes_total:
                     # Calculate the expansion factor
                     expansion_factor = nb_modes_total // nb_modes_sparam
 
-                    # Expand S_module_12 and S_module_21 by repeating the data
-                    S_module_12 = np.tile(S_module_12, expansion_factor)
-                    S_module_21 = np.tile(S_module_21, expansion_factor)
+                    # Don't expand S_module_12 and S_module_21 - they connect to mode 0 only
+                    # S_module_12 and S_module_21 stay as-is (single values)
 
                     # Expand S_module_22 by repeating the block structure
                     # S_module_22 is (nb_wg_per_module * nb_modes_sparam, nb_wg_per_module * nb_modes_sparam)
@@ -1046,7 +1048,7 @@ class Scenario:
                     S_module_22 = np.kron(S_module_22, np.eye(expansion_factor))
 
                     # Update nb_wg_per_module to match the expanded size
-                    nb_wg_per_module = (len(S_module_12)) // nb_modes_total
+                    nb_wg_per_module = (S_module_22.shape[0]) // nb_modes_total
 
                 # Note: Phase deembedding is only applied when bool_mesure = true in MATLAB
                 # For this scenario (WEST_LH1), bool_mesure = false, so we don't apply it
