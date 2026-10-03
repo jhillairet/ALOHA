@@ -10,6 +10,8 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib
 
+from pprint import pp
+
 from aloha.utils import load_m_file, load_mat_file
 
 
@@ -52,6 +54,7 @@ class Scenario:
             self.scenario = scenario
         elif scenario is not None:
             raise ValueError("Invalid scenario type. Must be a string, Path, or dict.")
+        self.debug = self.scenario["options"]["debug"]
 
     @classmethod
     def from_file(cls, filename: str | os.PathLike):
@@ -291,6 +294,8 @@ class Scenario:
                 "antenne_elementaire": "8_active_waveguides.toml",
                 "tutorial_aloha_antenna_simple_grill_8waveguides": "8_active_waveguides.toml",
                 "antenna_8_active_waveguides": "8_active_waveguides.toml",
+                "antenna_C3_ITM": "WEST_LH1_top.toml",
+                "antenna_C4_ITM": "WEST_LH2_top.toml",
                 # Add more mappings as needed
             }
             antenna["file"] = antenna_name_mapping.get(architecture_str, architecture_str)
@@ -569,8 +574,6 @@ class Scenario:
         # plasma.d_couche -> plasma.spectral_1D.bilinear.plasma_layer_length
         if "plasma" in matlab_scenario and "d_couche" in matlab_scenario["plasma"]:
             bilinear["plasma_layer_length"] = float(matlab_scenario["plasma"]["d_couche"])
-            # Also keep the old name for backward compatibility (as expected by tests)
-            bilinear["d_couche"] = float(matlab_scenario["plasma"]["d_couche"])
 
         # options.B0 -> plasma.spectral_1D.bilinear.B0
         if "options" in matlab_scenario and "B0" in matlab_scenario["options"]:
@@ -579,8 +582,6 @@ class Scenario:
         # plasma.d_vide -> plasma.spectral_1D.bilinear.vacuum_layer_length
         if "plasma" in matlab_scenario and "d_vide" in matlab_scenario["plasma"]:
             bilinear["vacuum_layer_length"] = float(matlab_scenario["plasma"]["d_vide"])
-            # Also keep the old name for backward compatibility (as expected by tests)
-            bilinear["d_vide"] = float(matlab_scenario["plasma"]["d_vide"])
 
         # options.type_swan_aloha -> plasma.spectral_1D.bilinear.infinite_waveguide (0 -> False, if 1 -> True)
         if "options" in matlab_scenario and "type_swan_aloha" in matlab_scenario["options"]:
@@ -783,6 +784,9 @@ class Scenario:
 
         plasma = self.scenario["plasma"]
         solver = plasma.get("solver", "")
+        if self.debug:
+            print("[DEBUG] Plasma configuration:")
+            pp(plasma)
 
         # Only proceed if solver is spectral_1D
         if solver == "spectral_1D":
@@ -799,12 +803,19 @@ class Scenario:
                 # Execute the plasma coupling calculation
                 S_plasma, rac_Zhe = S_plasma_1D(self)
 
+                if self.debug:
+                    print("[DEBUG] Sum S_plasma:", np.sum(S_plasma))
+                    print("[DEBUG] Sum rac_Zhe", np.sum(rac_Zhe))
+
                 # Store results in the scenario
                 self.results["S_plasma"] = S_plasma
                 self.results["rac_Zhe"] = rac_Zhe
 
                 # Compute antenna response (reflection coefficients)
                 self._compute_antenna_response()
+
+                if self.debug:
+                    print("[DEBUG] RC", self.results["RC"])
 
                 return
             else:
@@ -1120,7 +1131,6 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     if layout:
         nb_mod_phi = layout.get("nb_mod_phi", nb_mod_phi)
         nb_mod_theta = layout.get("nb_mod_theta", nb_mod_theta)
-        nb_g_pol = nb_mod_theta  # Number of poloidal rows
 
     # Initialize module parameters with defaults
     nb_wg_theta = 1  # Number of waveguides per module in poloidal direction
@@ -1136,6 +1146,11 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
         mask = module.get("mask", mask)
         nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", nb_pwg_btw_mod_phi)
         nb_pwg_edge = module.get("nb_pwg_edge", nb_pwg_edge)
+
+    # number of poloidal waveguide rows (nb_wg_theta),
+    # not the number of poloidal modules (nb_mod_theta).
+    # This matches the MATLAB behavior in aloha_utils_ITM2oldAntenna.m line 6:
+    nb_g_pol = nb_wg_theta
 
     # Calculate total number of waveguides per poloidal row
     # Using the MATLAB formula: nb_g_total_ligne = nb_wg_phi * nb_mod_phi + 2 * nb_pwg_edge

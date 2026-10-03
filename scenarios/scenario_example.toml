@@ -47,13 +47,13 @@ profile = 'bilinear'
 nb_evanescent_modes = 2
 
 [plasma.spectral_1D.bilinear]
-# vacuum gap width between the antenna and the first layer of the plasma [m]
+# vacuum gap width between the antenna and the first layer of the plasma (d_vide) [m]
 vacuum_layer_length = 0.0
 # edge density [1/m^3]
 ne0 = 5e17
 # gradients scrape-off lengths [m]
 lambda_n = [0.002, 0.02]
-# width of the first plasma layer [m]
+# width of the first plasma layer (d_couche) [m]
 plasma_layer_length = 0.002
 # toroidal magnetic field at the antenna mouth [T]
 B0 = 2.95

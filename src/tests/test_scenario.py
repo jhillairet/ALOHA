@@ -154,12 +154,294 @@ class TestScenario(unittest.TestCase):
                 m_scenario["plasma"]["spectral_1D"]["profile"], mat_scenario["plasma"]["spectral_1D"]["profile"]
             )
 
-    def test_run_method_consistency_across_file_formats(self):
+    def test_run_method_consistency_across_file_formats_8waveguides(self):
         """Test that run() method generates the same results for scenarios from different file formats."""
         # Paths to the different file formats
         toml_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.toml"
         mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
         m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+
+        # Create scenarios from different file formats
+        scenario_from_mat_ref = Scenario(mat_file)  # reference results to compare results (from ALOHA-matlab) with
+        scenario_from_mat = Scenario(mat_file)
+        scenario_from_m = Scenario(m_file)
+        scenario_from_toml = Scenario.from_file(toml_file)
+
+        for scenario in [scenario_from_mat_ref, scenario_from_mat, scenario_from_m]:
+            # "comment" is missing in the matlab version -- adding it to pass the following tests
+            scenario.scenario["comment"] = scenario_from_toml.scenario["comment"]
+
+            # Compare all three scenario dictionaries using Scenario equality test
+            self.assertEqual(scenario_from_toml, scenario)
+
+        # Run each scenario to (re)generate results
+        scenario_from_toml.run()
+        scenario_from_mat.run()  # results are overwritten in this case
+        scenario_from_m.run()
+
+        # Verify all scenarios have a "results" fields
+        for fields in ["S_plasma", "rac_Zhe"]:
+            for scenario in [scenario_from_toml, scenario_from_m, scenario_from_mat, scenario_from_mat_ref]:
+                self.assertIn(fields, scenario.results)
+
+        # Compare S_plasma matrices
+        S_plasma_mat_ref = scenario_from_mat_ref.results["S_plasma"]
+        S_plasma_mat = scenario_from_mat.results["S_plasma"]
+        S_plasma_m = scenario_from_m.results["S_plasma"]
+        S_plasma_toml = scenario_from_toml.results["S_plasma"]
+
+        for S_plasma in [S_plasma_toml, S_plasma_mat, S_plasma_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                S_plasma_mat_ref.shape,
+                S_plasma.shape,
+                f"S_plasma shape mismatch: ref={S_plasma_mat_ref.shape}, test={S_plasma.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                S_plasma_mat_ref,
+                S_plasma,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="S_plasma values differ between TOML and other}",
+            )
+
+        # Compare rac_Zhe matrices
+        rac_Zhe_mat_ref = scenario_from_mat_ref.results["rac_Zhe"]
+        rac_Zhe_mat = scenario_from_mat.results["rac_Zhe"]
+        rac_Zhe_m = scenario_from_m.results["rac_Zhe"]
+        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
+
+        for rac_Zhe in [rac_Zhe_toml, rac_Zhe_mat, rac_Zhe_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                rac_Zhe_mat_ref.shape,
+                rac_Zhe.shape,
+                f"rac_Zhe shape mismatch: ref={rac_Zhe_mat_ref.shape}, test={rac_Zhe.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                rac_Zhe_mat_ref,
+                rac_Zhe,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="rac_Zhe values differ between ref and other}",
+            )
+
+        # Compare reflection coefficients (RC)
+        rc_mat_ref = scenario_from_mat_ref.results["RC"]
+        rc_mat = scenario_from_mat.results["RC"]
+        rc_m = scenario_from_m.results["RC"]
+        rc_toml = scenario_from_toml.results["RC"]
+
+        # Check shapes are the same
+        for rc in [rc_toml, rc_mat, rc_m]:
+            self.assertEqual(
+                rc_mat_ref.shape,
+                rc.shape,
+                f"RC shape mismatch: ref={rc_mat_ref.shape}, test={rc.shape}",
+            )
+
+            np.testing.assert_allclose(
+                rc_mat_ref, rc, rtol=1e-10, atol=1e-10, err_msg="RC values differ between ref and other"
+            )
+
+    def test_run_method_consistency_across_file_formats_8waveguides_3modes(self):
+        """Test that run() method generates the same results for scenarios from different file formats."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides_3modes" / "scenario_8_active_waveguides_3modes.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides_3modes" / "scenario_8_active_waveguides_3modes.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides_3modes" / "scenario_8_active_waveguides_3modes.m"
+
+        # Create scenarios from different file formats
+        scenario_from_mat_ref = Scenario(mat_file)  # reference results to compare results (from ALOHA-matlab) with
+        scenario_from_mat = Scenario(mat_file)
+        scenario_from_m = Scenario(m_file)
+        scenario_from_toml = Scenario.from_file(toml_file)
+
+        for scenario in [scenario_from_mat_ref, scenario_from_mat, scenario_from_m]:
+            # "comment" is missing in the matlab version -- adding it to pass the following tests
+            scenario.scenario["comment"] = scenario_from_toml.scenario["comment"]
+
+            # Compare all three scenario dictionaries using Scenario equality test
+            self.assertEqual(scenario_from_toml, scenario)
+
+        # Run each scenario to (re)generate results
+        scenario_from_toml.run()
+        scenario_from_mat.run()  # results are overwritten in this case
+        scenario_from_m.run()
+
+        # Verify all scenarios have a "results" fields
+        for fields in ["S_plasma", "rac_Zhe"]:
+            for scenario in [scenario_from_toml, scenario_from_m, scenario_from_mat, scenario_from_mat_ref]:
+                self.assertIn(fields, scenario.results)
+
+        # Compare S_plasma matrices
+        S_plasma_mat_ref = scenario_from_mat_ref.results["S_plasma"]
+        S_plasma_mat = scenario_from_mat.results["S_plasma"]
+        S_plasma_m = scenario_from_m.results["S_plasma"]
+        S_plasma_toml = scenario_from_toml.results["S_plasma"]
+
+        for S_plasma in [S_plasma_toml, S_plasma_mat, S_plasma_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                S_plasma_mat_ref.shape,
+                S_plasma.shape,
+                f"S_plasma shape mismatch: ref={S_plasma_mat_ref.shape}, test={S_plasma.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                S_plasma_mat_ref,
+                S_plasma,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="S_plasma values differ between TOML and other}",
+            )
+
+        # Compare rac_Zhe matrices
+        rac_Zhe_mat_ref = scenario_from_mat_ref.results["rac_Zhe"]
+        rac_Zhe_mat = scenario_from_mat.results["rac_Zhe"]
+        rac_Zhe_m = scenario_from_m.results["rac_Zhe"]
+        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
+
+        for rac_Zhe in [rac_Zhe_toml, rac_Zhe_mat, rac_Zhe_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                rac_Zhe_mat_ref.shape,
+                rac_Zhe.shape,
+                f"rac_Zhe shape mismatch: ref={rac_Zhe_mat_ref.shape}, test={rac_Zhe.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                rac_Zhe_mat_ref,
+                rac_Zhe,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="rac_Zhe values differ between ref and other}",
+            )
+
+        # Compare reflection coefficients (RC)
+        rc_mat_ref = scenario_from_mat_ref.results["RC"]
+        rc_mat = scenario_from_mat.results["RC"]
+        rc_m = scenario_from_m.results["RC"]
+        rc_toml = scenario_from_toml.results["RC"]
+
+        # Check shapes are the same
+        for rc in [rc_toml, rc_mat, rc_m]:
+            self.assertEqual(
+                rc_mat_ref.shape,
+                rc.shape,
+                f"RC shape mismatch: ref={rc_mat_ref.shape}, test={rc.shape}",
+            )
+
+            np.testing.assert_allclose(
+                rc_mat_ref, rc, rtol=1e-10, atol=1e-10, err_msg="RC values differ between ref and other"
+            )
+
+    def test_run_method_consistency_across_file_formats_LH1(self):
+        """Test that run() method generates the same results for scenarios from different file formats."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.m"
+
+        # Create scenarios from different file formats
+        scenario_from_mat_ref = Scenario(mat_file)  # reference results to compare results (from ALOHA-matlab) with
+        scenario_from_mat = Scenario(mat_file)
+        scenario_from_m = Scenario(m_file)
+        scenario_from_toml = Scenario.from_file(toml_file)
+
+        for scenario in [scenario_from_mat_ref, scenario_from_mat, scenario_from_m]:
+            # "comment" is missing in the matlab version -- adding it to pass the following tests
+            scenario.scenario["comment"] = scenario_from_toml.scenario["comment"]
+
+            # Compare all three scenario dictionaries using Scenario equality test
+            self.assertEqual(scenario_from_toml, scenario)
+
+        # Run each scenario to (re)generate results
+        scenario_from_toml.run()
+        scenario_from_mat.run()  # results are overwritten in this case
+        scenario_from_m.run()
+
+        # Verify all scenarios have a "results" fields
+        for fields in ["S_plasma", "rac_Zhe"]:
+            for scenario in [scenario_from_toml, scenario_from_m, scenario_from_mat, scenario_from_mat_ref]:
+                self.assertIn(fields, scenario.results)
+
+        # Compare S_plasma matrices
+        S_plasma_mat_ref = scenario_from_mat_ref.results["S_plasma"]
+        S_plasma_mat = scenario_from_mat.results["S_plasma"]
+        S_plasma_m = scenario_from_m.results["S_plasma"]
+        S_plasma_toml = scenario_from_toml.results["S_plasma"]
+
+        for S_plasma in [S_plasma_toml, S_plasma_mat, S_plasma_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                S_plasma_mat_ref.shape,
+                S_plasma.shape,
+                f"S_plasma shape mismatch: ref={S_plasma_mat_ref.shape}, test={S_plasma.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                S_plasma_mat_ref,
+                S_plasma,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="S_plasma values differ between TOML and other}",
+            )
+
+        # Compare rac_Zhe matrices
+        rac_Zhe_mat_ref = scenario_from_mat_ref.results["rac_Zhe"]
+        rac_Zhe_mat = scenario_from_mat.results["rac_Zhe"]
+        rac_Zhe_m = scenario_from_m.results["rac_Zhe"]
+        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
+
+        for rac_Zhe in [rac_Zhe_toml, rac_Zhe_mat, rac_Zhe_m]:
+            # Check shapes are the same
+            self.assertEqual(
+                rac_Zhe_mat_ref.shape,
+                rac_Zhe.shape,
+                f"rac_Zhe shape mismatch: ref={rac_Zhe_mat_ref.shape}, test={rac_Zhe.shape}",
+            )
+
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                rac_Zhe_mat_ref,
+                rac_Zhe,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="rac_Zhe values differ between ref and other}",
+            )
+
+        # Compare reflection coefficients (RC)
+        rc_mat_ref = scenario_from_mat_ref.results["RC"]
+        rc_mat = scenario_from_mat.results["RC"]
+        rc_m = scenario_from_m.results["RC"]
+        rc_toml = scenario_from_toml.results["RC"]
+
+        # Check shapes are the same
+        for rc in [rc_toml, rc_mat, rc_m]:
+            self.assertEqual(
+                rc_mat_ref.shape,
+                rc.shape,
+                f"RC shape mismatch: ref={rc_mat_ref.shape}, test={rc.shape}",
+            )
+
+            np.testing.assert_allclose(
+                rc_mat_ref, rc, rtol=1e-10, atol=1e-10, err_msg="RC values differ between ref and other"
+            )
+
+    def test_run_method_consistency_across_file_formats_LH2(self):
+        """Test that run() method generates the same results for scenarios from different file formats."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.m"
 
         # Create scenarios from different file formats
         scenario_from_mat_ref = Scenario(mat_file)  # reference results to compare results (from ALOHA-matlab) with

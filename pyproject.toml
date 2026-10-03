@@ -59,7 +59,7 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "FA", "I", "NPY", "T", "UP", "W"]
-ignore = ["F401", "F841", "B904", "B005"]
+ignore = ["F401", "F841", "B904", "B005", "T201"]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
