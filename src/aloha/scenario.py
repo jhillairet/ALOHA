@@ -951,6 +951,7 @@ class Scenario:
 
             # For each waveguide in the module, check if it's active (based on mask)
             # The S-parameter files may include waveguides from multiple poloidal rows
+            # Note: Following MATLAB's convention, we only use mode 0 for S_ant matrices
             active_plasma_ports = []
             for pol_offset in range(nb_wg_theta):
                 for wg_offset in range(nb_wg_phi):
@@ -960,7 +961,7 @@ class Scenario:
                         wg_index = wg_start + wg_offset + pol_offset * nb_g_total_ligne
                         # Calculate the plasma port index for mode 0 of this waveguide
                         # This matches MATLAB's convention: modules_act = modules_act * (Nme+Nmh) - (Nme+Nmh-1)
-                        # In 0-based indexing: plasma_port = wg_index * nb_modes_total
+                        # In 0-based indexing: plasma_port = wg_index * nb_modes_total + 0
                         plasma_port = wg_index * nb_modes_total
                         active_plasma_ports.append(plasma_port)
 
@@ -1038,29 +1039,25 @@ class Scenario:
                 nb_wg_per_module = (n_ports - 1) // nb_modes_sparam
 
                 S_module_11 = S_module[0, 0]
-                S_module_12 = S_module[0, 1:]
-                S_module_21 = S_module[1:, 0]
-                S_module_22 = S_module[1:, 1:]
 
-                # If the number of modes in the S-parameter file is less than nb_modes_total,
-                # we need to expand the S-parameter data to match the plasma modes.
-                # However, following MATLAB's convention, we only connect to mode 0 of each waveguide,
-                # so we don't expand S_module_12 and S_module_21 (they stay as single values).
-                # We only expand S_module_22 to handle scattering between modes.
-                if nb_modes_sparam < nb_modes_total:
-                    # Calculate the expansion factor
-                    expansion_factor = nb_modes_total // nb_modes_sparam
+                # Extract only mode 0 elements from S_module_12, S_module_21, and S_module_22
+                # S_module has shape (n_ports, n_ports) where n_ports = 1 + nb_wg_per_module * nb_modes_sparam
+                # Waveguide ports are at indices 1, 2, ..., nb_wg_per_module * nb_modes_sparam
+                # Mode 0 ports are at indices 1, 1+nb_modes_sparam, 1+2*nb_modes_sparam, ...
+                # In Python (0-based): indices 1::nb_modes_sparam
+                S_module_12 = S_module[0, 1::nb_modes_sparam]
+                S_module_21 = S_module[1::nb_modes_sparam, 0]
 
-                    # Don't expand S_module_12 and S_module_21 - they connect to mode 0 only
-                    # S_module_12 and S_module_21 stay as-is (single values)
+                # Extract mode 0 submatrix from S_module_22
+                # This selects rows and columns at mode 0 waveguide ports
+                S_module_22 = S_module[1::nb_modes_sparam, 1::nb_modes_sparam]
 
-                    # Expand S_module_22 by repeating the block structure
-                    # S_module_22 is (nb_wg_per_module * nb_modes_sparam, nb_wg_per_module * nb_modes_sparam)
-                    # We need to expand it to (nb_wg_per_module * nb_modes_total, nb_wg_per_module * nb_modes_total)
-                    S_module_22 = np.kron(S_module_22, np.eye(expansion_factor))
+                # Note: We only use mode 0 for S_ant matrices, so no expansion is needed
+                # even if nb_modes_sparam != nb_modes_total.
+                # The S_module matrices already contain the mode 0 data for all waveguides.
 
-                    # Update nb_wg_per_module to match the expanded size
-                    nb_wg_per_module = (S_module_22.shape[0]) // nb_modes_total
+                # Update nb_wg_per_module to match the extracted size
+                nb_wg_per_module = S_module_22.shape[0]
 
                 # Note: Phase deembedding is only applied when bool_mesure = true in MATLAB
                 # For this scenario (WEST_LH1), bool_mesure = false, so we don't apply it
@@ -1087,12 +1084,20 @@ class Scenario:
                     S_ant_11[ind, ind] = S_module_11
 
                     # Place S_module_12: connects access port to active waveguide ports
+                    # Note: Python uses transposed convention to match .mat files
+                    # MATLAB code: S_ant_12(ind, modules_act(ind,:)) = S_module_12
+                    # Python convention: S_ant_12 has shape (nb_plasma_ports, nb_access_ports)
+                    # So we need to transpose: S_ant_12[plasma_port, ind] = s_val
                     for i, s_val in enumerate(S_module_12):
                         if i < len(active_plasma_ports):
                             plasma_port = active_plasma_ports[i]
                             S_ant_12[plasma_port, ind] = s_val
 
                     # Place S_module_21: connects active waveguide ports to access port
+                    # Note: Python uses transposed convention to match .mat files
+                    # MATLAB code: S_ant_21(modules_act(ind,:), ind) = S_module_21
+                    # Python convention: S_ant_21 has shape (nb_access_ports, nb_plasma_ports)
+                    # So we need to transpose: S_ant_21[ind, plasma_port] = s_val
                     for i, s_val in enumerate(S_module_21):
                         if i < len(active_plasma_ports):
                             plasma_port = active_plasma_ports[i]
@@ -1116,6 +1121,10 @@ class Scenario:
                     S_ant_11[ind, ind] = S_module_11
 
                     # Place S_module_12: connects access port to waveguide ports
+                    # Note: Python uses transposed convention to match .mat files
+                    # MATLAB code: S_ant_12(ind, modules_act(ind,:)) = S_module_12
+                    # Python convention: S_ant_12 has shape (nb_plasma_ports, nb_access_ports)
+                    # So we need to transpose: S_ant_12[plasma_port, ind] = s_val
                     for i, s_val in enumerate(S_module_12):
                         mode_index = i // nb_wg_per_module
                         waveguide_offset = i % nb_wg_per_module
@@ -1124,6 +1133,10 @@ class Scenario:
                         S_ant_12[plasma_port, ind] = s_val
 
                     # Place S_module_21: connects waveguide ports to access port
+                    # Note: Python uses transposed convention to match .mat files
+                    # MATLAB code: S_ant_21(modules_act(ind,:), ind) = S_module_21
+                    # Python convention: S_ant_21 has shape (nb_access_ports, nb_plasma_ports)
+                    # So we need to transpose: S_ant_21[ind, plasma_port] = s_val
                     for i, s_val in enumerate(S_module_21):
                         mode_index = i // nb_wg_per_module
                         waveguide_offset = i % nb_wg_per_module

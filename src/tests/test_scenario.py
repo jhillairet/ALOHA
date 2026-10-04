@@ -199,6 +199,33 @@ class TestScenario(unittest.TestCase):
 
         self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
+    def test_run_method_consistency_across_file_formats_LH1_2modes(self):
+        """Test that run() method generates the same results for LH1 with 2 modes."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH1_2modes" / "scenario_WEST_LH1_2modes.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH1_2modes" / "scenario_WEST_LH1_2modes.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH1_2modes" / "scenario_WEST_LH1_2modes.m"
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    def test_run_method_consistency_across_file_formats_LH1_3modes(self):
+        """Test that run() method generates the same results for LH1 with 3 modes."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH1_3modes" / "scenario_WEST_LH1_3modes.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH1_3modes" / "scenario_WEST_LH1_3modes.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH1_3modes" / "scenario_WEST_LH1_3modes.m"
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    def test_run_method_consistency_across_file_formats_LH2_3modes(self):
+        """Test that run() method generates the same results for LH2 with 3 moszq."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH2_3modes" / "scenario_WEST_LH2_3modes.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH2_3modes" / "scenario_WEST_LH2_3modes.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH2_3modes" / "scenario_WEST_LH2_3modes.m"
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
     def _test_run_method_consistency_across_file_formats(self, scenario_reference, scenarios):
         # Create scenarios from different file formats
         scenario_from_mat_ref = Scenario(
