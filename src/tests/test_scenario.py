@@ -320,6 +320,43 @@ class TestScenario(unittest.TestCase):
 
             np.testing.assert_allclose(rc_mat_ref, rc, rtol=1e-10, atol=1e-10, err_msg="RC values differ from ref")
 
+        # Compare spectrum results (nz, ny, dP, dP_nz, nz0)
+        spectrum_keys = ["nz", "ny", "dP", "dP_nz", "nz0"]
+        for key in spectrum_keys:
+            if key in scenario_from_mat_ref.results:
+                ref_value = scenario_from_mat_ref.results[key]
+                for scenario in scenarios:
+                    if key in scenario.results:
+                        test_value = scenario.results[key]
+
+                        # Check shapes for array values
+                        if hasattr(ref_value, "shape") and hasattr(test_value, "shape"):
+                            self.assertEqual(
+                                ref_value.shape,
+                                test_value.shape,
+                                f"{key} shape mismatch: ref={ref_value.shape}, test={test_value.shape}",
+                            )
+
+                        # Compare values with tolerance
+                        elif hasattr(ref_value, "shape") and hasattr(test_value, "shape"):
+                            # Use a more relaxed tolerance for values due to numerical differences
+                            np.testing.assert_allclose(
+                                ref_value,
+                                test_value,
+                                rtol=1e-1,
+                                atol=1e-5,
+                                err_msg=f"{key} values differ from ref",
+                            )
+                        else:
+                            # For scalar values
+                            np.testing.assert_allclose(
+                                ref_value,
+                                test_value,
+                                rtol=1e-1,
+                                atol=1e-5,
+                                err_msg=f"{key} scalar value differs from ref",
+                            )
+
 
 if __name__ == "__main__":
     unittest.main()

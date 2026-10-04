@@ -819,6 +819,11 @@ class Scenario:
                 # Compute antenna response (reflection coefficients)
                 self._compute_antenna_response()
 
+                # Compute spectrum
+                from aloha.plasma import compute_spectrum1D
+
+                compute_spectrum1D(self)
+
                 if self.debug:
                     print("[DEBUG] RC", self.results["RC"])
 

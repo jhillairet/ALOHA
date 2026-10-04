@@ -418,3 +418,451 @@ def S_plasma_1D(scenario: "Scenario") -> tuple[np.ndarray, np.ndarray]:
         bool_debug=bool_debug,
         max_nz=max_nz,
     )
+
+
+def compute_spectrum1D(scenario: "Scenario") -> None:
+    """
+    Compute the power spectrum of the antenna (1D version).
+
+    This function implements the logic from MATLAB's aloha_compute_spectrum1D.m to
+    calculate the power spectrum dP and its nz-integrated version dP_nz.
+
+    Parameters
+    ----------
+    scenario : Scenario
+        A Scenario object containing the scenario parameters and results.
+        Must have the following in scenario.results:
+        - S_plasma: Plasma scattering matrix
+        - rac_Zhe: Characteristic impedance matrix
+        - a_plasma: Incident wave vector on plasma
+        - b_plasma: Reflected wave vector from plasma
+
+    Results are stored in scenario.results:
+        - ny: Array of ny values
+        - nz: Array of nz values
+        - nz0: Main nz peak value
+        - dny: Step in ny
+        - dnz: Step in nz
+        - dP: Power spectrum density (2D array: ny x nz)
+        - dP_nz: Power spectrum integrated over ny (1D array: nz)
+
+    Raises
+    ------
+    ValueError
+        If required parameters are missing from scenario.results or scenario.scenario
+    """
+    _compute_spectrum1D_impl(scenario)
+
+
+def _compute_spectrum_modes(
+    scenario,
+    ny,
+    nz,
+    nyt,
+    nzt,
+    k0,
+    nc_val,
+    X0,
+    D0,
+    X1,
+    D1,
+    nb_g_pol,
+    nb_g_total_ligne,
+    a,
+    b,
+    y,
+    z,
+    Nme,
+    Nmh,
+    ne0_arr,
+    lambda_n_arr,
+    d_couche_arr,
+    d_vide_arr,
+    version,
+    poids_E,
+    poids_H,
+    Y0,
+):
+    """Compute the spectrum modes and return dP matrix."""
+    import numpy as np
+    from scipy.special import airy
+
+    modes_E_sp_list = []
+    modes_H_sp_list = []
+
+    if version == 6:
+        for ind in range(nb_g_pol):
+            neta_1 = (
+                ((nzt**2 - 1) ** (1 / 3)) * ((D1[ind] / X1[ind]) ** (2 / 3)) * (X1[ind] - 1) * np.exp(-1j * np.pi / 3)
+            )
+
+            airy_0_neta_1, airy_1_neta_1 = airy(neta_1)[0:2]
+            airy_0_neta_1[np.abs(airy_0_neta_1) < 1e-30] = 1e-30
+
+            # Avoid division by zero for (nzt**2 - 1)**(2/3)
+            nzt_squared_minus_1 = nzt**2 - 1
+            nzt_squared_minus_1[np.abs(nzt_squared_minus_1) < 1e-30] = 1e-30
+            nzt_squared_minus_1_power_2_3 = nzt_squared_minus_1 ** (2 / 3)
+            nzt_squared_minus_1_power_2_3[np.abs(nzt_squared_minus_1_power_2_3) < 1e-30] = 1e-30
+
+            Y_L = (
+                -(airy_1_neta_1 / airy_0_neta_1)
+                / nzt_squared_minus_1_power_2_3
+                * ((X1[ind] / D1[ind]) ** (1 / 3))
+                * np.exp(1j * np.pi / 6)
+            )
+
+            neta_0 = (
+                (nzt_squared_minus_1 ** (1 / 3))
+                * ((D0[ind] / X0[ind]) ** (2 / 3))
+                * (X0[ind] - 1)
+                * np.exp(-1j * np.pi / 3)
+            )
+
+            airy_0_neta_0, airy_1_neta_0, airy_2_neta_0, airy_3_neta_0 = airy(neta_0)[0:4]
+            airy_0_neta_0[np.abs(airy_0_neta_0) < 1e-30] = 1e-30
+            airy_2_neta_0[np.abs(airy_2_neta_0) < 1e-30] = 1e-30
+
+            Ya = (
+                -(airy_1_neta_0 / airy_0_neta_0)
+                / nzt_squared_minus_1_power_2_3
+                * ((X0[ind] / D0[ind]) ** (1 / 3))
+                * np.exp(1j * np.pi / 6)
+            )
+            Yb = (
+                -(airy_3_neta_0 / airy_2_neta_0)
+                / nzt_squared_minus_1_power_2_3
+                * ((X0[ind] / D0[ind]) ** (1 / 3))
+                * np.exp(1j * np.pi / 6)
+            )
+
+            neta_d = neta_0 + (nzt_squared_minus_1 ** (1 / 3)) * ((X0[ind] / D0[ind]) ** (1 / 3)) * k0 * d_couche_arr[
+                ind
+            ] * np.exp(-1j * np.pi / 3)
+
+            airy_0_neta_d, airy_1_neta_d, airy_2_neta_d, airy_3_neta_d = airy(neta_d)[0:4]
+
+            # neta_d and neta_0 have the same length, so no tiling is needed
+            # Use the airy values directly
+            airy_0_neta_0_tiled = airy_0_neta_0
+            airy_2_neta_0_tiled = airy_2_neta_0
+            airy_1_neta_0_tiled = airy_1_neta_0
+            airy_3_neta_0_tiled = airy_3_neta_0
+
+            airy_0_neta_0_tiled[np.abs(airy_0_neta_0_tiled) < 1e-30] = 1e-30
+            airy_2_neta_0_tiled[np.abs(airy_2_neta_0_tiled) < 1e-30] = 1e-30
+
+            num = Y_L * (
+                Yb * airy_0_neta_d / airy_0_neta_0_tiled - Ya * airy_2_neta_d / airy_2_neta_0_tiled
+            ) + Ya * Yb * (airy_3_neta_d / airy_3_neta_0_tiled - airy_1_neta_d / airy_1_neta_0_tiled)
+
+            denom = (
+                Y_L * (airy_0_neta_d / airy_0_neta_0_tiled - airy_2_neta_d / airy_2_neta_0_tiled)
+                - Ya * airy_1_neta_d / airy_1_neta_0_tiled
+                + Yb * airy_3_neta_d / airy_3_neta_0_tiled
+            )
+
+            # Avoid division by zero
+            denom[np.abs(denom) < 1e-30] = 1e-30
+            # Handle NaN/Inf in num and denom before division
+            # num[np.isnan(num) | np.isinf(num)] = 0  # REMOVED: let NaN/Inf propagate
+            # denom[np.isnan(denom) | np.isinf(denom)] = 1e-30  # REMOVED: let NaN/Inf propagate
+            denom[np.abs(denom) < 1e-30] = 1e-30
+            Ys = num / denom
+            # Handle any remaining NaN/Inf
+            # Ys[np.isnan(Ys) | np.isinf(Ys)] = 0  # REMOVED: let NaN/Inf propagate
+
+            alph = 1.0
+            gamm = k0 * (nzt**2 - alph) ** (1 / 2)
+            # Avoid division by zero for gamm
+            gamm[np.abs(gamm) < 1e-30] = 1e-30
+            u = gamm * d_vide_arr[ind]
+            tanh_d_vide = np.tanh(u)
+
+            y2 = 1j * k0 / gamm
+            # Avoid division by zero in the final Ys calculation
+            denominator_Ys = Ys * tanh_d_vide + y2
+            denominator_Ys[np.abs(denominator_Ys) < 1e-30] = 1e-30
+            Ys = y2 * (Ys + y2 * tanh_d_vide) / denominator_Ys
+
+            for k in range(nb_g_total_ligne):
+                m = 1
+                n = 0
+
+                coeff_h = -np.sqrt(2 / (a * b[k]))
+
+                term1 = 1 - ((-1) ** m) * np.exp(-1j * k0 * nyt * a)
+                denominator_fy = nyt**2 - (m * np.pi / (k0 * a)) ** 2
+                denominator_fy[np.abs(denominator_fy) < 1e-30] = 1e-30
+                fy = -(m * np.pi / (a * (k0**2))) * (term1 / denominator_fy) * np.exp(-1j * k0 * nyt * y[ind])
+
+                term2 = 1 - ((-1) ** n) * np.exp(-1j * k0 * nzt * b[k])
+                denominator_fz = nzt**2 - (n * np.pi / (k0 * b[k])) ** 2
+                denominator_fz[np.abs(denominator_fz) < 1e-30] = 1e-30
+                fz = -1j * (nzt / k0) * (term2 / denominator_fz) * np.exp(-1j * k0 * nzt * z[k])
+
+                modes_E_sp_list.append(coeff_h * fy * fz)
+                modes_H_sp_list.append(-Y0 * Ys * coeff_h * fy * fz)
+
+                for n_val in range(1, Nme + 1):
+                    coeff_e = -(2 * n_val / np.sqrt(b[k] / a + (n_val**2) * a / b[k])) / b[k]
+
+                    term2_tm = 1 - ((-1) ** n_val) * np.exp(-1j * k0 * nzt * b[k])
+                    denominator_fz_tm = nzt**2 - (n_val * np.pi / (k0 * b[k])) ** 2
+                    denominator_fz_tm[np.abs(denominator_fz_tm) < 1e-30] = 1e-30
+                    fz_tm = -1j * (nzt / k0) * (term2_tm / denominator_fz_tm) * np.exp(-1j * k0 * nzt * z[k])
+
+                    modes_E_sp_list.append(coeff_e * fy * fz_tm)
+                    modes_H_sp_list.append(-Y0 * Ys * coeff_e * fy * fz_tm)
+    else:
+        raise ValueError(f"Plasma version {version} not supported for spectrum calculation")
+
+    modes_E_sp = np.array(modes_E_sp_list)
+    modes_H_sp = np.array(modes_H_sp_list)
+
+    # MATLAB: E_spc = modes_E_sp.*(poids_E*ones(1,length(nyt)))
+    # poids_E is a column vector with length equal to number of modes
+    # ones(1,length(nyt)) is a row vector
+    # The result is a matrix where each row is a copy of poids_E
+
+    # In Python: reshape poids_E to (N, 1) to match MATLAB's column vector behavior
+    # Then broadcast: modes_E_sp (N, M) * poids_E.reshape(N, 1) -> (N, M)
+    # This multiplies each row of modes_E_sp by the corresponding element of poids_E
+    # NOTE: MATLAB uses poids_E for BOTH E_spc and H_spc (line 228-229)
+    poids_E_reshaped = poids_E.reshape(-1, 1)
+
+    E_spc = modes_E_sp * poids_E_reshaped
+    H_spc = modes_H_sp * poids_E_reshaped
+
+    sum_E_spc = np.sum(E_spc, axis=0)
+    sum_H_spc = np.sum(H_spc, axis=0)
+    dP_ligne = -0.5 * ((k0 / (2 * np.pi)) ** 2) * (sum_E_spc * np.conj(sum_H_spc))
+
+    dP = np.reshape(dP_ligne, (len(ny), len(nz)))
+    # Transpose to match MATLAB reference shape (nz, ny)
+    # MATLAB's dP has shape (length(nz), length(ny)), not (length(ny), length(nz))
+    dP = dP.T
+
+    return dP
+
+
+def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
+    """Implementation of compute_spectrum1D."""
+    import numpy as np
+    from scipy.constants import e as qe
+    from scipy.constants import mu_0
+
+    # Extract scenario parameters
+    scenario_dict = scenario.scenario
+    results = scenario.results
+
+    # Calculate Y0 (characteristic admittance of free space)
+    Z0 = np.sqrt(mu_0 / epsilon_0)
+    Y0 = 1 / Z0
+
+    # Check if required results exist
+    required_results = ["S_plasma", "rac_Zhe", "a_plasma", "b_plasma"]
+    for field in required_results:
+        if field not in results:
+            raise ValueError(f"Required field '{field}' not found in scenario.results")
+
+    # Extract spectrum parameters
+    plasma = scenario_dict.get("plasma", {})
+    spectral_1D = plasma.get("spectral_1D", {})
+    bilinear = spectral_1D.get("bilinear", {})
+
+    nz_min = spectral_1D.get("nz_min", -20)
+    nz_max = spectral_1D.get("nz_max", 20)
+    dnz = spectral_1D.get("dnz", 0.01)
+    ny_min = spectral_1D.get("ny_min", -2)
+    ny_max = spectral_1D.get("ny_max", 2)
+    dny = spectral_1D.get("dny", 0.1)
+
+    # Get frequency
+    antenna = scenario_dict.get("antenna", {})
+    excitation = antenna.get("excitation", {})
+    freq = excitation.get("f", 3.7e9)
+
+    # Convert scenario to get geometry
+    from aloha.scenario import _convert_scenario_to_matlab_inputs
+
+    matlab_scenario = _convert_scenario_to_matlab_inputs(scenario)
+
+    # Extract geometry
+    a = matlab_scenario.get("a", 1.0)
+    b = matlab_scenario.get("b", [])
+    h = matlab_scenario.get("h", [])
+    z = matlab_scenario.get("z", [])
+    y = matlab_scenario.get("y", [])
+    nb_g_total_ligne = matlab_scenario.get("nb_g_total_ligne", 0)
+    nb_g_pol = matlab_scenario.get("nb_g_pol", 1)
+
+    # Ensure y has the correct length (nb_g_pol elements)
+    # Convert to lists first to handle the extension
+    y_list = list(y) if not isinstance(y, list) else y
+    z_list = list(z) if not isinstance(z, list) else z
+    b_list = list(b) if not isinstance(b, list) else b
+
+    # Ensure arrays have the correct lengths
+    if len(y_list) < nb_g_pol:
+        y_list = y_list + [0.0] * (nb_g_pol - len(y_list))
+    elif len(y_list) == 0:
+        y_list = [0.0] * nb_g_pol
+
+    if len(z_list) < nb_g_total_ligne:
+        z_list = z_list + [0.0] * (nb_g_total_ligne - len(z_list))
+    elif len(z_list) == 0:
+        z_list = [0.0] * nb_g_total_ligne
+
+    if len(b_list) < nb_g_total_ligne:
+        b_list = (
+            b_list + [b_list[-1]] * (nb_g_total_ligne - len(b_list)) if len(b_list) > 0 else [0.008] * nb_g_total_ligne
+        )
+    elif len(b_list) == 0:
+        b_list = [0.008] * nb_g_total_ligne
+
+    # Convert to numpy arrays for easier indexing
+    y = np.array(y_list)
+    z = np.array(z_list)
+    b = np.array(b_list)
+
+    # Get plasma parameters
+    ne0 = bilinear.get("ne0", 5e17)
+    lambda_n = bilinear.get("lambda_n", [0.002, 0.02])
+    d_couche = bilinear.get("plasma_layer_length", 0.002)
+    d_vide = bilinear.get("vacuum_layer_length", 0.0)
+    bool_lignes_identiques = bilinear.get("identical_profiles", False)
+    version = bilinear.get("version", 6)
+
+    # Get number of modes
+    Nme = matlab_scenario.get("Nme", 1)
+    Nmh = matlab_scenario.get("Nmh", 1)
+
+    # Extract results
+    S_plasma = results["S_plasma"]
+    rac_Zhe = results["rac_Zhe"]
+    a_plasma = results["a_plasma"]
+    b_plasma = results["b_plasma"]
+
+    # Ensure a_plasma and b_plasma are column vectors
+    if a_plasma.ndim == 1:
+        a_plasma = a_plasma.reshape(-1, 1)
+    if b_plasma.ndim == 1:
+        b_plasma = b_plasma.reshape(-1, 1)
+
+    # Physical constants
+    k0 = 2 * np.pi * freq / c
+    nc_val = ((2 * np.pi * freq) ** 2) * m_e * epsilon_0 / (qe**2)
+
+    # Compute modes and spectrum
+    # Translate MATLAB aloha_compute_spectrum1D.m logic
+
+    # Create ny and nz arrays
+    # MATLAB: ny = ny_min:dny:ny_max, nz = nz_min:dnz:nz_max
+    # Use np.arange with the correct endpoint handling
+    ny = np.arange(ny_min, ny_max + dny / 2, dny)
+    nz = np.arange(nz_min, nz_max + dnz / 2, dnz)
+
+    # Avoid pure 0 and +/-1 discontinuities by adding a small real part
+    # Use a tolerance for floating-point comparison
+    nz = np.where(np.abs(nz) < 1e-10, 1e-4, nz)
+    nz = np.where(np.abs(nz - 1) < 1e-10, 1 - 1e-4, nz)
+    nz = np.where(np.abs(nz + 1) < 1e-10, -1 + 1e-4, nz)
+
+    # Create nyt and nzt arrays (kron in MATLAB)
+    nyt = np.kron(np.ones(len(nz)), ny)
+    nzt = np.kron(nz, np.ones(len(ny)))
+
+    # Handle identical profiles
+    if bool_lignes_identiques:
+        ne0_arr = np.ones(nb_g_pol) * ne0
+        lambda_n_arr = np.ones(nb_g_pol) * lambda_n
+        d_couche_arr = np.ones(nb_g_pol) * d_couche
+        d_vide_arr = np.ones(nb_g_pol) * d_vide
+    else:
+        ne0_arr = np.array(ne0) if isinstance(ne0, list) else np.ones(nb_g_pol) * ne0
+        lambda_n_arr = np.array(lambda_n) if isinstance(lambda_n, list) else np.ones(nb_g_pol) * lambda_n
+        d_couche_arr = np.array(d_couche) if isinstance(d_couche, list) else np.ones(nb_g_pol) * d_couche
+        d_vide_arr = np.array(d_vide) if isinstance(d_vide, list) else np.ones(nb_g_pol) * d_vide
+
+    # Calculate X0, D0, X1, D1 for each polarization line
+    X0 = ne0_arr / nc_val
+
+    # Calculate dne0 and dne1 following MATLAB logic
+    if len(lambda_n_arr) > 0:
+        dne0_arr = ne0_arr / lambda_n_arr[0]
+        D0 = k0 * ne0_arr / dne0_arr
+    else:
+        dne0_arr = ne0_arr / 0.002
+        D0 = k0 * ne0_arr / dne0_arr
+
+    if len(lambda_n_arr) > 0:
+        n1 = ne0_arr + lambda_n_arr[0] * d_couche_arr
+    else:
+        n1 = ne0_arr + 0.002 * d_couche_arr
+
+    X1 = n1 / nc_val
+
+    if len(lambda_n_arr) > 1:
+        # MATLAB: dne1 = (1 + d_couche/lambda_n0) * ne0 / lambda_n1
+        dne1_arr = (1 + d_couche_arr / lambda_n_arr[0]) * ne0_arr / lambda_n_arr[1]
+        D1 = k0 * n1 / dne1_arr
+    else:
+        D1 = k0 * n1 / 0.02
+
+    # Calculate weights from power waves (MATLAB lines 53-57)
+    poids_E = rac_Zhe @ (a_plasma + b_plasma)
+    poids_H = np.linalg.inv(rac_Zhe) @ (a_plasma - b_plasma)
+
+    poids_E = poids_E * np.sqrt(2)
+    poids_H = poids_H * np.sqrt(2)
+
+    # Call the mode calculation function
+    dP = _compute_spectrum_modes(
+        scenario,
+        ny,
+        nz,
+        nyt,
+        nzt,
+        k0,
+        nc_val,
+        X0,
+        D0,
+        X1,
+        D1,
+        nb_g_pol,
+        nb_g_total_ligne,
+        a,
+        b,
+        y,
+        z,
+        Nme,
+        Nmh,
+        ne0_arr,
+        lambda_n_arr,
+        d_couche_arr,
+        d_vide_arr,
+        version,
+        poids_E,
+        poids_H,
+        Y0,
+    )
+
+    # Handle NaN/Inf in dP first
+    dP = np.where(np.isnan(dP) | np.isinf(dP), 1e-10, dP)
+
+    # Calculate dP_nz (sum over ny dimension)
+    dP_nz = (dny * np.sum(dP, axis=1)).reshape(-1, 1)
+
+    # Find main nz peak
+    max_nz_idx = np.argmax(np.real(dP_nz))
+    nz0 = float(nz[max_nz_idx].real)
+
+    # Store results
+    scenario.results["ny"] = ny
+    scenario.results["nz"] = np.real(nz)
+    scenario.results["nz0"] = nz0
+    scenario.results["dny"] = dny
+    scenario.results["dnz"] = dnz
+    scenario.results["dP"] = dP
+    scenario.results["dP_nz"] = dP_nz
