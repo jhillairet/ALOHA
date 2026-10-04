@@ -1,0 +1,48 @@
+# ALOHA Passive-Active example (no multijunction)
+comment = "Passive-Active example"
+
+# ------------------------------------------------------------------
+#   Antenna description
+# ------------------------------------------------------------------
+[antenna]
+file = "PA_1row.toml"
+
+[antenna.excitation]
+f = 3.7e9
+experimental = false
+power = [1, 1, 1, 1, 1, 1, 1, 1]
+phase = [0, 270, 180, 90, 0, 270, 180, 90]
+
+port = "Q6B"
+pulse = 45155
+avg_times = [7.0, 8.0]
+
+[plasma]
+solver = "spectral_1D"
+
+[plasma.spectral_1D]
+profile = 'bilinear'
+nb_evanescent_modes = 2
+nz_min = -20
+nz_max = 20
+dnz = 0.01
+ny_min = -2
+ny_max = 2
+dny = 0.1
+z_min = -0.015
+z_max = 0.075
+nb_z = 60
+x_max = 0.05
+nb_x = 8
+
+[plasma.spectral_1D.bilinear]
+identical_profiles = true
+vacuum_layer_length = 0.001
+ne0 = 5e17
+lambda_n = [0.001, 0.04]
+plasma_layer_length = 0.003
+B0 = 2.95
+infinite_waveguide = true
+
+[options]
+debug = true

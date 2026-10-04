@@ -300,6 +300,7 @@ class Scenario:
                 "antenna_8_active_waveguides": "8_active_waveguides.toml",
                 "antenna_C3_ITM": "WEST_LH1_top.toml",
                 "antenna_C4_ITM": "WEST_LH2_top.toml",
+                "antenna_PA_ITM": "PA_1row.toml",
                 # Add more mappings as needed
             }
             antenna["file"] = antenna_name_mapping.get(architecture_str, architecture_str)
@@ -922,16 +923,18 @@ class Scenario:
 
         # Set diagonal values for passive waveguides
         # Passive waveguides exist in all poloidal rows
+        # Note: MATLAB only sets S_ant_22 for mode 0 of each passive waveguide
         for pol_row in range(nb_wg_theta):
             for wg_idx in passive_wg_indices:
                 if wg_idx < nb_g_total_ligne:  # Make sure it's within bounds
-                    for mode in range(nb_modes_total):
-                        # Calculate plasma port index accounting for poloidal row
-                        wg_index = wg_idx + pol_row * nb_g_total_ligne
-                        plasma_port = (wg_index + 1) * nb_modes_total + mode - (nb_modes_total - 1) - 1
-                        # S_ant_22 is diagonal in MATLAB, so only set diagonal elements
-                        # In our transposed convention: S_ant_22[plasma_port, plasma_port]
-                        S_ant_22[plasma_port, plasma_port] = -np.exp(1j * 4 * np.pi * lcc_default)
+                    # Only set mode 0 (matching MATLAB behavior)
+                    mode = 0
+                    # Calculate plasma port index accounting for poloidal row
+                    wg_index = wg_idx + pol_row * nb_g_total_ligne
+                    plasma_port = (wg_index + 1) * nb_modes_total + mode - (nb_modes_total - 1) - 1
+                    # S_ant_22 is diagonal in MATLAB, so only set diagonal elements
+                    # In our transposed convention: S_ant_22[plasma_port, plasma_port]
+                    S_ant_22[plasma_port, plasma_port] = -np.exp(1j * 4 * np.pi * lcc_default)
 
         # Precompute the active waveguide indices for each module
         # This is similar to MATLAB's modules_act

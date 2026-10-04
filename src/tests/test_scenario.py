@@ -172,6 +172,15 @@ class TestScenario(unittest.TestCase):
 
         self._test_run_method_consistency_across_file_formats(mat_file, [toml_file, m_file])
 
+    def test_run_method_consistency_across_file_formats_PA_1row(self):
+        """Test that run() method generates the same results for Passive-Active antenna."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "PassiveActive_1row" / "scenario_PA_1row.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "PassiveActive_1row" / "scenario_PA_1row.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "PassiveActive_1row" / "scenario_PA_1row.m"
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
     def test_run_method_consistency_across_file_formats_LH1(self):
         """Test that run() method generates the same results for LH1."""
         # Paths to the different file formats
@@ -197,16 +206,16 @@ class TestScenario(unittest.TestCase):
         )  # reference results to compare results (from ALOHA-matlab) with
         scenarios = [Scenario(scenario) for scenario in scenarios]
 
+        # Run each scenario to (re)generate results
         for scenario in scenarios:
             # "comment" is missing in the matlab version -- adding it to pass the following tests
             scenario.scenario["comment"] = ""
 
-            # Run each scenario to (re)generate results
             scenario.run()
 
         # Verify all scenarios have a "results" fields
-        for fields in ["S_plasma", "rac_Zhe"]:
-            for scenario in scenarios:
+        for scenario in scenarios:
+            for fields in ["S_plasma", "rac_Zhe"]:
                 self.assertIn(fields, scenario.results)
 
         # Compare S_plasma matrices
@@ -248,6 +257,24 @@ class TestScenario(unittest.TestCase):
                 atol=1e-6,
                 err_msg="rac_Zhe values differ from ref",
             )
+        # Compare the antenna sub-S-parameters
+        S_ant_ref = {
+            "S_ant_11": scenario_from_mat_ref.results["S_ant_11"],
+            "S_ant_12": scenario_from_mat_ref.results["S_ant_12"],
+            "S_ant_21": scenario_from_mat_ref.results["S_ant_21"],
+            "S_ant_22": scenario_from_mat_ref.results["S_ant_22"],
+        }
+        for scenario in scenarios:
+            for key in ["S_ant_11", "S_ant_12", "S_ant_21", "S_ant_22"]:
+                self.assertEqual(
+                    S_ant_ref[key].shape,
+                    scenario.results[key].shape,
+                    f"{key} shape mismatch: ref={S_ant_ref[key].shape}, test={scenario.results[key].shape}",
+                )
+
+                np.testing.assert_allclose(
+                    S_ant_ref[key], scenario.results[key], rtol=1e-8, atol=1e-8, err_msg=f"{key} matrix differ from ref"
+                )
 
         # Compare reflection coefficients (RC)
         rc_mat_ref = scenario_from_mat_ref.results["RC"]
