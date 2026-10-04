@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   Tests:
+    timeout-minutes: 15
 
     runs-on: ubuntu-latest
     permissions:
