@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 # Use tomllib for Python 3.11+, tomli for earlier versions
 try:
@@ -199,6 +200,7 @@ class TestScenario(unittest.TestCase):
 
         self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
+    @pytest.mark.timeout(360)
     def test_run_method_consistency_across_file_formats_LH1_2modes(self):
         """Test that run() method generates the same results for LH1 with 2 modes."""
         # Paths to the different file formats
@@ -208,6 +210,7 @@ class TestScenario(unittest.TestCase):
 
         self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
+    @pytest.mark.timeout(360)
     def test_run_method_consistency_across_file_formats_LH1_3modes(self):
         """Test that run() method generates the same results for LH1 with 3 modes."""
         # Paths to the different file formats
@@ -217,6 +220,7 @@ class TestScenario(unittest.TestCase):
 
         self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
+    @pytest.mark.timeout(360)
     def test_run_method_consistency_across_file_formats_LH2_3modes(self):
         """Test that run() method generates the same results for LH2 with 3 moszq."""
         # Paths to the different file formats
