@@ -5,7 +5,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from aloha.plasma import S_plasma_1D, S_plasma_1D_matlab_inputs, get_binary_name, get_binary_path
+from aloha.plasma import (
+    S_plasma_1D,
+    S_plasma_1D_matlab_inputs,
+    get_binary_name,
+    get_binary_path,
+)
 from aloha.scenario import Scenario
 
 

@@ -39,6 +39,10 @@ dev = [
     "pytest-cov>=7.1.0",
 ]
 
+[tool.ruff]
+# larger line length for rule E501 (default is 88)
+line-length = 120
+indent-width = 4
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "FA", "I", "NPY", "T", "UP", "W"]
@@ -65,9 +69,6 @@ indent-style = "space"
 
 # Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
-
-# Like Black, automatically detect the appropriate line ending.
-line-ending = "auto"
 
 [tool.pytest.ini_options]
 testpaths = [
