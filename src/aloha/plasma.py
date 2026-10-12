@@ -11,14 +11,14 @@ if TYPE_CHECKING:
     from aloha.scenario import Scenario
 
 
-def get_binary_name(version: int, architecture: str = "glnxa64") -> str:
+def get_binary_name(version: int = 6, architecture: str = "glnxa64") -> str:
     """
     Determine the Fortran binary name based on version and architecture.
 
     Parameters
     ----------
     version : int
-        Version number of the binary (e.g., 6)
+        Version number of the binary (default: 6)
     architecture : str, optional
         Target architecture (default: 'glnxa64')
 
@@ -263,9 +263,7 @@ def S_plasma_1D_matlab_inputs(
         if bool_lignes_identiques and ind > 0:
             if bool_debug:
                 print(f"{text_ind}[bool_lignes_identiques=true]")  # noqa: T201
-                print(
-                    f"{text_ind}--> No need to calculate this row! taking previous result"
-                )  # noqa: T201
+                print(f"{text_ind}--> No need to calculate this row! taking previous result")  # noqa: T201
             # Skip binary execution but continue to read results
             skip_binary = True
         else:
@@ -323,9 +321,7 @@ def S_plasma_1D_matlab_inputs(
                         print(result.stderr)  # noqa: T201
 
             except subprocess.CalledProcessError as e:
-                raise RuntimeError(
-                    f"Binary execution failed: {e}\nStdout: {e.stdout}\nStderr: {e.stderr}"
-                ) from e
+                raise RuntimeError(f"Binary execution failed: {e}\nStdout: {e.stdout}\nStderr: {e.stderr}") from e
 
         # Read results (even if we skipped binary execution, we still need to read the previous results)
         if bool_debug:
@@ -337,9 +333,7 @@ def S_plasma_1D_matlab_inputs(
         if not fortran_output_file.exists():
             raise FileNotFoundError(f"Output file not created: {fortran_output_file}")
 
-        S_plasma_line, rac_Zhe_line, K_cpl = read_fortran_output_file(
-            fortran_output_file
-        )
+        S_plasma_line, rac_Zhe_line, K_cpl = read_fortran_output_file(fortran_output_file)
 
         # Update the output matrices
         # For version 6, the matrices are (Nme+Nmh)*nb_g_total_ligne x (Nme+Nmh)*nb_g_total_ligne
@@ -606,10 +600,7 @@ def _compute_spectrum_modes(
     if version == 6:
         for ind in range(nb_g_pol):
             neta_1 = (
-                ((nzt**2 - 1) ** (1 / 3))
-                * ((D1[ind] / X1[ind]) ** (2 / 3))
-                * (X1[ind] - 1)
-                * np.exp(-1j * np.pi / 3)
+                ((nzt**2 - 1) ** (1 / 3)) * ((D1[ind] / X1[ind]) ** (2 / 3)) * (X1[ind] - 1) * np.exp(-1j * np.pi / 3)
             )
 
             airy_0_neta_1, airy_1_neta_1 = airy(neta_1)[0:2]
@@ -619,9 +610,7 @@ def _compute_spectrum_modes(
             nzt_squared_minus_1 = nzt**2 - 1
             nzt_squared_minus_1[np.abs(nzt_squared_minus_1) < 1e-30] = 1e-30
             nzt_squared_minus_1_power_2_3 = nzt_squared_minus_1 ** (2 / 3)
-            nzt_squared_minus_1_power_2_3[
-                np.abs(nzt_squared_minus_1_power_2_3) < 1e-30
-            ] = 1e-30
+            nzt_squared_minus_1_power_2_3[np.abs(nzt_squared_minus_1_power_2_3) < 1e-30] = 1e-30
 
             Y_L = (
                 -(airy_1_neta_1 / airy_0_neta_1)
@@ -637,9 +626,7 @@ def _compute_spectrum_modes(
                 * np.exp(-1j * np.pi / 3)
             )
 
-            airy_0_neta_0, airy_1_neta_0, airy_2_neta_0, airy_3_neta_0 = airy(neta_0)[
-                0:4
-            ]
+            airy_0_neta_0, airy_1_neta_0, airy_2_neta_0, airy_3_neta_0 = airy(neta_0)[0:4]
             airy_0_neta_0[np.abs(airy_0_neta_0) < 1e-30] = 1e-30
             airy_2_neta_0[np.abs(airy_2_neta_0) < 1e-30] = 1e-30
 
@@ -656,13 +643,11 @@ def _compute_spectrum_modes(
                 * np.exp(1j * np.pi / 6)
             )
 
-            neta_d = neta_0 + (nzt_squared_minus_1 ** (1 / 3)) * (
-                (X0[ind] / D0[ind]) ** (1 / 3)
-            ) * k0 * d_couche_arr[ind] * np.exp(-1j * np.pi / 3)
+            neta_d = neta_0 + (nzt_squared_minus_1 ** (1 / 3)) * ((X0[ind] / D0[ind]) ** (1 / 3)) * k0 * d_couche_arr[
+                ind
+            ] * np.exp(-1j * np.pi / 3)
 
-            airy_0_neta_d, airy_1_neta_d, airy_2_neta_d, airy_3_neta_d = airy(neta_d)[
-                0:4
-            ]
+            airy_0_neta_d, airy_1_neta_d, airy_2_neta_d, airy_3_neta_d = airy(neta_d)[0:4]
 
             # neta_d and neta_0 have the same length, so no tiling is needed
             # Use the airy values directly
@@ -675,19 +660,11 @@ def _compute_spectrum_modes(
             airy_2_neta_0_tiled[np.abs(airy_2_neta_0_tiled) < 1e-30] = 1e-30
 
             num = Y_L * (
-                Yb * airy_0_neta_d / airy_0_neta_0_tiled
-                - Ya * airy_2_neta_d / airy_2_neta_0_tiled
-            ) + Ya * Yb * (
-                airy_3_neta_d / airy_3_neta_0_tiled
-                - airy_1_neta_d / airy_1_neta_0_tiled
-            )
+                Yb * airy_0_neta_d / airy_0_neta_0_tiled - Ya * airy_2_neta_d / airy_2_neta_0_tiled
+            ) + Ya * Yb * (airy_3_neta_d / airy_3_neta_0_tiled - airy_1_neta_d / airy_1_neta_0_tiled)
 
             denom = (
-                Y_L
-                * (
-                    airy_0_neta_d / airy_0_neta_0_tiled
-                    - airy_2_neta_d / airy_2_neta_0_tiled
-                )
+                Y_L * (airy_0_neta_d / airy_0_neta_0_tiled - airy_2_neta_d / airy_2_neta_0_tiled)
                 - Ya * airy_1_neta_d / airy_1_neta_0_tiled
                 + Yb * airy_3_neta_d / airy_3_neta_0_tiled
             )
@@ -724,46 +701,28 @@ def _compute_spectrum_modes(
                 term1 = 1 - ((-1) ** m) * np.exp(-1j * k0 * nyt * a)
                 denominator_fy = nyt**2 - (m * np.pi / (k0 * a)) ** 2
                 denominator_fy[np.abs(denominator_fy) < 1e-30] = 1e-30
-                fy = (
-                    -(m * np.pi / (a * (k0**2)))
-                    * (term1 / denominator_fy)
-                    * np.exp(-1j * k0 * nyt * y[ind])
-                )
+                fy = -(m * np.pi / (a * (k0**2))) * (term1 / denominator_fy) * np.exp(-1j * k0 * nyt * y[ind])
 
                 term2 = 1 - ((-1) ** n) * np.exp(-1j * k0 * nzt * b[k])
                 denominator_fz = nzt**2 - (n * np.pi / (k0 * b[k])) ** 2
                 denominator_fz[np.abs(denominator_fz) < 1e-30] = 1e-30
-                fz = (
-                    -1j
-                    * (nzt / k0)
-                    * (term2 / denominator_fz)
-                    * np.exp(-1j * k0 * nzt * z[k])
-                )
+                fz = -1j * (nzt / k0) * (term2 / denominator_fz) * np.exp(-1j * k0 * nzt * z[k])
 
                 modes_E_sp_list.append(coeff_h * fy * fz)
                 modes_H_sp_list.append(-Y0 * Ys * coeff_h * fy * fz)
 
                 for n_val in range(1, Nme + 1):
-                    coeff_e = (
-                        -(2 * n_val / np.sqrt(b[k] / a + (n_val**2) * a / b[k])) / b[k]
-                    )
+                    coeff_e = -(2 * n_val / np.sqrt(b[k] / a + (n_val**2) * a / b[k])) / b[k]
 
                     term2_tm = 1 - ((-1) ** n_val) * np.exp(-1j * k0 * nzt * b[k])
                     denominator_fz_tm = nzt**2 - (n_val * np.pi / (k0 * b[k])) ** 2
                     denominator_fz_tm[np.abs(denominator_fz_tm) < 1e-30] = 1e-30
-                    fz_tm = (
-                        -1j
-                        * (nzt / k0)
-                        * (term2_tm / denominator_fz_tm)
-                        * np.exp(-1j * k0 * nzt * z[k])
-                    )
+                    fz_tm = -1j * (nzt / k0) * (term2_tm / denominator_fz_tm) * np.exp(-1j * k0 * nzt * z[k])
 
                     modes_E_sp_list.append(coeff_e * fy * fz_tm)
                     modes_H_sp_list.append(-Y0 * Ys * coeff_e * fy * fz_tm)
     else:
-        raise ValueError(
-            f"Plasma version {version} not supported for spectrum calculation"
-        )
+        raise ValueError(f"Plasma version {version} not supported for spectrum calculation")
 
     modes_E_sp = np.array(modes_E_sp_list)
     modes_H_sp = np.array(modes_H_sp_list)
@@ -828,21 +787,21 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
             raise ValueError(f"Required field '{field}' not found in scenario.results")
 
     # Extract spectrum parameters
-    plasma = scenario_dict.get("plasma", {})
-    spectral_1D = plasma.get("spectral_1D", {})
-    bilinear = spectral_1D.get("bilinear", {})
+    plasma = scenario_dict["plasma"]
+    spectral_1D = plasma["spectral_1D"]
+    bilinear = spectral_1D["bilinear"]
 
-    nz_min = spectral_1D.get("nz_min", -20)
-    nz_max = spectral_1D.get("nz_max", 20)
-    dnz = spectral_1D.get("dnz", 0.01)
-    ny_min = spectral_1D.get("ny_min", -2)
-    ny_max = spectral_1D.get("ny_max", 2)
-    dny = spectral_1D.get("dny", 0.1)
+    nz_min = spectral_1D["nz_min"]
+    nz_max = spectral_1D["nz_max"]
+    dnz = spectral_1D["dnz"]
+    ny_min = spectral_1D["ny_min"]
+    ny_max = spectral_1D["ny_max"]
+    dny = spectral_1D["dny"]
 
     # Get frequency
-    antenna = scenario_dict.get("antenna", {})
-    excitation = antenna.get("excitation", {})
-    freq = excitation.get("f", 3.7e9)
+    antenna = scenario_dict["antenna"]
+    excitation = antenna["excitation"]
+    freq = excitation["f"]
 
     # Convert scenario to get geometry
     from aloha.scenario import _convert_scenario_to_matlab_inputs
@@ -850,13 +809,13 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
     matlab_scenario = _convert_scenario_to_matlab_inputs(scenario)
 
     # Extract geometry
-    a = matlab_scenario.get("a", 1.0)
-    b = matlab_scenario.get("b", [])
-    h = matlab_scenario.get("h", [])
-    z = matlab_scenario.get("z", [])
-    y = matlab_scenario.get("y", [])
-    nb_g_total_ligne = matlab_scenario.get("nb_g_total_ligne", 0)
-    nb_g_pol = matlab_scenario.get("nb_g_pol", 1)
+    a = matlab_scenario["a"]
+    b = matlab_scenario["b"]
+    h = matlab_scenario["h"]
+    z = matlab_scenario["z"]
+    y = matlab_scenario["y"]
+    nb_g_total_ligne = matlab_scenario["nb_g_total_ligne"]
+    nb_g_pol = matlab_scenario["nb_g_pol"]
 
     # Ensure y has the correct length (nb_g_pol elements)
     # Convert to lists first to handle the extension
@@ -877,9 +836,7 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
 
     if len(b_list) < nb_g_total_ligne:
         b_list = (
-            b_list + [b_list[-1]] * (nb_g_total_ligne - len(b_list))
-            if len(b_list) > 0
-            else [0.008] * nb_g_total_ligne
+            b_list + [b_list[-1]] * (nb_g_total_ligne - len(b_list)) if len(b_list) > 0 else [0.008] * nb_g_total_ligne
         )
     elif len(b_list) == 0:
         b_list = [0.008] * nb_g_total_ligne
@@ -890,11 +847,11 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
     b = np.array(b_list)
 
     # Get plasma parameters
-    ne0 = bilinear.get("ne0", 5e17)
-    lambda_n = bilinear.get("lambda_n", [0.002, 0.02])
-    d_couche = bilinear.get("plasma_layer_length", 0.002)
-    d_vide = bilinear.get("vacuum_layer_length", 0.0)
-    bool_lignes_identiques = bilinear.get("identical_profiles", False)
+    ne0 = bilinear["ne0"]
+    lambda_n = bilinear["lambda_n"]
+    d_couche = bilinear["plasma_layer_length"]
+    d_vide = bilinear["vacuum_layer_length"]
+    bool_lignes_identiques = bilinear["identical_profiles"]
     version = bilinear.get("version", 6)
 
     # Ensure lambda_n is a list with at least 1 element
@@ -902,8 +859,8 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
         lambda_n = [lambda_n]
 
     # Get number of modes
-    Nme = matlab_scenario.get("Nme", 1)
-    Nmh = matlab_scenario.get("Nmh", 1)
+    Nme = matlab_scenario["Nme"]
+    Nmh = matlab_scenario["Nmh"]
 
     # Extract results
     S_plasma = results["S_plasma"]
@@ -981,15 +938,15 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
 
     # Get dne0 and dne1 from matlab_scenario (already computed by Fortran binary)
     # These should be arrays with length nb_g_pol
-    if isinstance(matlab_scenario.get("dne0"), list):
+    if isinstance(matlab_scenario["dne0"], list):
         dne0_arr = np.array(matlab_scenario["dne0"])
     else:
-        dne0_arr = np.ones(nb_g_pol) * matlab_scenario.get("dne0", ne0_arr / 0.002)
+        dne0_arr = np.ones(nb_g_pol) * matlab_scenario["dne0"]
 
-    if isinstance(matlab_scenario.get("dne1"), list):
+    if isinstance(matlab_scenario["dne1"], list):
         dne1_arr = np.array(matlab_scenario["dne1"])
     else:
-        dne1_arr = np.ones(nb_g_pol) * matlab_scenario.get("dne1", 0.02)
+        dne1_arr = np.ones(nb_g_pol) * matlab_scenario["dne1"]
 
     D0 = k0 * ne0_arr / dne0_arr
 
