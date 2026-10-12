@@ -30,10 +30,10 @@ class WaveguideTests(unittest.TestCase):
         for m in range(1, 3):
             for n in range(0, 3):
                 for mode in ("te", "tm"):
-                    # warning is not logged below
-                    # to hide the warnings which appears 1/0 (evanescent modes)
+                    if mode == "tm" and n == 0:  # TM mode should be non-zero index
+                        break
                     with np.errstate(divide="ignore"):
-                        wg_skrf = RectangularWaveguide(freq, a=a, b=b, m=m, n=n, mode_type=mode)
+                        wg_skrf = RectangularWaveguide(freq, a=a, b=b, m=m, n=n, mode_type=mode, rho=None)
                         # cut-off properties
                         assert np.isclose(wg.cutoff_wavenumber(m, n), wg_skrf.kc)
                         assert np.isclose(wg.cutoff_frequency(m, n), wg_skrf.f_cutoff)

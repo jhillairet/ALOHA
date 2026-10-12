@@ -1,0 +1,68 @@
+# WEST LH2 antenna description
+name = "Passive-Active antenna without multijunction (1 row of waveguides)"
+frequency = 3.7e9
+
+# General description of the modules
+[layout]
+# Number of modules per antenna in the poloidal direction.
+nb_mod_theta = 1
+# Number of modules per antenna in the toroidal direction.
+nb_mod_phi = 8
+# Spacing between toroidally neighboring modules [m]
+spacing_btw_mod_phi = 0
+# Spacing between poloidally neighboring modules [m]
+spacing_btw_mod_theta = 0
+
+# module description
+[module]
+# Number of waveguides per module in the toroidal direction. (passive and active)
+nb_wg_phi = 1
+# Number of waveguides per module in the poloidal direction. (passive and active)
+nb_wg_theta = 1
+# Mask of passive and active waveguides for an internal module
+# 1 for active -- 0 for passive.
+mask = [1]
+# Number of passive waveguide between modules in the toroidal direction.
+nb_pwg_btw_mod_phi = 1
+# Number of passive waveguides on each antenna edge in the toroidal direction.
+nb_pwg_edge = 1
+# Spacing between poloidally neighboring waveguides [m]
+space_btw_wg_theta = 12e-3
+# Height of waveguides in the poloidal direction [m]
+wg_size_theta = 70e-3
+# Width of active waveguides [m]
+awg_size_phi = 14.65e-3
+# Width of internal passive waveguides [m]
+pwg_size_phi = 12e-3
+# Width of edge passive waveguides [m]
+pwg_size_edge_phi = 10e-3
+# Thickness between waveguides in the toroidal direction [m]
+e_phi = 4.325e-3  # between active waveguides
+# Thicness between passive waveguides
+e_phi_pwg = 4.325e-3
+# Short circuit depth for passive waveguides in guided wavelegth
+pwg_depth = [0.25]
+
+[sparameters]
+# matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
+
+filenames = [
+    'S_elem',
+    'S_elem',
+    'S_elem',
+    'S_elem',
+    'S_elem',
+    'S_elem',
+    'S_elem',
+    'S_elem'
+]
+
+## Phase deembedding
+phases_deembedded = [0, 0, 0, 0, 0, 0, 0, 0]
+
+# Antenna default power and phase excitations
+[excitation]
+# Default forward power for all modules [watt]
+magnitudes = [1, 1, 1, 1, 1, 1, 1, 1]
+# Default phase shifts for all modules [deg]
+phases = [0, 270, 180, 90, 0, 270, 180, 90]

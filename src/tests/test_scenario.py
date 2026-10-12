@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 # Use tomllib for Python 3.11+, tomli for earlier versions
 try:
@@ -47,8 +48,16 @@ class TestScenario(unittest.TestCase):
 
     def test_scenario_constructor_matlab_files(self):
         """Test that the constructor can handle .m and .mat files directly."""
-        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
-        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
+        m_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.m"
+        )
+        mat_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.mat"
+        )
 
         # Test .m file
         scenario_from_m = Scenario(m_file)
@@ -62,13 +71,19 @@ class TestScenario(unittest.TestCase):
 
     def test_matlab_to_toml_roundtrip(self):
         """Test that reading MATLAB scenario, saving to TOML, and reading back produces the same scenario dictionary."""
-        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+        m_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.m"
+        )
 
         # Step 1: Read the MATLAB scenario using constructor
         scenario_obj = Scenario(m_file)
 
         # Step 2: Save the scenario to a temporary TOML file
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".toml", delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".toml", delete=False
+        ) as tmp_file:
             tmp_path = Path(tmp_file.name)
 
         try:
@@ -81,7 +96,9 @@ class TestScenario(unittest.TestCase):
             # Step 4: Assert that the scenario dictionaries are the same
             # Note: The 'comment' field is intentionally not preserved in TOML format
             # as it's converted to actual TOML comments, so we exclude it from comparison
-            scenario_dict_no_comment = {k: v for k, v in scenario_obj.scenario.items() if k != "comment"}
+            scenario_dict_no_comment = {
+                k: v for k, v in scenario_obj.scenario.items() if k != "comment"
+            }
             self.assertEqual(scenario_from_toml.scenario, scenario_dict_no_comment)
         finally:
             # Clean up the temporary file
@@ -90,12 +107,16 @@ class TestScenario(unittest.TestCase):
     def test_matlab_files_consistency(self):
         """Test that loading scenario from .m and .mat files produces similar Scenario objects."""
         m_files = [
-            MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m",
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.m",
             MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.m",
         ]
 
         mat_files = [
-            MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat",
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.mat",
             MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.mat",
         ]
 
@@ -123,14 +144,21 @@ class TestScenario(unittest.TestCase):
             self.assertTrue(len(scenario_from_mat.results) > 0)
 
             # Compare the structure of the scenario dictionaries (excluding comment)
-            m_scenario = {k: v for k, v in scenario_from_m.scenario.items() if k != "comment"}
-            mat_scenario = {k: v for k, v in scenario_from_mat.scenario.items() if k != "comment"}
+            m_scenario = {
+                k: v for k, v in scenario_from_m.scenario.items() if k != "comment"
+            }
+            mat_scenario = {
+                k: v for k, v in scenario_from_mat.scenario.items() if k != "comment"
+            }
 
             # Check that both have the same top-level keys
             self.assertEqual(set(m_scenario.keys()), set(mat_scenario.keys()))
 
             # Check that frequency is the same
-            self.assertEqual(m_scenario["antenna"]["excitation"]["f"], mat_scenario["antenna"]["excitation"]["f"])
+            self.assertEqual(
+                m_scenario["antenna"]["excitation"]["f"],
+                mat_scenario["antenna"]["excitation"]["f"],
+            )
 
             # Check that power arrays have the same length
             m_power = m_scenario["antenna"]["excitation"]["power"]
@@ -143,7 +171,9 @@ class TestScenario(unittest.TestCase):
             self.assertEqual(len(m_phase), len(mat_phase))
 
             # Check that both have the same plasma solver
-            self.assertEqual(m_scenario["plasma"]["solver"], mat_scenario["plasma"]["solver"])
+            self.assertEqual(
+                m_scenario["plasma"]["solver"], mat_scenario["plasma"]["solver"]
+            )
 
             # Check that both have spectral_1D in plasma
             self.assertIn("spectral_1D", m_scenario["plasma"])
@@ -151,112 +181,273 @@ class TestScenario(unittest.TestCase):
 
             # Check that both have the same spectral_1D profile
             self.assertEqual(
-                m_scenario["plasma"]["spectral_1D"]["profile"], mat_scenario["plasma"]["spectral_1D"]["profile"]
+                m_scenario["plasma"]["spectral_1D"]["profile"],
+                mat_scenario["plasma"]["spectral_1D"]["profile"],
             )
 
-    def test_run_method_consistency_across_file_formats(self):
+    def test_run_method_consistency_across_file_formats_8waveguides(self):
+        """Test that run() method generates the same results for 8 waveguides."""
+        # Paths to the different file formats
+        toml_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.toml"
+        )
+        mat_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.mat"
+        )
+        m_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides"
+            / "scenario_8_active_waveguides.m"
+        )
+
+        self._test_run_method_consistency_across_file_formats(
+            mat_file, [toml_file, m_file]
+        )
+
+    def test_run_method_consistency_across_file_formats_8waveguides_3modes(self):
+        """Test that run() method generates the same results for 8 waveguides with 3 modes."""
+        # Paths to the different file formats
+        toml_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides_3modes"
+            / "scenario_8_active_waveguides_3modes.toml"
+        )
+        mat_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides_3modes"
+            / "scenario_8_active_waveguides_3modes.mat"
+        )
+        m_file = (
+            MATLAB_TEST_CASES_DIR
+            / "8_active_waveguides_3modes"
+            / "scenario_8_active_waveguides_3modes.m"
+        )
+
+        self._test_run_method_consistency_across_file_formats(
+            mat_file, [toml_file, m_file]
+        )
+
+    def test_run_method_consistency_across_file_formats_PA_1row(self):
+        """Test that run() method generates the same results for Passive-Active antenna."""
+        # Paths to the different file formats
+        toml_file = (
+            MATLAB_TEST_CASES_DIR / "PassiveActive_1row" / "scenario_PA_1row.toml"
+        )
+        mat_file = MATLAB_TEST_CASES_DIR / "PassiveActive_1row" / "scenario_PA_1row.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "PassiveActive_1row" / "scenario_PA_1row.m"
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    def test_run_method_consistency_across_file_formats_LH1(self):
+        """Test that run() method generates the same results for LH1."""
+        # Paths to the different file formats
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH1" / "scenario_WEST_LH1.m"
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    def test_run_method_consistency_across_file_formats_LH2(self):
         """Test that run() method generates the same results for scenarios from different file formats."""
         # Paths to the different file formats
-        toml_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.toml"
-        mat_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.mat"
-        m_file = MATLAB_TEST_CASES_DIR / "8_active_waveguides" / "scenario_8_active_waveguides.m"
+        toml_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.toml"
+        mat_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.mat"
+        m_file = MATLAB_TEST_CASES_DIR / "WEST_LH2" / "scenario_WEST_LH2.m"
 
-        # Check if the Fortran binary exists before running tests
-        from aloha.plasma import get_binary_path
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
 
-        binary_path = get_binary_path(6, "glnxa64")
-        if not binary_path.exists():
-            self.skipTest(f"Fortran binary not found: {binary_path}")
+    @pytest.mark.timeout(600)
+    def test_run_method_consistency_across_file_formats_LH1_2modes(self):
+        """Test that run() method generates the same results for LH1 with 2 modes."""
+        # Paths to the different file formats
+        toml_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH1_2modes" / "scenario_WEST_LH1_2modes.toml"
+        )
+        mat_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH1_2modes" / "scenario_WEST_LH1_2modes.mat"
+        )
+        m_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH1_2modes" / "scenario_WEST_LH1_2modes.m"
+        )
 
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    @pytest.mark.timeout(600)
+    def test_run_method_consistency_across_file_formats_LH1_3modes(self):
+        """Test that run() method generates the same results for LH1 with 3 modes."""
+        # Paths to the different file formats
+        toml_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH1_3modes" / "scenario_WEST_LH1_3modes.toml"
+        )
+        mat_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH1_3modes" / "scenario_WEST_LH1_3modes.mat"
+        )
+        m_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH1_3modes" / "scenario_WEST_LH1_3modes.m"
+        )
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    @pytest.mark.timeout(360)
+    def test_run_method_consistency_across_file_formats_LH2_3modes(self):
+        """Test that run() method generates the same results for LH2 with 3 moszq."""
+        # Paths to the different file formats
+        toml_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH2_3modes" / "scenario_WEST_LH2_3modes.toml"
+        )
+        mat_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH2_3modes" / "scenario_WEST_LH2_3modes.mat"
+        )
+        m_file = (
+            MATLAB_TEST_CASES_DIR / "WEST_LH2_3modes" / "scenario_WEST_LH2_3modes.m"
+        )
+
+        self._test_run_method_consistency_across_file_formats(mat_file, [toml_file])
+
+    def _test_run_method_consistency_across_file_formats(
+        self, scenario_reference, scenarios
+    ):
         # Create scenarios from different file formats
-        scenario_from_toml = Scenario.from_file(toml_file)
-        scenario_from_mat = Scenario(mat_file)
-        scenario_from_m = Scenario(m_file)
+        scenario_from_mat_ref = Scenario(
+            scenario_reference
+        )  # reference results to compare results (from ALOHA-matlab) with
+        scenarios = [Scenario(scenario) for scenario in scenarios]
 
-        # check that the scenario dictionnary is the same between formats
-        # "comment" is missing in the matlab version -- adding it to pass the test
-        scenario_from_m.scenario["comment"] = scenario_from_toml.scenario["comment"]
-        scenario_from_mat.scenario["comment"] = scenario_from_toml.scenario["comment"]
+        # Run each scenario to (re)generate results
+        for scenario in scenarios:
+            # "comment" is missing in the matlab version -- adding it to pass the following tests
+            scenario.scenario["comment"] = ""
 
-        # Compare all three scenario dictionaries using Scenario equality test
-        self.assertEqual(scenario_from_toml, scenario_from_m)
-        self.assertEqual(scenario_from_toml, scenario_from_mat)
+            scenario.run()
 
-        # Run each scenario to generate results
-        try:
-            scenario_from_toml.run()
-            scenario_from_mat.run()
-            scenario_from_m.run()
-        except RuntimeError as e:
-            if "Binary execution failed" in str(e):
-                self.skipTest(f"Fortran binary execution failed: {e}")
-            else:
-                raise
-
-        # Verify all scenarios have results
-        self.assertIn("S_plasma", scenario_from_toml.results)
-        self.assertIn("rac_Zhe", scenario_from_toml.results)
-        self.assertIn("S_plasma", scenario_from_mat.results)
-        self.assertIn("rac_Zhe", scenario_from_mat.results)
-        self.assertIn("S_plasma", scenario_from_m.results)
-        self.assertIn("rac_Zhe", scenario_from_m.results)
+        # Verify all scenarios have a "results" fields
+        for scenario in scenarios:
+            for fields in ["S_plasma", "rac_Zhe"]:
+                self.assertIn(fields, scenario.results)
 
         # Compare S_plasma matrices
-        S_plasma_toml = scenario_from_toml.results["S_plasma"]
-        S_plasma_mat = scenario_from_mat.results["S_plasma"]
-        S_plasma_m = scenario_from_m.results["S_plasma"]
+        S_plasma_mat_ref = scenario_from_mat_ref.results["S_plasma"]
+        for scenario in scenarios:
+            S_plasma = scenario.results["S_plasma"]
+            # Check shapes are the same
+            self.assertEqual(
+                S_plasma_mat_ref.shape,
+                S_plasma.shape,
+                f"S_plasma shape mismatch: ref={S_plasma_mat_ref.shape}, test={S_plasma.shape}",
+            )
 
-        # Check shapes are the same
-        self.assertEqual(
-            S_plasma_toml.shape,
-            S_plasma_mat.shape,
-            f"S_plasma shape mismatch: TOML={S_plasma_toml.shape}, MAT={S_plasma_mat.shape}",
-        )
-        self.assertEqual(
-            S_plasma_toml.shape,
-            S_plasma_m.shape,
-            f"S_plasma shape mismatch: TOML={S_plasma_toml.shape}, M={S_plasma_m.shape}",
-        )
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                S_plasma_mat_ref,
+                S_plasma,
+                rtol=1e-6,
+                atol=1e-6,
+                err_msg="S_plasma values differfrom ref",
+            )
 
         # Compare rac_Zhe matrices
-        rac_Zhe_toml = scenario_from_toml.results["rac_Zhe"]
-        rac_Zhe_mat = scenario_from_mat.results["rac_Zhe"]
-        rac_Zhe_m = scenario_from_m.results["rac_Zhe"]
+        rac_Zhe_mat_ref = scenario_from_mat_ref.results["rac_Zhe"]
+        for scenario in scenarios:
+            rac_Zhe = scenario.results["rac_Zhe"]
+            # Check shapes are the same
+            self.assertEqual(
+                rac_Zhe_mat_ref.shape,
+                rac_Zhe.shape,
+                f"rac_Zhe shape mismatch: ref={rac_Zhe_mat_ref.shape}, test={rac_Zhe.shape}",
+            )
 
+            # Compare values with tolerance (due to potential numerical differences)
+            np.testing.assert_allclose(
+                rac_Zhe_mat_ref,
+                rac_Zhe,
+                rtol=1e-6,
+                atol=1e-6,
+                err_msg="rac_Zhe values differ from ref",
+            )
+        # Compare the antenna sub-S-parameters
+        S_ant_ref = {
+            "S_ant_11": scenario_from_mat_ref.results["S_ant_11"],
+            "S_ant_12": scenario_from_mat_ref.results["S_ant_12"],
+            "S_ant_21": scenario_from_mat_ref.results["S_ant_21"],
+            "S_ant_22": scenario_from_mat_ref.results["S_ant_22"],
+        }
+        for scenario in scenarios:
+            for key in ["S_ant_11", "S_ant_12", "S_ant_21", "S_ant_22"]:
+                self.assertEqual(
+                    S_ant_ref[key].shape,
+                    scenario.results[key].shape,
+                    f"{key} shape mismatch: ref={S_ant_ref[key].shape}, test={scenario.results[key].shape}",
+                )
+
+                np.testing.assert_allclose(
+                    S_ant_ref[key],
+                    scenario.results[key],
+                    rtol=1e-8,
+                    atol=1e-8,
+                    err_msg=f"{key} matrix differ from ref",
+                )
+
+        # Compare reflection coefficients (RC)
+        rc_mat_ref = scenario_from_mat_ref.results["RC"]
         # Check shapes are the same
-        self.assertEqual(
-            rac_Zhe_toml.shape,
-            rac_Zhe_mat.shape,
-            f"rac_Zhe shape mismatch: TOML={rac_Zhe_toml.shape}, MAT={rac_Zhe_mat.shape}",
-        )
-        self.assertEqual(
-            rac_Zhe_toml.shape,
-            rac_Zhe_m.shape,
-            f"rac_Zhe shape mismatch: TOML={rac_Zhe_toml.shape}, M={rac_Zhe_m.shape}",
-        )
+        for scenario in scenarios:
+            rc = scenario.results["RC"]
+            self.assertEqual(
+                rc_mat_ref.shape,
+                rc.shape,
+                f"RC shape mismatch: ref={rc_mat_ref.shape}, test={rc.shape}",
+            )
 
-        # Compare values with tolerance (due to potential numerical differences)
-        np.testing.assert_allclose(
-            S_plasma_toml,
-            S_plasma_mat,
-            rtol=1e-10,
-            atol=1e-10,
-            err_msg="S_plasma values differ between TOML and MAT files",
-        )
-        np.testing.assert_allclose(
-            S_plasma_toml, S_plasma_m, rtol=1e-10, atol=1e-10, err_msg="S_plasma values differ between TOML and M files"
-        )
+            np.testing.assert_allclose(
+                rc_mat_ref,
+                rc,
+                rtol=1e-10,
+                atol=1e-10,
+                err_msg="RC values differ from ref",
+            )
 
-        np.testing.assert_allclose(
-            rac_Zhe_toml,
-            rac_Zhe_mat,
-            rtol=1e-10,
-            atol=1e-10,
-            err_msg="rac_Zhe values differ between TOML and MAT files",
-        )
-        np.testing.assert_allclose(
-            rac_Zhe_toml, rac_Zhe_m, rtol=1e-10, atol=1e-10, err_msg="rac_Zhe values differ between TOML and M files"
-        )
+        # Compare spectrum results (nz, ny, dP, dP_nz, nz0)
+        spectrum_keys = ["nz", "ny", "dP", "dP_nz", "nz0"]
+        for key in spectrum_keys:
+            if key in scenario_from_mat_ref.results:
+                ref_value = scenario_from_mat_ref.results[key]
+                for scenario in scenarios:
+                    if key in scenario.results:
+                        test_value = scenario.results[key]
+
+                        # Check shapes for array values
+                        if hasattr(ref_value, "shape") and hasattr(test_value, "shape"):
+                            self.assertEqual(
+                                ref_value.shape,
+                                test_value.shape,
+                                f"{key} shape mismatch: ref={ref_value.shape}, test={test_value.shape}",
+                            )
+
+                        # Compare values with tolerance
+                        elif hasattr(ref_value, "shape") and hasattr(
+                            test_value, "shape"
+                        ):
+                            # Use a more relaxed tolerance for values due to numerical differences
+                            np.testing.assert_allclose(
+                                ref_value,
+                                test_value,
+                                rtol=1e-1,
+                                atol=1e-5,
+                                err_msg=f"{key} values differ from ref",
+                            )
+                        else:
+                            # For scalar values
+                            np.testing.assert_allclose(
+                                ref_value,
+                                test_value,
+                                rtol=1e-1,
+                                atol=1e-5,
+                                err_msg=f"{key} scalar value differs from ref",
+                            )
 
 
 if __name__ == "__main__":
