@@ -8,8 +8,8 @@ comment = "Simple scenario example for ALOHA"
 # ------------------------------------------------------------------
 [antenna]
 # Antenna name. Should match an existing antenna name
-# in the antennas folder.
-file = "simple_antenna.toml"
+# in the antennas folder or in the same directory than this file.
+file = "8_active_waveguides.toml"
 
 [antenna.excitation]
 # Antenna modules' excitations
