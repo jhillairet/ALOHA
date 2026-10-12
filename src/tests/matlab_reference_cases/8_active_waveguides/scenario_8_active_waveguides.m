@@ -105,7 +105,7 @@ options.version_code = '1D';
 % (Modele electromagnetique 1D)
 %
 Nmh = 1;    % nbre de modes TE
-Nme = 2;    % nbre de modes TM
+Nme = 0;    % nbre de modes TM
 
 %% #####################
 % Plasma model

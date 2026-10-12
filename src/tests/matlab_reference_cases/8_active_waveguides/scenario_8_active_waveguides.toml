@@ -21,7 +21,7 @@ solver = "spectral_1D"
 
 [plasma.spectral_1D]
 profile = "bilinear"
-nb_evanescent_modes = 2
+nb_evanescent_modes = 0
 nz_min = -20
 nz_max = 20
 dnz = 0.01
@@ -39,10 +39,8 @@ identical_profiles = true
 ne0 = 5e+17
 lambda_n = [0.002, 0.02]
 plasma_layer_length = 0.002
-d_couche = 0.002
 B0 = 2.95
 vacuum_layer_length = 0.0
-d_vide = 0.0
 infinite_waveguide = true
 
 [options]

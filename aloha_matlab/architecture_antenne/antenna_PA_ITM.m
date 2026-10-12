@@ -1,21 +1,21 @@
 function antenna_lh = antenna_ITM
 % ALOHA description of an LH antenna
-% 
-% 
+%
+%
 % Passive Active antenne (not necessary a multijunction)
-% 
+%
 % ITM CPO antenn_lh description
-% 
+%
 % INPUT : none
-%  
+%
 % OUTPUT
 %  - antenna_lh <structure> : Matlab CPO antenna_lh
-% 
-% 
+%
+%
 
 % This file contains the description of an LH antenna according to the ITM
-% defition, i.e. using the CPO antenna_lh format. 
-% 
+% defition, i.e. using the CPO antenna_lh format.
+%
 % An LH antenna is defined as the following :
 %  - general description
 %  - modules description
@@ -34,22 +34,22 @@ antenna_lh.frequency = 3.7e9;
 %  Power [W]
 antenna_lh.power  = []; % not defined here in ALOHA
 
-% Main parallel refractive index of the launched spectrum, for multi-junction antennas. 
+% Main parallel refractive index of the launched spectrum, for multi-junction antennas.
 antenna_lh.n_par = 1.72;
 
 %% ----------------------------------------
 %% Modules description
 %% ----------------------------------------
-% Number of modules per antenna in the poloidal direction. 
+% Number of modules per antenna in the poloidal direction.
 modules.nma_theta = 1;
-%  Number of modules per antenna in the toroidal direction. 
-modules.nma_phi = 1;
+%  Number of modules per antenna in the toroidal direction.
+modules.nma_phi = 8;
 
-%  Position index of the module in the poloidal direction (from low theta to high theta, 
-%  i.e. from bottom to top if the antenna is on LFS). 
+%  Position index of the module in the poloidal direction (from low theta to high theta,
+%  i.e. from bottom to top if the antenna is on LFS).
 modules.ima_theta = ones(1,modules.nma_phi*modules.nma_theta); % numbering in ALOHA goes from top to bottom as view from the plasma.
 
-%  Position index of the module in the toroidal direction (from low phi to high phi, 
+%  Position index of the module in the toroidal direction (from low phi to high phi,
 %  counter-clockwise when seen from above).
 modules.ima_phi = [modules.nma_phi:-1:1]; % numbering in ALOHA goes from left to right as view from the plasma.
 
@@ -69,10 +69,10 @@ waveguides.nwm_phi = 1;
 % 1 for active -- 0 for passive.
 waveguides.mask = [1];
 
-% Number of passive waveguide between modules in the toroidal direction. 
+% Number of passive waveguide between modules in the toroidal direction.
 waveguides.npwbm_phi = 1;
 
-% Number of passive waveguides on each antenna edge in the toroidal direction. 
+% Number of passive waveguides on each antenna edge in the toroidal direction.
 waveguides.npwe_phi = 1;
 
 % Spacing between poloidally neighboring waveguides [m]
@@ -82,7 +82,7 @@ waveguides.sw_theta = 12e-3;
 waveguides.hw_theta = 70e-3;
 
 % Width of active waveguides [m]
-waveguides.bwa = 14.65e-3;     
+waveguides.bwa = 14.65e-3;
 
 % Width of internal passive waveguides [m]
 waveguides.biwp = 12e-3;
@@ -103,14 +103,14 @@ waveguides.e_phi = repmat(ep, 1, ne_phi);
 nscl = waveguides.npwbm_phi*(modules.nma_phi-1) + ...
        waveguides.npwe_phi*2 + ...
        sum(not(waveguides.mask))*modules.nma_phi;
-waveguides.scl = repmat(1/4, 1, nscl);     
+waveguides.scl = repmat(1/4, 1, nscl);
 
 %% --------------------------------
 %% Modules Scattering parameters
 %% --------------------------------
 % matrice S des modules ds des fichiers .m (NB : la matrice est rangee sur une seule colonne)
 modules.Sparameters.pathFrom = pwd;
-modules.Sparameters.pathTo = 'S_HFSS/matrices_HFSS_elem';  % path the S-matrix files (.m files) 
+modules.Sparameters.pathTo = 'S_HFSS/matrices_HFSS_elem';  % path the S-matrix files (.m files)
 
 filenames = ['S_elem'];
 
@@ -142,20 +142,20 @@ modules.amplitude = sqrt(1/modules.nma_phi)*ones(modules.nma_phi,1);
 %modules.phase = zeros(1, modules.nma_theta*modules.nma_phi)';
 modules.phase = (270*pi/180)*(0:modules.nma_phi-1)';
 
-%% Not used at all in ALOHA - 
+%% Not used at all in ALOHA -
 %  Reference global antenna position. Vectors (nantenna_lh). Time-dependent
-antenna_lh.position = []; 
+antenna_lh.position = [];
 %  Beam characteristics
 antenna_lh.beam = [];
 
 
-%% ------------------------------  
+%% ------------------------------
 %% DO NOT EDIT UNDER THIS LINE
 %% ------------------------------
 % architecture name of the current antenna = its filename
 antenna_lh.archName = mfilename;
 
-% % Make the array b which contains all the waveguide width 
+% % Make the array b which contains all the waveguide width
 % % of a row of waveguides
 % % Not mandory for ITM CPO antenna_lh, but usefull for ALOHA
 % b_module = waveguides.mask.*waveguides.bwa + not(waveguides.mask).*waveguides.biwp; % waveguide width inside a module
@@ -168,6 +168,3 @@ antenna_lh.archName = mfilename;
 modules.waveguides = waveguides;
 setup.modules = modules;
 antenna_lh.setup = setup;
-
-
-

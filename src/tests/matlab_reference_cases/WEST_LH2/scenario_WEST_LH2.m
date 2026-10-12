@@ -68,8 +68,8 @@ options.bool_homeMadeExcitation = true;
 % Warning : the length of the array must be correct
 % in respect to the number of module of your antenna !
 % help aloha_antenna_excitation for some examples
-antenna.a_ampl = sqrt(2.6725e6/16)*ones(8,1);
-antenna.a_phase = 1*(180*pi/180)*(0:7)';
+antenna.a_ampl = [408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954 408.6945681067954]';
+antenna.a_phase = (pi/180)*[0 180 0 180 0 180 0 180]';
 
 
 % [bool_mesure=true only]
@@ -105,7 +105,7 @@ options.version_code = '1D';
 % (Modele electromagnetique 1D)
 %
 Nmh = 1;    % nbre de modes TE
-Nme = 2;    % nbre de modes TM
+Nme = 0;    % nbre de modes TM
 
 %% #####################
 % Plasma model

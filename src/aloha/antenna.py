@@ -735,7 +735,10 @@ class Antenna:
 
         """
         antenna = self.antenna
-        mod = antenna["global"]
+        # Use layout if available, otherwise fall back to global
+        mod = antenna.get("layout") or antenna.get("global")
+        if mod is None:
+            raise ValueError("Antenna description must have either 'layout' or 'global' section")
         wg = antenna["module"]
 
         # (total) number of waveguides per row
