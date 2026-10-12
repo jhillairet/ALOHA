@@ -139,9 +139,13 @@ class Scenario:
             if missing_in_2 or missing_in_1:
                 msg_parts = []
                 if missing_in_2:
-                    msg_parts.append(f"keys {sorted(missing_in_2)} missing in scenario2")
+                    msg_parts.append(
+                        f"keys {sorted(missing_in_2)} missing in scenario2"
+                    )
                 if missing_in_1:
-                    msg_parts.append(f"keys {sorted(missing_in_1)} missing in scenario1")
+                    msg_parts.append(
+                        f"keys {sorted(missing_in_1)} missing in scenario1"
+                    )
                 msg = f"Keys mismatch at '{path}': {', '.join(msg_parts)}"
                 _differences.append(msg)
                 # Continue to collect all differences, don't raise yet
@@ -153,7 +157,9 @@ class Scenario:
                 # Skip debug option as it may differ between file formats
                 if new_path == "options.debug":
                     continue
-                Scenario.compare_scenarios(scenario1[key], scenario2[key], new_path, _differences)
+                Scenario.compare_scenarios(
+                    scenario1[key], scenario2[key], new_path, _differences
+                )
 
         elif isinstance(scenario1, np.ndarray) and isinstance(scenario2, np.ndarray):
             # Compare NumPy arrays with tolerance
@@ -164,7 +170,9 @@ class Scenario:
                 _differences.append(msg)
                 return False
 
-        elif isinstance(scenario1, (list, tuple)) and isinstance(scenario2, (list, tuple)):
+        elif isinstance(scenario1, (list, tuple)) and isinstance(
+            scenario2, (list, tuple)
+        ):
             # Check length first
             if len(scenario1) != len(scenario2):
                 msg = f"List length mismatch at '{path}': {len(scenario1)} vs {len(scenario2)}"
@@ -186,7 +194,9 @@ class Scenario:
         # If we're at the top level and have differences, raise them all
         if path == "" and _differences:
             header = f"Found {len(_differences)} difference(s) between scenarios:"
-            all_differences = header + "\n" + "\n".join(f"  - {diff}" for diff in _differences)
+            all_differences = (
+                header + "\n" + "\n".join(f"  - {diff}" for diff in _differences)
+            )
             raise AssertionError(all_differences)
 
         return True
@@ -224,7 +234,9 @@ class Scenario:
         elif filepath.suffix.lower() == ".m":
             matlab_scenario, results_dict = load_m_file(filepath)
         else:
-            raise ValueError(f"Unsupported file format: {filepath.suffix}. Expected .m or .mat")
+            raise ValueError(
+                f"Unsupported file format: {filepath.suffix}. Expected .m or .mat"
+            )
 
         # Convert the MATLAB scenario to the TOML schema
         scenario_dict = cls.convert_matlab_scenario(matlab_scenario)
@@ -275,7 +287,10 @@ class Scenario:
 
         # antenna.architecture -> antenna.file
         architecture_str = None
-        if "antenna" in matlab_scenario and "architecture" in matlab_scenario["antenna"]:
+        if (
+            "antenna" in matlab_scenario
+            and "architecture" in matlab_scenario["antenna"]
+        ):
             architecture = matlab_scenario["antenna"]["architecture"]
             # Convert list of ASCII codes to string (for .mat files)
             if isinstance(architecture, list):
@@ -288,9 +303,13 @@ class Scenario:
                 # Handle numpy arrays (from .mat files with preserved arrays)
                 if architecture.ndim == 2 and architecture.shape[1] == 1:
                     # Column vector of character codes
-                    architecture_str = "".join(chr(code) for code in architecture.flatten())
+                    architecture_str = "".join(
+                        chr(code) for code in architecture.flatten()
+                    )
                 else:
-                    architecture_str = "".join(chr(code) for code in architecture.flatten())
+                    architecture_str = "".join(
+                        chr(code) for code in architecture.flatten()
+                    )
             else:
                 architecture_str = architecture
             # Map MATLAB antenna names to TOML file names
@@ -303,7 +322,9 @@ class Scenario:
                 "antenna_PA_ITM": "PA_1row.toml",
                 # Add more mappings as needed
             }
-            antenna["file"] = antenna_name_mapping.get(architecture_str, architecture_str)
+            antenna["file"] = antenna_name_mapping.get(
+                architecture_str, architecture_str
+            )
 
         # antenna.freq -> antenna.excitation.f
         excitation = {}
@@ -347,7 +368,9 @@ class Scenario:
                                 # For expressions like sqrt(1)*ones(8,1), extract the number from ones(8,1)
                                 # Use regex to find the last occurrence of ones(N,1) or zeros(N,1)
                                 ones_match = re.search(r"ones\((\d+),\s*\d+\)", a_ampl)
-                                zeros_match = re.search(r"zeros\((\d+),\s*\d+\)", a_ampl)
+                                zeros_match = re.search(
+                                    r"zeros\((\d+),\s*\d+\)", a_ampl
+                                )
                                 if ones_match:
                                     num_modules = int(ones_match.group(1))
                                 elif zeros_match:
@@ -388,9 +411,15 @@ class Scenario:
             if isinstance(a_ampl, (list, np.ndarray)):
                 # Handle nested lists/arrays from .mat files
                 # Check if this is a 2D array with a single row (common MATLAB format)
-                if isinstance(a_ampl, np.ndarray) and a_ampl.ndim == 2 and a_ampl.shape[0] == 1:
+                if (
+                    isinstance(a_ampl, np.ndarray)
+                    and a_ampl.ndim == 2
+                    and a_ampl.shape[0] == 1
+                ):
                     a_ampl = a_ampl[0]  # Extract the first row
-                elif isinstance(a_ampl, list) and a_ampl and isinstance(a_ampl[0], list):
+                elif (
+                    isinstance(a_ampl, list) and a_ampl and isinstance(a_ampl[0], list)
+                ):
                     a_ampl = a_ampl[0]  # Extract the inner list
                 # Convert to list of floats (assume same unit as MATLAB)
                 excitation["power"] = [float(x) for x in a_ampl]
@@ -410,9 +439,17 @@ class Scenario:
             if isinstance(a_phase, (list, np.ndarray)):
                 # Handle nested lists/arrays from .mat files
                 # Check if this is a 2D array with a single row (common MATLAB format)
-                if isinstance(a_phase, np.ndarray) and a_phase.ndim == 2 and a_phase.shape[0] == 1:
+                if (
+                    isinstance(a_phase, np.ndarray)
+                    and a_phase.ndim == 2
+                    and a_phase.shape[0] == 1
+                ):
                     a_phase = a_phase[0]  # Extract the first row
-                elif isinstance(a_phase, list) and a_phase and isinstance(a_phase[0], list):
+                elif (
+                    isinstance(a_phase, list)
+                    and a_phase
+                    and isinstance(a_phase[0], list)
+                ):
                     a_phase = a_phase[0]  # Extract the inner list
                 # Convert radians to degrees and normalize modulo 360
                 excitation["phase"] = [float(np.rad2deg(x)) % 360 for x in a_phase]
@@ -437,8 +474,14 @@ class Scenario:
                 # Convert ASCII codes to string
                 if isinstance(TSport, list) and TSport and isinstance(TSport[0], list):
                     # Handle nested lists from .mat files
-                    TSport = [item[0] if isinstance(item, list) else item for item in TSport]
-                elif isinstance(TSport, np.ndarray) and TSport.ndim == 2 and TSport.shape[1] == 1:
+                    TSport = [
+                        item[0] if isinstance(item, list) else item for item in TSport
+                    ]
+                elif (
+                    isinstance(TSport, np.ndarray)
+                    and TSport.ndim == 2
+                    and TSport.shape[1] == 1
+                ):
                     # Handle 2D numpy array of character codes
                     TSport = TSport.flatten()
                 excitation["port"] = "".join(chr(int(code)) for code in TSport)
@@ -526,11 +569,18 @@ class Scenario:
         bilinear = {}
 
         # options.bool_lignes_identiques -> plasma.spectral_1D.bilinear.identical_profiles
-        if "options" in matlab_scenario and "bool_lignes_identiques" in matlab_scenario["options"]:
-            bool_lignes_identiques = matlab_scenario["options"]["bool_lignes_identiques"]
+        if (
+            "options" in matlab_scenario
+            and "bool_lignes_identiques" in matlab_scenario["options"]
+        ):
+            bool_lignes_identiques = matlab_scenario["options"][
+                "bool_lignes_identiques"
+            ]
             # Handle MATLAB boolean strings properly ("true"/"false")
             if isinstance(bool_lignes_identiques, str):
-                bilinear["identical_profiles"] = bool_lignes_identiques.lower() == "true"
+                bilinear["identical_profiles"] = (
+                    bool_lignes_identiques.lower() == "true"
+                )
             else:
                 bilinear["identical_profiles"] = bool(bool_lignes_identiques)
 
@@ -546,7 +596,11 @@ class Scenario:
             lambda_n_value = plasma_data["lambda_n"]
             if isinstance(lambda_n_value, (list, np.ndarray)):
                 # Handle nested lists from .mat files (e.g., [[0.002], [0.02]])
-                if isinstance(lambda_n_value, list) and lambda_n_value and isinstance(lambda_n_value[0], list):
+                if (
+                    isinstance(lambda_n_value, list)
+                    and lambda_n_value
+                    and isinstance(lambda_n_value[0], list)
+                ):
                     # Extract all values from nested lists
                     for item in lambda_n_value:
                         if isinstance(item, list) and len(item) > 0:
@@ -554,7 +608,9 @@ class Scenario:
                         elif isinstance(item, (int, float, np.number)):
                             lambda_n.append(float(item))
                 elif (
-                    isinstance(lambda_n_value, np.ndarray) and lambda_n_value.ndim == 2 and lambda_n_value.shape[1] == 1
+                    isinstance(lambda_n_value, np.ndarray)
+                    and lambda_n_value.ndim == 2
+                    and lambda_n_value.shape[1] == 1
                 ):
                     # Handle 2D numpy array with single column
                     for item in lambda_n_value:
@@ -578,7 +634,9 @@ class Scenario:
 
         # plasma.d_couche -> plasma.spectral_1D.bilinear.plasma_layer_length
         if "plasma" in matlab_scenario and "d_couche" in matlab_scenario["plasma"]:
-            bilinear["plasma_layer_length"] = float(matlab_scenario["plasma"]["d_couche"])
+            bilinear["plasma_layer_length"] = float(
+                matlab_scenario["plasma"]["d_couche"]
+            )
 
         # options.B0 -> plasma.spectral_1D.bilinear.B0
         if "options" in matlab_scenario and "B0" in matlab_scenario["options"]:
@@ -589,7 +647,10 @@ class Scenario:
             bilinear["vacuum_layer_length"] = float(matlab_scenario["plasma"]["d_vide"])
 
         # options.type_swan_aloha -> plasma.spectral_1D.bilinear.infinite_waveguide (0 -> False, if 1 -> True)
-        if "options" in matlab_scenario and "type_swan_aloha" in matlab_scenario["options"]:
+        if (
+            "options" in matlab_scenario
+            and "type_swan_aloha" in matlab_scenario["options"]
+        ):
             type_swan_aloha = matlab_scenario["options"]["type_swan_aloha"]
             bilinear["infinite_waveguide"] = bool(int(type_swan_aloha))
 
@@ -743,7 +804,9 @@ class Scenario:
             comment = self.scenario["comment"]
             if isinstance(comment, list):
                 # Handle list of comments (MATLAB style) - convert all elements to strings
-                non_empty_comments = [str(line) for line in comment if str(line).strip()]
+                non_empty_comments = [
+                    str(line) for line in comment if str(line).strip()
+                ]
                 if non_empty_comments:
                     comment_value = " ".join(non_empty_comments)
             elif isinstance(comment, str) and comment.strip():
@@ -766,7 +829,9 @@ class Scenario:
 
         # Remove trailing whitespace and multiple blank lines
         toml_content = "\n".join(line.rstrip() for line in toml_content.split("\n"))
-        toml_content = "\n\n".join([part for part in toml_content.split("\n\n") if part.strip()])
+        toml_content = "\n\n".join(
+            [part for part in toml_content.split("\n\n") if part.strip()]
+        )
 
         if filename is None:
             return toml_content
@@ -797,7 +862,9 @@ class Scenario:
         if solver == "spectral_1D":
             spectral_1D = plasma.get("spectral_1D", {})
             if not spectral_1D:
-                raise ValueError("spectral_1D section is required in plasma for spectral_1D solver")
+                raise ValueError(
+                    "spectral_1D section is required in plasma for spectral_1D solver"
+                )
 
             profile = spectral_1D.get("profile", "")
 
@@ -833,7 +900,9 @@ class Scenario:
                     f"Unsupported plasma profile '{profile}' for spectral_1D solver. Only 'bilinear' is supported."
                 )
         else:
-            raise ValueError(f"Unsupported solver '{solver}'. Only 'spectral_1D' is currently supported.")
+            raise ValueError(
+                f"Unsupported solver '{solver}'. Only 'spectral_1D' is currently supported."
+            )
 
     def _load_sparameters_from_files(
         self,
@@ -880,7 +949,9 @@ class Scenario:
 
         # Calculate lcc (short circuit depth in guided wavelengths)
         # For now, use the first pwg_depth value
-        lcc_default = pwg_depth[0] if isinstance(pwg_depth, list) and len(pwg_depth) > 0 else 0.25
+        lcc_default = (
+            pwg_depth[0] if isinstance(pwg_depth, list) and len(pwg_depth) > 0 else 0.25
+        )
 
         # Get the number of modules
         layout_data = antenna_data.get("layout", {})
@@ -936,10 +1007,17 @@ class Scenario:
                     mode = 0
                     # Calculate plasma port index accounting for poloidal row
                     wg_index = wg_idx + pol_row * nb_g_total_ligne
-                    plasma_port = (wg_index + 1) * nb_modes_total + mode - (nb_modes_total - 1) - 1
+                    plasma_port = (
+                        (wg_index + 1) * nb_modes_total
+                        + mode
+                        - (nb_modes_total - 1)
+                        - 1
+                    )
                     # S_ant_22 is diagonal in MATLAB, so only set diagonal elements
                     # In our transposed convention: S_ant_22[plasma_port, plasma_port]
-                    S_ant_22[plasma_port, plasma_port] = -np.exp(1j * 4 * np.pi * lcc_default)
+                    S_ant_22[plasma_port, plasma_port] = -np.exp(
+                        1j * 4 * np.pi * lcc_default
+                    )
 
         # Precompute the active waveguide indices for each module
         # This is similar to MATLAB's modules_act
@@ -975,7 +1053,9 @@ class Scenario:
         # For each module, load its S-parameter file
         for ind in range(len(filenames)):
             filename = filenames[ind]
-            phase_deembedded = phases_deembedded[ind] if ind < len(phases_deembedded) else 0.0
+            phase_deembedded = (
+                phases_deembedded[ind] if ind < len(phases_deembedded) else 0.0
+            )
 
             # Try to find the S-parameter file
             sparam_file = None
@@ -984,27 +1064,63 @@ class Scenario:
                 Path(filename + ".m"),
                 Path(filename + ".mat"),
                 # For WEST_LH1
-                Path(__file__).parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_C3" / filename,
-                Path(__file__).parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_C3" / (filename + ".m"),
-                Path(__file__).parent.parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_C3" / filename,
+                Path(__file__).parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_C3"
+                / filename,
+                Path(__file__).parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_C3"
+                / (filename + ".m"),
+                Path(__file__).parent.parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_C3"
+                / filename,
                 Path(__file__).parent.parent.parent
                 / "aloha_matlab"
                 / "S_HFSS"
                 / "matrices_HFSS_C3"
                 / (filename + ".m"),
                 # For WEST_LH2
-                Path(__file__).parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_C4" / filename,
-                Path(__file__).parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_C4" / (filename + ".m"),
-                Path(__file__).parent.parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_C4" / filename,
+                Path(__file__).parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_C4"
+                / filename,
+                Path(__file__).parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_C4"
+                / (filename + ".m"),
+                Path(__file__).parent.parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_C4"
+                / filename,
                 Path(__file__).parent.parent.parent
                 / "aloha_matlab"
                 / "S_HFSS"
                 / "matrices_HFSS_C4"
                 / (filename + ".m"),
                 # For 8_active_waveguides
-                Path(__file__).parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_elem" / filename,
-                Path(__file__).parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_elem" / (filename + ".m"),
-                Path(__file__).parent.parent.parent / "aloha_matlab" / "S_HFSS" / "matrices_HFSS_elem" / filename,
+                Path(__file__).parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_elem"
+                / filename,
+                Path(__file__).parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_elem"
+                / (filename + ".m"),
+                Path(__file__).parent.parent.parent
+                / "aloha_matlab"
+                / "S_HFSS"
+                / "matrices_HFSS_elem"
+                / filename,
                 Path(__file__).parent.parent.parent
                 / "aloha_matlab"
                 / "S_HFSS"
@@ -1018,7 +1134,9 @@ class Scenario:
                     break
 
             if sparam_file is None:
-                raise FileNotFoundError(f"S-parameter file not found for module {ind}. Filename: {filename}")
+                raise FileNotFoundError(
+                    f"S-parameter file not found for module {ind}. Filename: {filename}"
+                )
 
             # Load the S-parameter file
             try:
@@ -1026,7 +1144,9 @@ class Scenario:
                 S_module = sparam_data.get("S", None)
 
                 if S_module is None:
-                    raise ValueError(f"S-parameter matrix not found in file: {sparam_file}")
+                    raise ValueError(
+                        f"S-parameter matrix not found in file: {sparam_file}"
+                    )
 
                 # Extract S_module elements
                 if len(S_module.shape) == 1:
@@ -1080,7 +1200,10 @@ class Scenario:
                 # If nb_wg_per_module matches the total active waveguides per module (nb_active_wg_phi * nb_wg_theta),
                 # then S-parameter files include only active waveguides
                 # In this case, we use modules_act to place the S-parameter data
-                if nb_wg_per_module == nb_active_wg_phi * nb_wg_theta and len(modules_act) > ind:
+                if (
+                    nb_wg_per_module == nb_active_wg_phi * nb_wg_theta
+                    and len(modules_act) > ind
+                ):
                     # S-parameter files include only active waveguides
                     # Use modules_act to get the correct plasma port indices
                     active_plasma_ports = modules_act[ind]
@@ -1111,16 +1234,22 @@ class Scenario:
                     # Place S_module_22: scattering between active waveguide ports
                     for i in range(len(S_module_21)):
                         for j in range(len(S_module_21)):
-                            if i < len(active_plasma_ports) and j < len(active_plasma_ports):
+                            if i < len(active_plasma_ports) and j < len(
+                                active_plasma_ports
+                            ):
                                 plasma_port_i = active_plasma_ports[i]
                                 plasma_port_j = active_plasma_ports[j]
-                                S_ant_22[plasma_port_i, plasma_port_j] = S_module_22[i, j]
+                                S_ant_22[plasma_port_i, plasma_port_j] = S_module_22[
+                                    i, j
+                                ]
                 else:
                     # S-parameter files include all waveguides (active + passive)
                     # Use the original logic with contiguous waveguide indices
 
                     # Calculate waveguide start index for this module
-                    waveguide_start = nb_pwg_edge + ind * (nb_wg_phi + nb_pwg_btw_mod_phi)
+                    waveguide_start = nb_pwg_edge + ind * (
+                        nb_wg_phi + nb_pwg_btw_mod_phi
+                    )
 
                     # Place S_module_11 on the diagonal
                     S_ant_11[ind, ind] = S_module_11
@@ -1134,7 +1263,12 @@ class Scenario:
                         mode_index = i // nb_wg_per_module
                         waveguide_offset = i % nb_wg_per_module
                         waveguide_index = waveguide_start + waveguide_offset
-                        plasma_port = (waveguide_index + 1) * nb_modes_total + mode_index - (nb_modes_total - 1) - 1
+                        plasma_port = (
+                            (waveguide_index + 1) * nb_modes_total
+                            + mode_index
+                            - (nb_modes_total - 1)
+                            - 1
+                        )
                         S_ant_12[plasma_port, ind] = s_val
 
                     # Place S_module_21: connects waveguide ports to access port
@@ -1146,7 +1280,12 @@ class Scenario:
                         mode_index = i // nb_wg_per_module
                         waveguide_offset = i % nb_wg_per_module
                         waveguide_index = waveguide_start + waveguide_offset
-                        plasma_port = (waveguide_index + 1) * nb_modes_total + mode_index - (nb_modes_total - 1) - 1
+                        plasma_port = (
+                            (waveguide_index + 1) * nb_modes_total
+                            + mode_index
+                            - (nb_modes_total - 1)
+                            - 1
+                        )
                         S_ant_21[ind, plasma_port] = s_val
 
                     # Place S_module_22: scattering between waveguide ports
@@ -1156,18 +1295,26 @@ class Scenario:
                             waveguide_offset_i = i % nb_wg_per_module
                             waveguide_index_i = waveguide_start + waveguide_offset_i
                             plasma_port_i = (
-                                (waveguide_index_i + 1) * nb_modes_total + mode_index_i - (nb_modes_total - 1) - 1
+                                (waveguide_index_i + 1) * nb_modes_total
+                                + mode_index_i
+                                - (nb_modes_total - 1)
+                                - 1
                             )
 
                             mode_index_j = j // nb_wg_per_module
                             waveguide_offset_j = j % nb_wg_per_module
                             waveguide_index_j = waveguide_start + waveguide_offset_j
                             plasma_port_j = (
-                                (waveguide_index_j + 1) * nb_modes_total + mode_index_j - (nb_modes_total - 1) - 1
+                                (waveguide_index_j + 1) * nb_modes_total
+                                + mode_index_j
+                                - (nb_modes_total - 1)
+                                - 1
                             )
                             S_ant_22[plasma_port_i, plasma_port_j] = S_module_22[i, j]
             except Exception as e:
-                raise RuntimeError(f"Error loading S-parameter file {sparam_file}: {str(e)}")
+                raise RuntimeError(
+                    f"Error loading S-parameter file {sparam_file}: {str(e)}"
+                )
 
         return S_ant_11, S_ant_12, S_ant_21, S_ant_22
 
@@ -1189,7 +1336,10 @@ class Scenario:
 
         """
         # Check if S_ant matrices are already computed (e.g., loaded from .mat file)
-        if all(key in self.results for key in ["S_ant_11", "S_ant_12", "S_ant_21", "S_ant_22"]):
+        if all(
+            key in self.results
+            for key in ["S_ant_11", "S_ant_12", "S_ant_21", "S_ant_22"]
+        ):
             # S_ant matrices are already available, use them directly
             S_ant_11 = self.results["S_ant_11"]
             S_ant_12 = self.results["S_ant_12"]
@@ -1205,7 +1355,9 @@ class Scenario:
         # Get S_plasma and rac_Zhe from results
         S_plasma = self.results.get("S_plasma")
         if S_plasma is None:
-            raise ValueError("S_plasma must be computed before calling _compute_antenna_response")
+            raise ValueError(
+                "S_plasma must be computed before calling _compute_antenna_response"
+            )
 
         # Get antenna excitation parameters from scenario
         scenario_antenna = self.scenario.get("antenna", {})
@@ -1243,8 +1395,12 @@ class Scenario:
                     antenna_paths.extend(
                         [
                             Path(f"{antenna_file}.m"),
-                            Path(__file__).parent.parent / "antennas" / f"{antenna_file}.m",
-                            Path(__file__).parent.parent.parent / "antennas" / f"{antenna_file}.m",
+                            Path(__file__).parent.parent
+                            / "antennas"
+                            / f"{antenna_file}.m",
+                            Path(__file__).parent.parent.parent
+                            / "antennas"
+                            / f"{antenna_file}.m",
                         ]
                     )
 
@@ -1272,12 +1428,18 @@ class Scenario:
         nb_pwg_btw_mod_phi = module.get("nb_pwg_btw_mod_phi", 0)
 
         # Calculate total number of waveguides per poloidal row
-        nb_g_total_ligne = nb_wg_phi * nb_modules_tor + 2 * nb_pwg_edge + nb_pwg_btw_mod_phi * (nb_modules_tor - 1)
+        nb_g_total_ligne = (
+            nb_wg_phi * nb_modules_tor
+            + 2 * nb_pwg_edge
+            + nb_pwg_btw_mod_phi * (nb_modules_tor - 1)
+        )
 
         # Get the number of modes from S_plasma shape
         # Total waveguides = nb_g_total_ligne * nb_wg_theta (accounting for poloidal rows)
         total_waveguides = nb_g_total_ligne * nb_wg_theta
-        nb_modes_total = S_plasma.shape[0] // total_waveguides if total_waveguides > 0 else 1
+        nb_modes_total = (
+            S_plasma.shape[0] // total_waveguides if total_waveguides > 0 else 1
+        )
 
         # Number of access ports = number of modules
         nb_access_ports = total_modules
@@ -1294,15 +1456,17 @@ class Scenario:
 
             if filenames and len(filenames) == total_modules:
                 # Load S-parameters from files
-                S_ant_11, S_ant_12, S_ant_21, S_ant_22 = self._load_sparameters_from_files(
-                    filenames,
-                    phases_deembedded,
-                    nb_access_ports,
-                    nb_plasma_ports,
-                    nb_g_total_ligne,
-                    nb_modes_total,
-                    S_plasma,
-                    antenna_data,
+                S_ant_11, S_ant_12, S_ant_21, S_ant_22 = (
+                    self._load_sparameters_from_files(
+                        filenames,
+                        phases_deembedded,
+                        nb_access_ports,
+                        nb_plasma_ports,
+                        nb_g_total_ligne,
+                        nb_modes_total,
+                        S_plasma,
+                        antenna_data,
+                    )
                 )
             else:
                 # S-parameter files are required
@@ -1420,7 +1584,9 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     # Check solver type - we only support spectral_1D for now
     solver = plasma.get("solver", "")
     if solver != "spectral_1D":
-        raise ValueError(f"_convert_scenario_to_matlab_inputs only supports 'spectral_1D' solver, got '{solver}'")
+        raise ValueError(
+            f"_convert_scenario_to_matlab_inputs only supports 'spectral_1D' solver, got '{solver}'"
+        )
 
     spectral_1D = plasma.get("spectral_1D", {})
     if not spectral_1D:
@@ -1443,8 +1609,12 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
             # Try both .toml and .m extensions
             antenna_paths = [
                 Path(antenna_file),  # Try as-is
-                Path(__file__).parent.parent / "antennas" / antenna_file,  # Try in antennas directory
-                Path(__file__).parent.parent.parent / "antennas" / antenna_file,  # Try in parent antennas directory
+                Path(__file__).parent.parent
+                / "antennas"
+                / antenna_file,  # Try in antennas directory
+                Path(__file__).parent.parent.parent
+                / "antennas"
+                / antenna_file,  # Try in parent antennas directory
             ]
 
             # Also try with .m extension (for MATLAB antenna files)
@@ -1453,7 +1623,9 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
                     [
                         Path(f"{antenna_file}.m"),
                         Path(__file__).parent.parent / "antennas" / f"{antenna_file}.m",
-                        Path(__file__).parent.parent.parent / "antennas" / f"{antenna_file}.m",
+                        Path(__file__).parent.parent.parent
+                        / "antennas"
+                        / f"{antenna_file}.m",
                     ]
                 )
 
@@ -1466,14 +1638,18 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
             raise (FileNotFoundError, "Antenna S-parameters files not found")
 
     # Get frequency from antenna excitation or antenna default
-    freq = excitation.get("f", antenna.get("frequency", antenna_data.get("frequency", None)))
+    freq = excitation.get(
+        "f", antenna.get("frequency", antenna_data.get("frequency", None))
+    )
     if freq is None:
         raise ValueError("Frequency (f) is required in antenna.excitation or antenna")
 
     # Extract plasma profile parameters from spectral_1D section
     profile = spectral_1D.get("profile", "")
     if profile != "bilinear":
-        raise ValueError(f"Unsupported plasma profile '{profile}'. Only 'bilinear' is supported.")
+        raise ValueError(
+            f"Unsupported plasma profile '{profile}'. Only 'bilinear' is supported."
+        )
 
     bilinear = spectral_1D.get("bilinear", {})
     if not bilinear:
@@ -1481,9 +1657,15 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
 
     # Extract bilinear profile parameters
     ne0 = bilinear.get("ne0", 0.0)  # edge density [1/m^3]
-    lambda_n = bilinear.get("lambda_n", [0.002, 0.02])  # gradients scrape-off lengths [m]
-    plasma_layer_length = bilinear.get("plasma_layer_length", 0.002)  # width of the first plasma layer [m]
-    vacuum_layer_length = bilinear.get("vacuum_layer_length", 0.0)  # vacuum gap width [m]
+    lambda_n = bilinear.get(
+        "lambda_n", [0.002, 0.02]
+    )  # gradients scrape-off lengths [m]
+    plasma_layer_length = bilinear.get(
+        "plasma_layer_length", 0.002
+    )  # width of the first plasma layer [m]
+    vacuum_layer_length = bilinear.get(
+        "vacuum_layer_length", 0.0
+    )  # vacuum gap width [m]
 
     # For version 6, we need to map the bilinear profile to the linear profile parameters
     # Convert to arrays for multiple poloidal rows
@@ -1524,24 +1706,36 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     # Using the MATLAB formula: nb_g_total_ligne = nb_wg_phi * nb_mod_phi + 2 * nb_pwg_edge
     # + nb_pwg_btw_mod_phi * (nb_mod_phi - 1)
     # This matches the waveguide logic in aloha_utils_getAntennaCoordinates.m
-    nb_g_total_ligne = nb_wg_phi * nb_mod_phi + 2 * nb_pwg_edge + nb_pwg_btw_mod_phi * (nb_mod_phi - 1)
+    nb_g_total_ligne = (
+        nb_wg_phi * nb_mod_phi + 2 * nb_pwg_edge + nb_pwg_btw_mod_phi * (nb_mod_phi - 1)
+    )
 
     # Waveguide dimensions from antenna module parameters
-    wg_size_theta = module.get("wg_size_theta", 70e-3)  # Height of waveguides in poloidal direction [m]
+    wg_size_theta = module.get(
+        "wg_size_theta", 70e-3
+    )  # Height of waveguides in poloidal direction [m]
     awg_size_phi = module.get("awg_size_phi", 10e-3)  # Width of active waveguides [m]
-    pwg_size_phi = module.get("pwg_size_phi", 6.5e-3)  # Width of internal passive waveguides [m]
-    pwg_size_edge_phi = module.get("pwg_size_edge_phi", 6.5e-3)  # Width of edge passive waveguides [m]
+    pwg_size_phi = module.get(
+        "pwg_size_phi", 6.5e-3
+    )  # Width of internal passive waveguides [m]
+    pwg_size_edge_phi = module.get(
+        "pwg_size_edge_phi", 6.5e-3
+    )  # Width of edge passive waveguides [m]
     e_phi = module.get("e_phi", 2e-3)  # Spacing between active waveguides [m]
     e_phi_pwg = module.get("e_phi_pwg", 3e-3)  # Spacing between passive waveguides [m]
 
     # For version 6, we need to provide arrays for each poloidal row
     # Convert scalar values to arrays with length nb_g_pol
     ne0_array = [ne0] * nb_g_pol
-    dne0_array = [ne0 / lambda_n[0] if lambda_n and len(lambda_n) > 0 else 0.0] * nb_g_pol
+    dne0_array = [
+        ne0 / lambda_n[0] if lambda_n and len(lambda_n) > 0 else 0.0
+    ] * nb_g_pol
     d_couche_array = [plasma_layer_length] * nb_g_pol
     # Fix dne1 calculation to match MATLAB: (1 + d_couche/lambda_n[0]) * ne0 / lambda_n[1]
     if lambda_n and len(lambda_n) > 1:
-        dne1_array = [(1 + plasma_layer_length / lambda_n[0]) * ne0 / lambda_n[1]] * nb_g_pol
+        dne1_array = [
+            (1 + plasma_layer_length / lambda_n[0]) * ne0 / lambda_n[1]
+        ] * nb_g_pol
     else:
         dne1_array = [0.0] * nb_g_pol
     d_vide_array = [vacuum_layer_length] * nb_g_pol
@@ -1603,6 +1797,19 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
     for ind in range(1, len(b)):
         z[ind] = z[ind - 1] + b[ind - 1] + e[ind - 1]
 
+    # Compute h array (waveguide heights in poloidal direction)
+    # For version 6, h is the height of each waveguide in the poloidal direction
+    # When nb_g_pol > 1, we need to compute the poloidal positions
+    # For now, use the waveguide height (a) for all waveguides
+    h = [a] * len(b)
+
+    # Compute y array (poloidal positions of each row)
+    # For version 6 with nb_g_pol rows, y should have nb_g_pol elements
+    # When nb_g_pol = 1, y = [0.0]
+    # When nb_g_pol > 1, y is the cumulative sum of h for each row
+    # For now, since we're only handling nb_g_pol = 1, set y = [0.0]
+    y = [0.0] * nb_g_pol
+
     # Other parameters (using typical defaults for version 6)
     # Match MATLAB defaults from aloha_init.m
     T_grill = 7.0  # Grill periodicity parameter
@@ -1626,6 +1833,8 @@ def _convert_scenario_to_matlab_inputs(scenario: "Scenario") -> dict:
         "nb_g_total_ligne": nb_g_total_ligne,
         "a": a,
         "b": b,
+        "h": h,
+        "y": y,
         "z": z,
         "T_grill": T_grill,
         "D_guide_max": D_guide_max,

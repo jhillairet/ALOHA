@@ -1,6 +1,4 @@
-"""
-ALOHA Plasma coupling calculation module.
-"""
+"""ALOHA Plasma coupling calculation module."""
 
 import subprocess
 from pathlib import Path
@@ -8,7 +6,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy.constants import c, epsilon_0, m_e
-from scipy.constants import e as q_e
 
 if TYPE_CHECKING:
     from aloha.scenario import Scenario
@@ -85,7 +82,9 @@ def save_fortran_input_file(filename: str | Path, parameters: list) -> None:
                 f.write(f"  {param:1.7e}\n")
 
 
-def read_fortran_output_file(filename: str | Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def read_fortran_output_file(
+    filename: str | Path,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Read Fortran output file containing S_plasma, rac_Zhe, and K_cpl matrices.
 
@@ -264,7 +263,9 @@ def S_plasma_1D_matlab_inputs(
         if bool_lignes_identiques and ind > 0:
             if bool_debug:
                 print(f"{text_ind}[bool_lignes_identiques=true]")  # noqa: T201
-                print(f"{text_ind}--> No need to calculate this row! taking previous result")  # noqa: T201
+                print(
+                    f"{text_ind}--> No need to calculate this row! taking previous result"
+                )  # noqa: T201
             # Skip binary execution but continue to read results
             skip_binary = True
         else:
@@ -308,7 +309,13 @@ def S_plasma_1D_matlab_inputs(
                 print(f"{text_ind}Run binary {binary_path}")  # noqa: T201
 
             try:
-                result = subprocess.run([str(binary_path)], cwd=working_dir, capture_output=True, text=True, check=True)
+                result = subprocess.run(
+                    [str(binary_path)],
+                    cwd=working_dir,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
 
                 if bool_debug:
                     print(result.stdout)  # noqa: T201
@@ -316,7 +323,9 @@ def S_plasma_1D_matlab_inputs(
                         print(result.stderr)  # noqa: T201
 
             except subprocess.CalledProcessError as e:
-                raise RuntimeError(f"Binary execution failed: {e}\nStdout: {e.stdout}\nStderr: {e.stderr}") from e
+                raise RuntimeError(
+                    f"Binary execution failed: {e}\nStdout: {e.stdout}\nStderr: {e.stderr}"
+                ) from e
 
         # Read results (even if we skipped binary execution, we still need to read the previous results)
         if bool_debug:
@@ -328,7 +337,9 @@ def S_plasma_1D_matlab_inputs(
         if not fortran_output_file.exists():
             raise FileNotFoundError(f"Output file not created: {fortran_output_file}")
 
-        S_plasma_line, rac_Zhe_line, K_cpl = read_fortran_output_file(fortran_output_file)
+        S_plasma_line, rac_Zhe_line, K_cpl = read_fortran_output_file(
+            fortran_output_file
+        )
 
         # Update the output matrices
         # For version 6, the matrices are (Nme+Nmh)*nb_g_total_ligne x (Nme+Nmh)*nb_g_total_ligne
@@ -424,32 +435,57 @@ def compute_spectrum1D(scenario: "Scenario") -> None:
     """
     Compute the power spectrum of the antenna (1D version).
 
-    This function implements the logic from MATLAB's aloha_compute_spectrum1D.m to
-    calculate the power spectrum dP and its nz-integrated version dP_nz.
+    This function implements the logic from MATLAB's aloha_compute_spectrum1D.m
+    to calculate the power spectrum dP and its nz-integrated version dP_nz.
+
+    The spectrum calculation follows the physics of wave propagation in a plasma,
+    computing the power density distribution over parallel (nz) and perpendicular (ny)
+    refractive indices.
 
     Parameters
     ----------
     scenario : Scenario
         A Scenario object containing the scenario parameters and results.
         Must have the following in scenario.results:
-        - S_plasma: Plasma scattering matrix
-        - rac_Zhe: Characteristic impedance matrix
-        - a_plasma: Incident wave vector on plasma
-        - b_plasma: Reflected wave vector from plasma
+        - S_plasma : np.ndarray
+            Plasma scattering matrix (complex, shape: (N, N))
+        - rac_Zhe : np.ndarray
+            Characteristic impedance matrix (complex, shape: (N, N))
+        - a_plasma : np.ndarray
+            Incident wave vector on plasma (complex, shape: (N, 1))
+        - b_plasma : np.ndarray
+            Reflected wave vector from plasma (complex, shape: (N, 1))
 
     Results are stored in scenario.results:
-        - ny: Array of ny values
-        - nz: Array of nz values
-        - nz0: Main nz peak value
-        - dny: Step in ny
-        - dnz: Step in nz
-        - dP: Power spectrum density (2D array: ny x nz)
-        - dP_nz: Power spectrum integrated over ny (1D array: nz)
+        - ny : np.ndarray
+            Array of perpendicular refractive index values (shape: (N_ny,))
+        - nz : np.ndarray
+            Array of parallel refractive index values (shape: (N_nz,))
+        - nz0 : float
+            Main parallel refractive index peak value
+        - dny : float
+            Step size in ny dimension
+        - dnz : float
+            Step size in nz dimension
+        - dP : np.ndarray
+            Power spectrum density (complex, shape: (N_nz, N_ny))
+        - dP_nz : np.ndarray
+            Power spectrum integrated over ny (complex, shape: (N_nz, 1))
 
     Raises
     ------
     ValueError
         If required parameters are missing from scenario.results or scenario.scenario
+
+    Notes
+    -----
+    The implementation uses Fortran-style (column-major) array ordering for reshape
+    operations to match MATLAB's behavior. The final dP array has shape (N_nz, N_ny)
+    where N_nz = len(nz) and N_ny = len(ny).
+
+    References
+    ----------
+    .. [1] MATLAB ALOHA code: aloha_compute_spectrum1D.m
     """
     _compute_spectrum1D_impl(scenario)
 
@@ -483,7 +519,84 @@ def _compute_spectrum_modes(
     poids_H,
     Y0,
 ):
-    """Compute the spectrum modes and return dP matrix."""
+    """
+    Compute the spectrum modes and return the power spectrum density matrix.
+
+    This function calculates the electric and magnetic field modes for each
+    waveguide and poloidal row, then combines them to compute the power spectrum
+    density distribution.
+
+    Parameters
+    ----------
+    scenario : Scenario
+        The scenario object containing configuration parameters.
+    ny : np.ndarray
+        Array of perpendicular refractive index values.
+    nz : np.ndarray
+        Array of parallel refractive index values.
+    nyt : np.ndarray
+        Tiled ny array for broadcasting (shape: (N_nz * N_ny,)).
+    nzt : np.ndarray
+        Tiled nz array for broadcasting (shape: (N_nz * N_ny,)).
+    k0 : float
+        Free-space wavenumber [rad/m].
+    nc_val : float
+        Critical density [m^-3].
+    X0 : np.ndarray
+        Normalized density at the antenna mouth for each poloidal row.
+    D0 : np.ndarray
+        Density gradient scale length for first plasma layer for each poloidal row.
+    X1 : np.ndarray
+        Normalized density at the end of first plasma layer for each poloidal row.
+    D1 : np.ndarray
+        Density gradient scale length for second plasma layer for each poloidal row.
+    nb_g_pol : int
+        Number of poloidal rows.
+    nb_g_total_ligne : int
+        Number of waveguides per poloidal row.
+    a : float
+        Waveguide width [m].
+    b : np.ndarray
+        Waveguide height for each waveguide [m].
+    y : np.ndarray
+        Poloidal position for each poloidal row [m].
+    z : np.ndarray
+        Toridal position for each waveguide [m].
+    Nme : int
+        Number of electric modes.
+    Nmh : int
+        Number of magnetic modes.
+    ne0_arr : np.ndarray
+        Electron density at antenna mouth for each poloidal row [m^-3].
+    lambda_n_arr : np.ndarray
+        Density gradient scale lengths [m].
+    d_couche_arr : np.ndarray
+        Plasma layer thickness for each poloidal row [m].
+    d_vide_arr : np.ndarray
+        Vacuum layer thickness for each poloidal row [m].
+    version : int
+        Plasma profile version (6 for bilinear).
+    poids_E : np.ndarray
+        Electric field weight vector (complex, shape: (N_modes,)).
+    poids_H : np.ndarray
+        Magnetic field weight vector (complex, shape: (N_modes,)).
+    Y0 : float
+        Characteristic admittance of free space [S].
+
+    Returns
+    -------
+    dP : np.ndarray
+        Power spectrum density matrix (complex, shape: (N_nz, N_ny)).
+
+    Notes
+    -----
+    For version 6 (bilinear profile), the function uses Airy functions to compute
+    the field modes in the plasma. The implementation handles numerical stability
+    by avoiding division by zero and handling near-zero values carefully.
+
+    The function uses Fortran-style (column-major) array ordering for reshape
+    operations to match MATLAB's behavior.
+    """
     import numpy as np
     from scipy.special import airy
 
@@ -493,7 +606,10 @@ def _compute_spectrum_modes(
     if version == 6:
         for ind in range(nb_g_pol):
             neta_1 = (
-                ((nzt**2 - 1) ** (1 / 3)) * ((D1[ind] / X1[ind]) ** (2 / 3)) * (X1[ind] - 1) * np.exp(-1j * np.pi / 3)
+                ((nzt**2 - 1) ** (1 / 3))
+                * ((D1[ind] / X1[ind]) ** (2 / 3))
+                * (X1[ind] - 1)
+                * np.exp(-1j * np.pi / 3)
             )
 
             airy_0_neta_1, airy_1_neta_1 = airy(neta_1)[0:2]
@@ -503,7 +619,9 @@ def _compute_spectrum_modes(
             nzt_squared_minus_1 = nzt**2 - 1
             nzt_squared_minus_1[np.abs(nzt_squared_minus_1) < 1e-30] = 1e-30
             nzt_squared_minus_1_power_2_3 = nzt_squared_minus_1 ** (2 / 3)
-            nzt_squared_minus_1_power_2_3[np.abs(nzt_squared_minus_1_power_2_3) < 1e-30] = 1e-30
+            nzt_squared_minus_1_power_2_3[
+                np.abs(nzt_squared_minus_1_power_2_3) < 1e-30
+            ] = 1e-30
 
             Y_L = (
                 -(airy_1_neta_1 / airy_0_neta_1)
@@ -519,7 +637,9 @@ def _compute_spectrum_modes(
                 * np.exp(-1j * np.pi / 3)
             )
 
-            airy_0_neta_0, airy_1_neta_0, airy_2_neta_0, airy_3_neta_0 = airy(neta_0)[0:4]
+            airy_0_neta_0, airy_1_neta_0, airy_2_neta_0, airy_3_neta_0 = airy(neta_0)[
+                0:4
+            ]
             airy_0_neta_0[np.abs(airy_0_neta_0) < 1e-30] = 1e-30
             airy_2_neta_0[np.abs(airy_2_neta_0) < 1e-30] = 1e-30
 
@@ -536,11 +656,13 @@ def _compute_spectrum_modes(
                 * np.exp(1j * np.pi / 6)
             )
 
-            neta_d = neta_0 + (nzt_squared_minus_1 ** (1 / 3)) * ((X0[ind] / D0[ind]) ** (1 / 3)) * k0 * d_couche_arr[
-                ind
-            ] * np.exp(-1j * np.pi / 3)
+            neta_d = neta_0 + (nzt_squared_minus_1 ** (1 / 3)) * (
+                (X0[ind] / D0[ind]) ** (1 / 3)
+            ) * k0 * d_couche_arr[ind] * np.exp(-1j * np.pi / 3)
 
-            airy_0_neta_d, airy_1_neta_d, airy_2_neta_d, airy_3_neta_d = airy(neta_d)[0:4]
+            airy_0_neta_d, airy_1_neta_d, airy_2_neta_d, airy_3_neta_d = airy(neta_d)[
+                0:4
+            ]
 
             # neta_d and neta_0 have the same length, so no tiling is needed
             # Use the airy values directly
@@ -553,11 +675,19 @@ def _compute_spectrum_modes(
             airy_2_neta_0_tiled[np.abs(airy_2_neta_0_tiled) < 1e-30] = 1e-30
 
             num = Y_L * (
-                Yb * airy_0_neta_d / airy_0_neta_0_tiled - Ya * airy_2_neta_d / airy_2_neta_0_tiled
-            ) + Ya * Yb * (airy_3_neta_d / airy_3_neta_0_tiled - airy_1_neta_d / airy_1_neta_0_tiled)
+                Yb * airy_0_neta_d / airy_0_neta_0_tiled
+                - Ya * airy_2_neta_d / airy_2_neta_0_tiled
+            ) + Ya * Yb * (
+                airy_3_neta_d / airy_3_neta_0_tiled
+                - airy_1_neta_d / airy_1_neta_0_tiled
+            )
 
             denom = (
-                Y_L * (airy_0_neta_d / airy_0_neta_0_tiled - airy_2_neta_d / airy_2_neta_0_tiled)
+                Y_L
+                * (
+                    airy_0_neta_d / airy_0_neta_0_tiled
+                    - airy_2_neta_d / airy_2_neta_0_tiled
+                )
                 - Ya * airy_1_neta_d / airy_1_neta_0_tiled
                 + Yb * airy_3_neta_d / airy_3_neta_0_tiled
             )
@@ -594,28 +724,46 @@ def _compute_spectrum_modes(
                 term1 = 1 - ((-1) ** m) * np.exp(-1j * k0 * nyt * a)
                 denominator_fy = nyt**2 - (m * np.pi / (k0 * a)) ** 2
                 denominator_fy[np.abs(denominator_fy) < 1e-30] = 1e-30
-                fy = -(m * np.pi / (a * (k0**2))) * (term1 / denominator_fy) * np.exp(-1j * k0 * nyt * y[ind])
+                fy = (
+                    -(m * np.pi / (a * (k0**2)))
+                    * (term1 / denominator_fy)
+                    * np.exp(-1j * k0 * nyt * y[ind])
+                )
 
                 term2 = 1 - ((-1) ** n) * np.exp(-1j * k0 * nzt * b[k])
                 denominator_fz = nzt**2 - (n * np.pi / (k0 * b[k])) ** 2
                 denominator_fz[np.abs(denominator_fz) < 1e-30] = 1e-30
-                fz = -1j * (nzt / k0) * (term2 / denominator_fz) * np.exp(-1j * k0 * nzt * z[k])
+                fz = (
+                    -1j
+                    * (nzt / k0)
+                    * (term2 / denominator_fz)
+                    * np.exp(-1j * k0 * nzt * z[k])
+                )
 
                 modes_E_sp_list.append(coeff_h * fy * fz)
                 modes_H_sp_list.append(-Y0 * Ys * coeff_h * fy * fz)
 
                 for n_val in range(1, Nme + 1):
-                    coeff_e = -(2 * n_val / np.sqrt(b[k] / a + (n_val**2) * a / b[k])) / b[k]
+                    coeff_e = (
+                        -(2 * n_val / np.sqrt(b[k] / a + (n_val**2) * a / b[k])) / b[k]
+                    )
 
                     term2_tm = 1 - ((-1) ** n_val) * np.exp(-1j * k0 * nzt * b[k])
                     denominator_fz_tm = nzt**2 - (n_val * np.pi / (k0 * b[k])) ** 2
                     denominator_fz_tm[np.abs(denominator_fz_tm) < 1e-30] = 1e-30
-                    fz_tm = -1j * (nzt / k0) * (term2_tm / denominator_fz_tm) * np.exp(-1j * k0 * nzt * z[k])
+                    fz_tm = (
+                        -1j
+                        * (nzt / k0)
+                        * (term2_tm / denominator_fz_tm)
+                        * np.exp(-1j * k0 * nzt * z[k])
+                    )
 
                     modes_E_sp_list.append(coeff_e * fy * fz_tm)
                     modes_H_sp_list.append(-Y0 * Ys * coeff_e * fy * fz_tm)
     else:
-        raise ValueError(f"Plasma version {version} not supported for spectrum calculation")
+        raise ValueError(
+            f"Plasma version {version} not supported for spectrum calculation"
+        )
 
     modes_E_sp = np.array(modes_E_sp_list)
     modes_H_sp = np.array(modes_H_sp_list)
@@ -638,16 +786,29 @@ def _compute_spectrum_modes(
     sum_H_spc = np.sum(H_spc, axis=0)
     dP_ligne = -0.5 * ((k0 / (2 * np.pi)) ** 2) * (sum_E_spc * np.conj(sum_H_spc))
 
-    dP = np.reshape(dP_ligne, (len(ny), len(nz)))
+    # Reshape using Fortran-style (column-major) order to match MATLAB's reshape behavior
+    # MATLAB: reshape(vector, length(ny), length(nz)) fills column-wise
+    dP = np.reshape(dP_ligne, (len(ny), len(nz)), order="F")
     # Transpose to match MATLAB reference shape (nz, ny)
-    # MATLAB's dP has shape (length(nz), length(ny)), not (length(ny), length(nz))
+    # The .mat files store dP with shape (length(nz), length(ny))
     dP = dP.T
 
     return dP
 
 
 def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
-    """Implementation of compute_spectrum1D."""
+    """
+    Implementation of compute_spectrum1D.
+
+    This function extracts parameters from the scenario, computes the necessary
+    intermediate values, and calls _compute_spectrum_modes to calculate the
+    power spectrum.
+
+    Parameters
+    ----------
+    scenario : Scenario
+        The scenario object containing configuration and results.
+    """
     import numpy as np
     from scipy.constants import e as qe
     from scipy.constants import mu_0
@@ -716,7 +877,9 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
 
     if len(b_list) < nb_g_total_ligne:
         b_list = (
-            b_list + [b_list[-1]] * (nb_g_total_ligne - len(b_list)) if len(b_list) > 0 else [0.008] * nb_g_total_ligne
+            b_list + [b_list[-1]] * (nb_g_total_ligne - len(b_list))
+            if len(b_list) > 0
+            else [0.008] * nb_g_total_ligne
         )
     elif len(b_list) == 0:
         b_list = [0.008] * nb_g_total_ligne
@@ -733,6 +896,10 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
     d_vide = bilinear.get("vacuum_layer_length", 0.0)
     bool_lignes_identiques = bilinear.get("identical_profiles", False)
     version = bilinear.get("version", 6)
+
+    # Ensure lambda_n is a list with at least 1 element
+    if not isinstance(lambda_n, list):
+        lambda_n = [lambda_n]
 
     # Get number of modes
     Nme = matlab_scenario.get("Nme", 1)
@@ -774,41 +941,65 @@ def _compute_spectrum1D_impl(scenario: "Scenario") -> None:
     nzt = np.kron(nz, np.ones(len(ny)))
 
     # Handle identical profiles
+    # Convert parameters to arrays with length nb_g_pol
     if bool_lignes_identiques:
         ne0_arr = np.ones(nb_g_pol) * ne0
-        lambda_n_arr = np.ones(nb_g_pol) * lambda_n
+        # For lambda_n, if it's a list with multiple elements, use the first for all rows
+        if isinstance(lambda_n, list) and len(lambda_n) > 0:
+            lambda_n_arr = np.ones(nb_g_pol) * lambda_n[0]
+        else:
+            lambda_n_arr = np.ones(nb_g_pol) * lambda_n
         d_couche_arr = np.ones(nb_g_pol) * d_couche
         d_vide_arr = np.ones(nb_g_pol) * d_vide
     else:
-        ne0_arr = np.array(ne0) if isinstance(ne0, list) else np.ones(nb_g_pol) * ne0
-        lambda_n_arr = np.array(lambda_n) if isinstance(lambda_n, list) else np.ones(nb_g_pol) * lambda_n
-        d_couche_arr = np.array(d_couche) if isinstance(d_couche, list) else np.ones(nb_g_pol) * d_couche
-        d_vide_arr = np.array(d_vide) if isinstance(d_vide, list) else np.ones(nb_g_pol) * d_vide
+        # For non-identical profiles, use the provided arrays or scalars
+        if isinstance(ne0, list):
+            ne0_arr = np.array(ne0)
+        else:
+            ne0_arr = np.ones(nb_g_pol) * ne0
+
+        if isinstance(lambda_n, list):
+            lambda_n_arr = np.array(lambda_n)
+        else:
+            lambda_n_arr = np.ones(nb_g_pol) * lambda_n
+
+        if isinstance(d_couche, list):
+            d_couche_arr = np.array(d_couche)
+        else:
+            d_couche_arr = np.ones(nb_g_pol) * d_couche
+
+        if isinstance(d_vide, list):
+            d_vide_arr = np.array(d_vide)
+        else:
+            d_vide_arr = np.ones(nb_g_pol) * d_vide
 
     # Calculate X0, D0, X1, D1 for each polarization line
+    # MATLAB: X0 = ne0./nc, D0 = k0*ne0./dne0
+    # Use the pre-computed dne0 and dne1 from matlab_scenario (from Fortran binary)
+    # These are already arrays with length nb_g_pol
     X0 = ne0_arr / nc_val
 
-    # Calculate dne0 and dne1 following MATLAB logic
-    if len(lambda_n_arr) > 0:
-        dne0_arr = ne0_arr / lambda_n_arr[0]
-        D0 = k0 * ne0_arr / dne0_arr
+    # Get dne0 and dne1 from matlab_scenario (already computed by Fortran binary)
+    # These should be arrays with length nb_g_pol
+    if isinstance(matlab_scenario.get("dne0"), list):
+        dne0_arr = np.array(matlab_scenario["dne0"])
     else:
-        dne0_arr = ne0_arr / 0.002
-        D0 = k0 * ne0_arr / dne0_arr
+        dne0_arr = np.ones(nb_g_pol) * matlab_scenario.get("dne0", ne0_arr / 0.002)
 
-    if len(lambda_n_arr) > 0:
-        n1 = ne0_arr + lambda_n_arr[0] * d_couche_arr
+    if isinstance(matlab_scenario.get("dne1"), list):
+        dne1_arr = np.array(matlab_scenario["dne1"])
     else:
-        n1 = ne0_arr + 0.002 * d_couche_arr
+        dne1_arr = np.ones(nb_g_pol) * matlab_scenario.get("dne1", 0.02)
+
+    D0 = k0 * ne0_arr / dne0_arr
+
+    # MATLAB: n1 = ne0 + dne0 .* d_couche
+    n1 = ne0_arr + dne0_arr * d_couche_arr
 
     X1 = n1 / nc_val
 
-    if len(lambda_n_arr) > 1:
-        # MATLAB: dne1 = (1 + d_couche/lambda_n0) * ne0 / lambda_n1
-        dne1_arr = (1 + d_couche_arr / lambda_n_arr[0]) * ne0_arr / lambda_n_arr[1]
-        D1 = k0 * n1 / dne1_arr
-    else:
-        D1 = k0 * n1 / 0.02
+    # MATLAB: D1 = k0 * n1 / dne1
+    D1 = k0 * n1 / dne1_arr
 
     # Calculate weights from power waves (MATLAB lines 53-57)
     poids_E = rac_Zhe @ (a_plasma + b_plasma)
