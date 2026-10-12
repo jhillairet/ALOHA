@@ -35,6 +35,8 @@ dev = [
     "mypy>=1.0",
     "prek>=0.5.5",
     "pytest-timeout>=2.4.0",
+    "coverage>=7.16.2",
+    "pytest-cov>=7.1.0",
 ]
 
 
